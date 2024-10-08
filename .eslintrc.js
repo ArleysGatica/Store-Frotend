@@ -13,7 +13,16 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'folders', 'import', 'simple-import-sort', 'unused-imports'],
+  plugins: [
+    '@typescript-eslint',
+    'folders',
+    'import',
+    'simple-import-sort',
+    'unused-imports',
+    'react-hooks',
+    'tailwindcss',
+  ],
+
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
