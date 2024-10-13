@@ -15,7 +15,9 @@ export const Page = (props: PageProps) => {
     <main
       className={`page-component ${className} ${center && 'page-component--center'}`}
       style={{
-        ...(backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}),
+        ...(backgroundImage
+          ? { backgroundImage: `url(${backgroundImage})` }
+          : {}),
       }}
     >
       {children}

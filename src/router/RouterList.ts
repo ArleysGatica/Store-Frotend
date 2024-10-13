@@ -8,8 +8,8 @@ const routes = {
     name: 'Home',
   },
   Login: {
-    path: '/autenticar',
-    name: 'Login',
+    path: '/login',
+    name: 'login',
   },
 };
 
