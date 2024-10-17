@@ -1,4 +1,5 @@
 /** @type {import('eslint').Linter.Config} */
+// eslint-disable-next-line no-undef
 module.exports = {
   root: true,
   env: {
@@ -10,6 +11,7 @@ module.exports = {
   parserOptions: {
     project: './tsconfig.json',
     ecmaVersion: 'latest',
+    // eslint-disable-next-line no-undef
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
