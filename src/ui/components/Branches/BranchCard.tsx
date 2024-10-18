@@ -13,12 +13,12 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MoreVertical, Package, Warehouse } from 'lucide-react';
+import { MoreVertical, Package, Pencil, Trash, Warehouse } from 'lucide-react';
 import { IBranchProps } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
 import { deleteBranch } from '@/app/slices/branchSlice';
 
-export const BranchCard = ({ branch }: IBranchProps) => {
+export const BranchCard = ({ branch, onEdit }: IBranchProps) => {
   const handleOnDelete = () => {
     store.dispatch(deleteBranch(branch.id));
   };
@@ -37,16 +37,19 @@ export const BranchCard = ({ branch }: IBranchProps) => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
-              <MoreVertical className="w-4 h-4" />
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Ver detalles</DropdownMenuItem>
-            <DropdownMenuItem>Editar</DropdownMenuItem>
-            <DropdownMenuItem onClick={handleOnDelete}>
+            <DropdownMenuItem onSelect={() => onEdit(true)}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleOnDelete()}>
+              <Trash className="mr-2 h-4 w-4" />
               Eliminar
             </DropdownMenuItem>
           </DropdownMenuContent>
