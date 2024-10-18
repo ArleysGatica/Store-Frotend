@@ -1,10 +1,11 @@
 import { Router } from './router';
+import { ToastProvider } from '@/components/ui/toast';
 
 function App() {
   return (
-    <div className="">
+    <ToastProvider>
       <Router />
-    </div>
+    </ToastProvider>
   );
 }
 
