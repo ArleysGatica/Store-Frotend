@@ -4,7 +4,7 @@ import AuthForm from '../ui/components/Login';
 import { Layout } from '../shared/components/ui/Layout';
 import { HeaderTable } from '../shared/components/ui/HeaderTable';
 import Dashboard from '../ui/components/Dashboard';
-import WarehouseDashboard from '../ui/components/Locations';
+import BranchDashboard from '../ui/components/Branches';
 import { DataTableDemo } from '../ui/components/Table';
 
 export const Router = () => {
@@ -31,7 +31,7 @@ export const Router = () => {
         path="/warehouse"
         element={
           <Layout>
-            <WarehouseDashboard />
+            <BranchDashboard />
           </Layout>
         }
       />
