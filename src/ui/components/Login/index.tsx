@@ -1,204 +1,275 @@
-import { useState } from 'react';
-import { FaUser, FaLock, FaEnvelope, FaUserTag } from 'react-icons/fa';
+'use client';
 
-const AuthForm: React.FC = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [role, setRole] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [error, setError] = useState('');
+import { ChangeEvent, FormEvent, useState } from 'react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-  const toggleMode = () => {
-    setIsLogin(!isLogin);
-    resetForm();
-  };
+type FormData = {
+  email: string;
+  password: string;
+  name?: string;
+};
 
-  const resetForm = () => {
-    setEmail('');
-    setPassword('');
-    setName('');
-    setRole('');
-    setError('');
-  };
+export default function AuthForm() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    email: '',
+    password: '',
+    name: '',
+  });
+  const [errors, setErrors] = useState<Partial<FormData>>({});
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload = isLogin ? { email, password } : { name, email, password, role };
-
-    try {
-      const response = await fetch(`/api/${isLogin ? 'login' : 'register'}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Error de autenticación');
-      }
-      localStorage.setItem('userLogin', JSON.stringify(data));
-      resetForm();
-      console.log('Autenticación exitosa', data);
-    } catch (err) {
-      setError((err as Error).message);
+  const validateForm = (data: FormData, isRegister: boolean) => {
+    const newErrors: Partial<FormData> = {};
+    if (!data.email) {
+      newErrors.email = 'El correo electrónico es requerido';
+    } else if (!/\S+@\S+\.\S+/.test(data.email)) {
+      newErrors.email = 'Dirección de correo inválida';
     }
+    if (!data.password) {
+      newErrors.password = 'La contraseña es requerida';
+    } else if (data.password.length < 8) {
+      newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
+    }
+    if (isRegister && !data.name) {
+      newErrors.name = 'El nombre es requerido';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Para registrar un usuario
-  const registerUser = async () => {
-    const response = await fetch('http://127.0.0.1:3000/api/users/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: 'Arleys Gatica',
-        password: 'Hello123',
-        role: 'Administrador',
-      }),
-    });
-
-    const data = await response.json();
-    console.log(data);
+  const handleSubmit = async (
+    event: FormEvent<HTMLFormElement>
+    // isRegister: boolean
+  ) => {
+    event.preventDefault();
+    console.log(formData);
   };
 
-  // Para iniciar sesión
-  const loginUser = async () => {
-    const response = await fetch('http://127.0.0.1:3000/api/users/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: 'Junior Hurtado',
-        password: 'Mapamapa84',
-      }),
-    });
-
-    const data = await response.json();
-    console.log(data);
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
-
-  // Llamar a la función para registrar o iniciar sesión
-  registerUser(); // o loginUser();
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
-      <div className="p-6 w-full max-w-md bg-gray-800 rounded-lg shadow-lg">
-        <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-white">{isLogin ? 'Iniciar Sesión' : 'Registrarse'}</h2>
-          <p className="text-gray-400">
-            {isLogin ? 'Ingresa tus credenciales para acceder' : 'Crea una nueva cuenta para comenzar'}
-          </p>
-        </div>
-        <button onClick={registerUser} className="mb-4 text-center text-white bg-blue-600 rounded-md hover:bg-blue-700">
-          regis...
-        </button>
-        {error && <p className="mb-4 text-center text-red-500">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <>
-              <FormField
-                id="name"
-                label="Nombre"
-                icon={<FaUser />}
-                placeholder="Tu nombre completo"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              <div className="space-y-2">
-                <label htmlFor="role" className="text-sm font-medium text-gray-200">
-                  Rol
-                </label>
-                <div className="relative">
-                  <FaUserTag className="absolute left-3 top-1/2 text-gray-400 transform -translate-y-1/2" />
-                  <select
-                    id="role"
-                    className="p-2 pl-10 w-full text-white bg-gray-800 rounded-md border border-gray-700 appearance-none"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700 p-4">
+      <div className="w-full max-w-md">
+        <Tabs defaultValue="login" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="login" className="text-white">
+              Iniciar sesión
+            </TabsTrigger>
+            <TabsTrigger value="register" className="text-white">
+              Registrarse
+            </TabsTrigger>
+          </TabsList>
+          <div className="mt-4 bg-white shadow-xl rounded-2xl p-8">
+            <TabsContent value="login">
+              <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="email-login"
+                    className="text-sm font-medium text-gray-700"
                   >
-                    <option value="" disabled>
-                      Selecciona un rol
-                    </option>
-                    <option value="caja">Caja</option>
-                    <option value="admin">Administrador</option>
-                  </select>
+                    Correo electrónico
+                  </Label>
+                  <Input
+                    id="email-login"
+                    name="email"
+                    type="email"
+                    placeholder="tu@ejemplo.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={
+                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    }
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                  )}
                 </div>
-              </div>
-            </>
-          )}
-
-          <FormField
-            id="email"
-            label="Correo Electrónico"
-            icon={<FaEnvelope />}
-            placeholder="tu@email.com"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <FormField
-            id="password"
-            label="Contraseña"
-            icon={<FaLock />}
-            placeholder="••••••••"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <button
-            type="submit"
-            className="py-2 w-full font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            {isLogin ? 'Iniciar Sesión' : 'Registrarse'}
-          </button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <p className="text-gray-400">
-            {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
-            <button onClick={toggleMode} className="ml-1 text-blue-400 hover:underline">
-              {isLogin ? 'Regístrate' : 'Inicia sesión'}
-            </button>
-          </p>
-        </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="password-login"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Contraseña
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="password-login"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className={`pr-10 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" aria-hidden="true" />
+                      ) : (
+                        <Eye className="h-5 w-5" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <input
+                      id="remember-me"
+                      name="remember-me"
+                      type="checkbox"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <Label
+                      htmlFor="remember-me"
+                      className="ml-2 block text-sm text-gray-700"
+                    >
+                      Recuérdame
+                    </Label>
+                  </div>
+                  <div className="text-sm">
+                    <a
+                      href="#"
+                      className="font-medium text-blue-600 hover:text-blue-500"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </a>
+                  </div>
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Cargando...
+                    </>
+                  ) : (
+                    'Iniciar sesión'
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+            <TabsContent value="register">
+              <form
+                onSubmit={(e) => handleSubmit(e, true)}
+                className="space-y-6"
+              >
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="name-register"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Nombre completo
+                  </Label>
+                  <Input
+                    id="name-register"
+                    name="name"
+                    type="text"
+                    placeholder="Juan Pérez"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className={
+                      errors.name ? 'border-red-500' : 'border-gray-300'
+                    }
+                  />
+                  {errors.name && (
+                    <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="email-register"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Correo electrónico
+                  </Label>
+                  <Input
+                    id="email-register"
+                    name="email"
+                    type="email"
+                    placeholder="tu@ejemplo.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={
+                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    }
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="password-register"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Contraseña
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="password-register"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className={`pr-10 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" aria-hidden="true" />
+                      ) : (
+                        <Eye className="h-5 w-5" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Cargando...
+                    </>
+                  ) : (
+                    'Registrarse'
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
     </div>
   );
-};
-
-interface FormFieldProps {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  placeholder: string;
-  type: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
-
-const FormField: React.FC<FormFieldProps> = ({ id, label, icon, placeholder, type, value, onChange }) => (
-  <div className="space-y-2">
-    <label htmlFor={id} className="text-sm font-medium text-gray-200">
-      {label}
-    </label>
-    <div className="relative">
-      <span className="absolute left-3 top-1/2 text-gray-400 transform -translate-y-1/2">{icon}</span>
-      <input
-        id={id}
-        placeholder={placeholder}
-        type={type}
-        value={value}
-        onChange={onChange}
-        className="p-2 pl-10 w-full text-white bg-gray-800 rounded-md border border-gray-700"
-      />
-    </div>
-  </div>
-);
-
-export default AuthForm;

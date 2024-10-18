@@ -12,8 +12,8 @@ export const NotFound404 = () => {
 
       <Typography className="message" component="h4">
         <>
-          El sitio al que intentas acceder al parecer no existe. Haz click en el siguiente botón para{' '}
-          <Link to="/">volver al inicio</Link>.
+          El sitio al que intentas acceder al parecer no existe. Haz click en el
+          siguiente botón para <Link to="/">volver al inicio</Link>.
         </>
       </Typography>
     </div>

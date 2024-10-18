@@ -16,7 +16,10 @@ const typographyComponents = (
   component: TypographyComponentType,
   props:
     | DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>
-    | DetailedHTMLProps<HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>,
+    | DetailedHTMLProps<
+        HTMLAttributes<HTMLParagraphElement>,
+        HTMLParagraphElement
+      >
 ) => {
   switch (component) {
     case 'p':
@@ -35,7 +38,14 @@ const typographyComponents = (
 };
 
 export const Typography = (props: TypographyProps) => {
-  const { className = '', component = 'p', children, bold = false, color = 'default', thin = false } = props;
+  const {
+    className = '',
+    component = 'p',
+    children,
+    bold = false,
+    color = 'default',
+    thin = false,
+  } = props;
 
   const TypographyComponent = typographyComponents(component, {
     className: `typography ${className} ${bold && 'typography--bold'} ${thin && 'typography--thin'} typography--${color}-color`,
