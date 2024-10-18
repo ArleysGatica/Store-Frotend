@@ -1,11 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { BranchReducer } from './slices/branchSlice';
-import { TablaBranchReducer } from './slices/tablaBranchSlice';
 
 export const store = configureStore({
   reducer: {
     branches: BranchReducer,
-    tablaBranches: TablaBranchReducer,
   },
 });
 

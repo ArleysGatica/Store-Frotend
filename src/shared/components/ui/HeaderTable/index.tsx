@@ -15,6 +15,16 @@ interface ToolShipmentData {
   sentBy: string;
 }
 
+const toolShipments: ToolShipmentData[] = [
+  {
+    id: '1',
+    status: 'Pendiente',
+    consecutive: '1234567890',
+    warehouse: 'Nombre de bodega',
+    date: '10/10/23',
+    sentBy: 'Pedro Castañeda',
+  },
+];
 export const HeaderTable = () => {
   const [searchTerm, setSearchTerm] = useState('');
 

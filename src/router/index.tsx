@@ -6,7 +6,6 @@ import { HeaderTable } from '../shared/components/ui/HeaderTable';
 import Dashboard from '../ui/components/Dashboard';
 import BranchDashboard from '../ui/components/Branches';
 import { DataTableDemo } from '../ui/components/Table';
-import { TableBranches } from '../ui/components/TableBranches';
 
 export const Router = () => {
   return (
@@ -41,15 +40,6 @@ export const Router = () => {
         element={
           <Layout>
             <DataTableDemo />
-          </Layout>
-        }
-      />
-
-      <Route
-        path="/tablaBranch"
-        element={
-          <Layout>
-            <TableBranches />
           </Layout>
         }
       />
