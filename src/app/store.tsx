@@ -1,7 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { BranchReducer } from './slices/branchSlice';
 
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    branches: BranchReducer,
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
