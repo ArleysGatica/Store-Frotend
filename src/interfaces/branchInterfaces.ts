@@ -17,6 +17,7 @@ export interface IBranch {
 
 export interface IBranchProps {
   branch: IBranch;
+  onEdit: (isEdit: boolean) => void;
 }
 
 export type IStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
