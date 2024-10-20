@@ -9,6 +9,7 @@ export const createAxiosInstance = (
   const headers = {
     Authorization: `Bearer ${JWT}`,
     'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
   };
 
   const clientAxios = axios.create({
