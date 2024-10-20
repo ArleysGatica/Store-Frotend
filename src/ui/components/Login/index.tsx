@@ -6,53 +6,157 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { store } from '../../../app/store';
+import { login, registerUser, updateSignIn } from '../../../app/slices/login';
 
 type FormData = {
-  email: string;
+  username: string;
   password: string;
-  name?: string;
+  role?: 'admin' | 'user';
 };
 
 export default function AuthForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    email: '',
+
+  const [loginData, setLoginData] = useState<FormData>({
+    username: '',
     password: '',
-    name: '',
   });
-  const [errors, setErrors] = useState<Partial<FormData>>({});
+
+  const [registerData, setRegisterData] = useState<FormData>({
+    username: '',
+    password: '',
+    role: 'user',
+  });
+
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>(
+    {}
+  );
 
   const validateForm = (data: FormData, isRegister: boolean) => {
     const newErrors: Partial<FormData> = {};
-    if (!data.email) {
-      newErrors.email = 'El correo electrónico es requerido';
-    } else if (!/\S+@\S+\.\S+/.test(data.email)) {
-      newErrors.email = 'Dirección de correo inválida';
+    if (!data.username) {
+      newErrors.username = 'El nombre de usuario es requerido';
     }
     if (!data.password) {
       newErrors.password = 'La contraseña es requerida';
     } else if (data.password.length < 8) {
       newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
     }
-    if (isRegister && !data.name) {
-      newErrors.name = 'El nombre es requerido';
+    if (isRegister && !data.role) {
+      newErrors.role = 'El rol es requerido' as 'admin' | 'user';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (
-    event: FormEvent<HTMLFormElement>
-    // isRegister: boolean
-  ) => {
-    event.preventDefault();
-    console.log(formData);
+  const saveUserData = (data: {
+    token?: string;
+    username: string;
+    password: string;
+    role?: string;
+    status: string;
+  }) => {
+    if (!data.token) {
+      store.dispatch(
+        updateSignIn({
+          username: '',
+          password: '',
+          role: '',
+          status: 'unauthenticated',
+        })
+      );
+      return;
+    }
+
+    store.dispatch(
+      updateSignIn({
+        token: data.token,
+        username: data.username,
+        password: data.password,
+        role: data.role || '',
+        status: 'authenticated',
+      })
+    );
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleSubmit = async (
+    event: FormEvent<HTMLFormElement>,
+    isRegister: boolean
+  ) => {
+    event.preventDefault();
+    const formData = isRegister ? registerData : loginData;
+
+    if (!validateForm(formData, isRegister)) {
+      return;
+    }
+    setIsLoading(true);
+
+    try {
+      const resultAction = isRegister
+        ? await store.dispatch(
+            login({
+              username: formData.username,
+              password: formData.password,
+              role: formData.role ?? 'user',
+            })
+          )
+        : await store.dispatch(
+            registerUser({
+              userCredentials: {
+                username: formData.username,
+                password: formData.password,
+              },
+            })
+          );
+      const combinedData = {
+        ...resultAction.payload,
+        ...loginData,
+      };
+      if (
+        isRegister
+          ? registerUser.fulfilled.match(resultAction)
+          : login.fulfilled.match(resultAction)
+      ) {
+        if (isRegister) {
+          setRegisterData({ username: '', password: '', role: 'user' });
+        } else {
+          setLoginData({ username: '', password: '' });
+        }
+      } else {
+        setErrors({
+          ...errors,
+          [isRegister ? 'register' : 'login']: resultAction.payload as string,
+        });
+      }
+      if (!isRegister) {
+        saveUserData(combinedData);
+      }
+
+      console.log(combinedData, 'user');
+    } catch (err: any) {
+      setErrors({
+        ...errors,
+        [isRegister ? 'register' : 'login']: err.message,
+      });
+    } finally {
+      setIsLoading(false);
+      setRegisterData({ username: '', password: '', role: 'user' });
+      setLoginData({ username: '', password: '' });
+    }
+  };
+
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    isRegister: boolean
+  ) => {
     const { name, value } = event.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    if (isRegister) {
+      setRegisterData((prevData) => ({ ...prevData, [name]: value }));
+    } else {
+      setLoginData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
   return (
@@ -69,27 +173,32 @@ export default function AuthForm() {
           </TabsList>
           <div className="mt-4 bg-white shadow-xl rounded-2xl p-8">
             <TabsContent value="login">
-              <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
+              <form
+                onSubmit={(e) => handleSubmit(e, false)}
+                className="space-y-6"
+              >
                 <div className="space-y-2">
                   <Label
-                    htmlFor="email-login"
+                    htmlFor="username-login"
                     className="text-sm font-medium text-gray-700"
                   >
-                    Correo electrónico
+                    Nombre de usuario
                   </Label>
                   <Input
-                    id="email-login"
-                    name="email"
-                    type="email"
-                    placeholder="tu@ejemplo.com"
-                    value={formData.email}
-                    onChange={handleChange}
+                    id="username-login"
+                    name="username"
+                    type="text"
+                    placeholder="tu_usuario"
+                    value={loginData.username}
+                    onChange={(e) => handleChange(e, false)}
                     className={
-                      errors.email ? 'border-red-500' : 'border-gray-300'
+                      errors.username ? 'border-red-500' : 'border-gray-300'
                     }
                   />
-                  {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                  {errors.username && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.username}
+                    </p>
                   )}
                 </div>
                 <div className="space-y-2">
@@ -105,8 +214,8 @@ export default function AuthForm() {
                       name="password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      value={formData.password}
-                      onChange={handleChange}
+                      value={loginData.password}
+                      onChange={(e) => handleChange(e, false)}
                       className={`pr-10 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
                     />
                     <button
@@ -127,30 +236,6 @@ export default function AuthForm() {
                     </p>
                   )}
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <input
-                      id="remember-me"
-                      name="remember-me"
-                      type="checkbox"
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <Label
-                      htmlFor="remember-me"
-                      className="ml-2 block text-sm text-gray-700"
-                    >
-                      Recuérdame
-                    </Label>
-                  </div>
-                  <div className="text-sm">
-                    <a
-                      href="#"
-                      className="font-medium text-blue-600 hover:text-blue-500"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </a>
-                  </div>
-                </div>
                 <Button
                   type="submit"
                   disabled={isLoading}
@@ -158,7 +243,7 @@ export default function AuthForm() {
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />{' '}
                       Cargando...
                     </>
                   ) : (
@@ -174,46 +259,26 @@ export default function AuthForm() {
               >
                 <div className="space-y-2">
                   <Label
-                    htmlFor="name-register"
+                    htmlFor="username-register"
                     className="text-sm font-medium text-gray-700"
                   >
-                    Nombre completo
+                    Nombre de usuario
                   </Label>
                   <Input
-                    id="name-register"
-                    name="name"
+                    id="username-register"
+                    name="username"
                     type="text"
-                    placeholder="Juan Pérez"
-                    value={formData.name}
-                    onChange={handleChange}
+                    placeholder="tu_usuario"
+                    value={registerData.username}
+                    onChange={(e) => handleChange(e, true)}
                     className={
-                      errors.name ? 'border-red-500' : 'border-gray-300'
+                      errors.username ? 'border-red-500' : 'border-gray-300'
                     }
                   />
-                  {errors.name && (
-                    <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="email-register"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Correo electrónico
-                  </Label>
-                  <Input
-                    id="email-register"
-                    name="email"
-                    type="email"
-                    placeholder="tu@ejemplo.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={
-                      errors.email ? 'border-red-500' : 'border-gray-300'
-                    }
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                  {errors.username && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.username}
+                    </p>
                   )}
                 </div>
                 <div className="space-y-2">
@@ -229,8 +294,8 @@ export default function AuthForm() {
                       name="password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      value={formData.password}
-                      onChange={handleChange}
+                      value={registerData.password}
+                      onChange={(e) => handleChange(e, true)}
                       className={`pr-10 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
                     />
                     <button
@@ -251,6 +316,27 @@ export default function AuthForm() {
                     </p>
                   )}
                 </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="role-register" className="text-right">
+                    Roles
+                  </Label>
+                  <select
+                    id="role-register"
+                    name="role"
+                    onChange={(e) => handleChange(e, true)}
+                    value={registerData.role}
+                    className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    required
+                  >
+                    <option value="user">Usuario</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  {errors.role && (
+                    <p className="text-red-500 text-sm mt-1">{errors.role}</p>
+                  )}
+                </div>
                 <Button
                   type="submit"
                   disabled={isLoading}
@@ -258,7 +344,7 @@ export default function AuthForm() {
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />{' '}
                       Cargando...
                     </>
                   ) : (

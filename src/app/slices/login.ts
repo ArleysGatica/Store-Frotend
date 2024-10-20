@@ -55,6 +55,7 @@ export type statusLoguer =
   | 'idle';
 export interface IAuthSlice extends Iauth {
   status: statusLoguer;
+  token?: string;
 }
 
 const initialStateLogin: IAuthSlice = (() => {

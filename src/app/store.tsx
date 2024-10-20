@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { BranchReducer } from './slices/branchSlice';
+import { loginReducer } from './slices/login';
 
 export const store = configureStore({
   reducer: {
     branches: BranchReducer,
+    auth: loginReducer,
   },
 });
 
