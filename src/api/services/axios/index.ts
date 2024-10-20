@@ -1,21 +1,30 @@
 import axios, { AxiosInstance } from 'axios';
 
+export enum PATH_LIST {
+  PREFIX = '/prod/',
+  Login = 'users',
+}
+
 export const createAxiosInstance = (
   JWT: string,
-  PATH?: string
+  PATH: string
 ): AxiosInstance => {
-  const baseURL = `${import.meta.env.VITE_API_BASE_URL as string}${PATH}`;
+  const baseURL = `${import.meta.env.VITE_API_URL_BACKEND?.replace(/\/?$/, '/')}${PATH}`;
 
-  const headers = {
-    Authorization: `Bearer ${JWT}`,
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-  };
+  const headers =
+    PATH === PATH_LIST.Login
+      ? {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        }
+      : {
+          Authorization: `Bearer ${JWT}`,
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        };
 
-  const clientAxios = axios.create({
+  return axios.create({
     baseURL,
     headers,
   });
-
-  return clientAxios;
 };

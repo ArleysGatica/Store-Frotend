@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { createAxiosInstance, PATH_LIST } from '../axios';
 
 export interface Iauth {
   username: string;
@@ -7,26 +8,21 @@ export interface Iauth {
 }
 
 export type IAuthCredentials = Omit<Iauth, 'role'>;
-// http://localhost:3000/api/users/login
-const URL = 'http://localhost:3000/api/';
 
-export const createUsers = async (data: Iauth): Promise<AxiosResponse> => {
-  const response = await axios.post(`${URL}`, data, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
-  });
+export const createUsers = async (
+  userCreate: Iauth
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance('', PATH_LIST.Login);
+  const response = await axiosInstance.post('/', userCreate);
   return response;
 };
 
-export const registerUsers = async (data: IAuthCredentials) => {
-  return await axios.post(`${URL}users/login`, data, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
-  });
+export const registerUsers = async (
+  signIN: IAuthCredentials
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance('', PATH_LIST.Login);
+  const response = await axiosInstance.post('/login', signIN);
+  return response;
 };
 
 export const getAllUsers = async (): Promise<AxiosResponse> => {
