@@ -5,18 +5,32 @@ export interface IBranchSlice {
 }
 
 export interface IBranch {
-  id: string;
+  _id: string;
   pais: string;
   ciudad: string;
   nombre: string;
   telefono: string;
   direccion: string;
-  pendingOrders: number;
-  hasAccess: boolean;
 }
 
 export interface IBranchProps {
+  onEdit: (isEdit: boolean) => void;
   branch: IBranch;
 }
 
 export type IStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
+
+export interface ITablaBranchSlice {
+  status: IStatus;
+  error: string | null;
+  tablaBranches: ITablaBranch[];
+}
+export interface ITablaBranch {
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  monedaId: string;
+  grupoId: string;
+  stock: number;
+  sucursalId: string;
+}
