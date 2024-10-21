@@ -6,17 +6,31 @@ import { HeaderTable } from '../shared/components/ui/HeaderTable';
 import Dashboard from '../ui/components/Dashboard';
 import BranchDashboard from '../ui/components/Branches';
 import { DataTableDemo } from '../ui/components/Table';
+import {
+  AlreadyAuthenticated,
+  RequireAuth,
+} from '../shared/helpers/login.Helper';
+import { TableBranches } from '../ui/components/TableBranchs';
 
 export const Router = () => {
   return (
     <Routes>
-      <Route path="/login" element={<AuthForm />} />
+      <Route
+        path="/login"
+        element={
+          <AlreadyAuthenticated>
+            <AuthForm />
+          </AlreadyAuthenticated>
+        }
+      />
       <Route
         path="/"
         element={
-          <Layout>
-            <HeaderTable />
-          </Layout>
+          <RequireAuth path="/">
+            <Layout>
+              <HeaderTable />
+            </Layout>
+          </RequireAuth>
         }
       />
       <Route
@@ -30,9 +44,11 @@ export const Router = () => {
       <Route
         path="/warehouse"
         element={
-          <Layout>
-            <BranchDashboard />
-          </Layout>
+          <RequireAuth>
+            <Layout>
+              <BranchDashboard />
+            </Layout>
+          </RequireAuth>
         }
       />
       <Route
@@ -44,8 +60,17 @@ export const Router = () => {
         }
       />
 
-      <Route path="/404" element={<Page404 />} />
-      <Route path="*" element={<Navigate to="/404" />} />
+      <Route
+        path="/branches"
+        element={
+          <Layout>
+            <TableBranches />
+          </Layout>
+        }
+      />
+
+      {/* <Route path="/404" element={<Page404 />} />
+      <Route path="*" element={<Navigate to="/404" />} /> */}
     </Routes>
   );
 };
