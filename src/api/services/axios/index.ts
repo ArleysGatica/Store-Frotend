@@ -1,12 +1,14 @@
 import axios, { AxiosInstance } from 'axios';
 
 export enum PATH_LIST {
-  PREFIX = '/prod/',
   Login = 'users',
+  Branch = 'branches',
+  Ineventory = 'inventory/products',
+  products = 'inventory/products',
 }
 
 export const createAxiosInstance = (
-  JWT: string,
+  JWT: string | null,
   PATH: string
 ): AxiosInstance => {
   const baseURL = `${import.meta.env.VITE_API_URL_BACKEND?.replace(/\/?$/, '/')}${PATH}`;
