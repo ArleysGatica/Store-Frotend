@@ -69,6 +69,15 @@ export const Router = () => {
         }
       />
 
+      <Route
+        path="/branches/:Id/products"
+        element={
+          <Layout>
+            <TableBranches />
+          </Layout>
+        }
+      />
+
       {/* <Route path="/404" element={<Page404 />} />
       <Route path="*" element={<Navigate to="/404" />} /> */}
     </Routes>
