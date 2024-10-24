@@ -3,14 +3,12 @@ import { Page404 } from '../pages/404';
 import AuthForm from '../ui/components/Login';
 import { Layout } from '../shared/components/ui/Layout';
 import { HeaderTable } from '../shared/components/ui/HeaderTable';
-import Dashboard from '../ui/components/Dashboard';
 import BranchDashboard from '../ui/components/Branches';
 import { DataTableDemo } from '../ui/components/Table';
 import {
   AlreadyAuthenticated,
   RequireAuth,
 } from '../shared/helpers/login.Helper';
-import { TableBranches } from '../ui/components/TableBranchs';
 import RegisterForm from '@/ui/components/Login/RegisterForm';
 
 export const Router = () => {
@@ -32,14 +30,14 @@ export const Router = () => {
         />
       </Route>
       <Route
-        path="/Dashboard"
-        element={<RequireAuth rolesAllowed={['admin']} />}
+        path="/warehouse"
+        element={<RequireAuth rolesAllowed={['root']} />}
       >
         <Route
-          path="/Dashboard"
+          path="/warehouse"
           element={
             <Layout>
-              <Dashboard />
+              <BranchDashboard />
             </Layout>
           }
         />
@@ -51,6 +49,31 @@ export const Router = () => {
           element={
             <Layout>
               <RegisterForm />
+            </Layout>
+          }
+        />
+      </Route>
+
+      <Route path="/branches" element={<RequireAuth rolesAllowed={['root']} />}>
+        <Route
+          path="/branches"
+          element={
+            <Layout>
+              <DataTableDemo />
+            </Layout>
+          }
+        />
+      </Route>
+
+      <Route
+        path="/branches/:Id/products"
+        element={<RequireAuth rolesAllowed={['root']} />}
+      >
+        <Route
+          path="/branches/:Id/products"
+          element={
+            <Layout>
+              <DataTableDemo />
             </Layout>
           }
         />

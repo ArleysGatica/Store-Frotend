@@ -1,11 +1,12 @@
+import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/app/hooks';
 import { fetchBranches } from '@/app/slices/branchSlice';
 import { RegistroUsuario } from '@/app/slices/login';
 import { store } from '@/app/store';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { GetBranches } from '@/shared/helpers/Branchs';
-import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+
 import {
   Select,
   SelectContent,
@@ -28,14 +29,25 @@ interface ILoginData {
 const RegisterForm = () => {
   const branches = useAppSelector((state) => state.branches.data);
 
+  const authRole = useAppSelector((state) => state.auth.signIn.user?.role);
+  console.log(authRole);
   const [selectedBranch, setSelectedBranch] = useState<{
     nombre: string;
     _id: string;
   } | null>(null);
 
   const [products, setProducts] = useState<ITablaBranch[]>([]);
-
   const [showPassword, setShowPassword] = useState(false);
+
+  const [credentials, setCredentials] = useState<ILoginData>({
+    username: '',
+    password: '',
+    role: 'user',
+    sucursalId: '',
+  });
+
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSelectChangeBranch = (value: string) => {
     const branch = branches.find((b) => b._id === value);
@@ -57,13 +69,6 @@ const RegisterForm = () => {
       fetchData();
     }
   }, [selectedBranch]);
-
-  const [credentials, setCredentials] = useState<ILoginData>({
-    username: '',
-    password: '',
-    role: 'user',
-    sucursalId: '',
-  });
 
   const handleSelectChange = (value: string) => {
     setCredentials({
@@ -88,7 +93,18 @@ const RegisterForm = () => {
 
     try {
       await store.dispatch(RegistroUsuario(dataToSubmit)).unwrap();
+      setIsSuccess(true);
+      setErrorMessage('');
+      setCredentials({
+        username: '',
+        password: '',
+        role: 'user',
+        sucursalId: '',
+      });
+      setSelectedBranch(null);
     } catch (error) {
+      setErrorMessage('Error al registrar usuario');
+      setIsSuccess(false);
       console.error('Error al registrar usuario:', error);
     }
   };
@@ -102,6 +118,7 @@ const RegisterForm = () => {
       transition={{ duration: 0.3 }}
     >
       <h1 className="text-2xl font-bold mb-6 text-center">Registrar Usuario</h1>
+
       <div className="mb-4">
         <label
           htmlFor="username"
@@ -128,7 +145,6 @@ const RegisterForm = () => {
         <Input
           type={showPassword ? 'text' : 'password'}
           id="password"
-          //   className='
           name="password"
           value={credentials.password}
           onChange={handleInputChange}
@@ -183,6 +199,15 @@ const RegisterForm = () => {
           </SelectContent>
         </Select>
       </div>
+
+      {errorMessage && (
+        <div className="text-red-500 mb-4 text-center">{errorMessage}</div>
+      )}
+      {isSuccess && (
+        <div className="text-green-500 mb-4 text-center">
+          Usuario registrado exitosamente.
+        </div>
+      )}
       <button
         type="submit"
         className="w-full bg-black text-white hover:bg-blue-700"

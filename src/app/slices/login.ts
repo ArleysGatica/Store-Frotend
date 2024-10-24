@@ -153,22 +153,6 @@ export const LoginSlice = createSlice({
       state.error = payload as string;
       state.status = 'failed';
     });
-    builder.addCase(RegistroUsuario.pending, (state) => {
-      state.status = 'loading';
-    });
-    builder.addCase(RegistroUsuario.fulfilled, (state, { payload }) => {
-      state.signIn = {
-        token: payload.token,
-        user: payload.user,
-        status: 'authenticated',
-      };
-      saveToLocalStorage('user', state.signIn);
-      state.status = 'succeeded';
-    });
-    builder.addCase(RegistroUsuario.rejected, (state, { payload }) => {
-      state.error = payload as string;
-      state.status = 'failed';
-    });
   },
 });
 
