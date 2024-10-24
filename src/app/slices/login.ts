@@ -1,32 +1,52 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
-import {
-  createUsers,
-  Iauth,
-  IAuthCredentials,
-  registerUsers,
-} from '../../api/services/auth';
+import { createUsers, Iauth, registerUsers } from '../../api/services/auth';
 import { handleAsyncThunkError } from '../../shared/utils/errorHandlers';
-export interface IUser {
-  id: string;
-  username: string;
+
+type IRoles = 'admin' | 'user' | 'root';
+
+export interface IToken {
+  token: string;
+  user?: {
+    _id: string;
+    username: string;
+    role: IRoles;
+    password: string;
+    sucursalId?: string;
+  };
 }
 
-export const login = createAsyncThunk('login/create', async (data: Iauth) => {
-  try {
-    const response = await createUsers(data);
-    return response as unknown as string;
-  } catch (error) {
-    return (error as AxiosError).response?.status === 404
-      ? []
-      : handleAsyncThunkError(error as Error);
-  }
-});
+const saveToLocalStorage = (key: string, value: any) => {
+  localStorage.setItem(key, JSON.stringify(value));
+};
 
-export const registerUser = createAsyncThunk(
+const removeFromLocalStorage = (key: string) => {
+  localStorage.removeItem(key);
+};
+
+const getFromLocalStorage = (key: string) => {
+  const data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : null;
+};
+
+export const RegistroUsuario = createAsyncThunk(
+  'login/create',
+  async (data: Iauth, { rejectWithValue }) => {
+    try {
+      const response = await createUsers(data);
+      return response as unknown as IToken;
+    } catch (error) {
+      return (error as AxiosError).response?.status === 404
+        ? rejectWithValue('Usuario no encontrado')
+        : handleAsyncThunkError(error as Error);
+    }
+  }
+);
+
+export const InicioSesion = createAsyncThunk(
   'auth/registerUser',
   async (
-    { userCredentials }: { userCredentials: IAuthCredentials },
+    { userCredentials }: { userCredentials: Iauth },
     { rejectWithValue }
   ) => {
     try {
@@ -34,7 +54,7 @@ export const registerUser = createAsyncThunk(
       if (response.data.error) {
         return rejectWithValue(response.data.error);
       }
-      return response.data;
+      return response.data as IToken;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(
@@ -53,15 +73,23 @@ export type statusLoguer =
   | 'loading'
   | 'error'
   | 'idle';
-export interface IAuthSlice extends Iauth {
-  status: statusLoguer;
+
+export interface IAuthSlice {
   token?: string;
+  user?: {
+    _id: string;
+    username: string;
+    role: IRoles;
+    sucursalId?: string;
+  };
+  status: statusLoguer;
 }
 
-const initialStateLogin: IAuthSlice = (() => {
-  const persistedState = localStorage.getItem('user');
-  return persistedState ? JSON.parse(persistedState) : {};
-})();
+const initialStateLogin: IAuthSlice = getFromLocalStorage('user') || {
+  token: '',
+  user: undefined,
+  status: 'unauthenticated',
+};
 
 export interface ILoginSlice {
   signIn: IAuthSlice;
@@ -75,7 +103,7 @@ const initialState: ILoginSlice = {
   signUp: {
     username: '',
     password: '',
-    role: '',
+    role: 'user',
   },
   status: 'idle',
   error: '',
@@ -83,56 +111,46 @@ const initialState: ILoginSlice = {
 
 export const LoginSlice = createSlice({
   name: 'login',
-  initialState: initialState,
+  initialState,
   reducers: {
-    updateSignIn: (state, action: PayloadAction<IAuthSlice>) => {
-      state.signIn = action.payload;
-      localStorage.setItem('user', JSON.stringify(action.payload));
+    updateSignIn: (state, action: PayloadAction<IToken>) => {
+      state.signIn = {
+        token: action.payload.token,
+        user: action.payload.user,
+        status: 'authenticated',
+      };
+      saveToLocalStorage('user', state.signIn);
     },
     updateSignUp: (state, action: PayloadAction<Iauth>) => {
       state.signUp = action.payload;
     },
     logout: (state) => {
       state.signIn = {
-        username: state.signIn.username,
-        status: state.signIn.status,
-        role: '',
-        password: '',
+        token: '',
+        user: undefined,
+        status: 'unauthenticated',
       };
-      localStorage.setItem(
-        'user',
-        JSON.stringify({
-          status: 'unauthenticated',
-          email: state.signIn.username,
-        })
-      );
+      removeFromLocalStorage('user');
     },
-
     errorLogin: (state, { payload }: PayloadAction<string>) => {
       state.error = payload;
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(login.pending, (state) => {
+    builder.addCase(InicioSesion.pending, (state) => {
       state.status = 'loading';
     });
-    builder.addCase(login.fulfilled, (state) => {
+    builder.addCase(InicioSesion.fulfilled, (state, { payload }) => {
+      state.signIn = {
+        token: payload.token,
+        user: payload.user,
+        status: 'authenticated',
+      };
+      saveToLocalStorage('user', state.signIn);
       state.status = 'succeeded';
     });
-    builder.addCase(login.rejected, (state, { error }) => {
-      if (error.message) state.error = error.message;
-      state.status = 'failed';
-    });
-    builder.addCase(registerUser.pending, (state) => {
-      state.status = 'loading';
-    });
-    builder.addCase(registerUser.fulfilled, (state, { payload }) => {
-      state.signIn = payload as unknown as IAuthSlice;
-      state.status = 'succeeded';
-    });
-    builder.addCase(registerUser.rejected, (state, { error }) => {
-      if (error.message) state.error = error.message;
-      console.error('Error logging in:', error.message);
+    builder.addCase(InicioSesion.rejected, (state, { payload }) => {
+      state.error = payload as string;
       state.status = 'failed';
     });
   },

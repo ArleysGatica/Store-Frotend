@@ -4,10 +4,8 @@ import { createAxiosInstance, PATH_LIST } from '../axios';
 export interface Iauth {
   username: string;
   password: string;
-  role: string;
+  role: 'admin' | 'user' | 'root';
 }
-
-export type IAuthCredentials = Omit<Iauth, 'role'>;
 
 export const createUsers = async (
   userCreate: Iauth
@@ -17,9 +15,7 @@ export const createUsers = async (
   return response;
 };
 
-export const registerUsers = async (
-  signIN: IAuthCredentials
-): Promise<AxiosResponse> => {
+export const registerUsers = async (signIN: Iauth): Promise<AxiosResponse> => {
   const axiosInstance = createAxiosInstance('', PATH_LIST.Login);
   const response = await axiosInstance.post('/login', signIN);
   return response;
