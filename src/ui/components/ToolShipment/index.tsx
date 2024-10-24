@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, X, Camera, MessageSquare, Edit3, Send } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,11 @@ import {
 import { TabsContent } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useAppSelector } from '@/app/hooks';
+import { store } from '@/app/store';
+import { fetchBranches } from '@/app/slices/branchSlice';
+import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { GetBranches } from '@/shared/helpers/Branchs';
 
 interface Tool {
   id: string;
@@ -58,6 +63,46 @@ export default function ToolShipment() {
   const filteredTools = tools.filter((tool) =>
     tool.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const branches = useAppSelector((state) => state.branches.data);
+
+  const [selectedBranch, setSelectedBranch] = useState<{
+    nombre: string;
+    _id: string;
+  } | null>(null);
+
+  const [products, setProducts] = useState<ITablaBranch[]>([]);
+  console.log(products);
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedBranchId = e.target.value;
+    const branch = branches.find((b) => b._id === selectedBranchId);
+
+    if (branch) {
+      setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
+    }
+  };
+
+  const fetchData = async () => {
+    // Solo procede si hay una sucursal seleccionada
+    if (!selectedBranch) return;
+
+    const response = await GetBranches(selectedBranch._id); // Usa solo el ID seleccionado
+    console.log(response, 'response');
+    setProducts(response);
+  };
+
+  useEffect(() => {
+    // Despacha la acción para obtener las sucursales
+    store.dispatch(fetchBranches()).unwrap();
+  }, []);
+
+  useEffect(() => {
+    // Cada vez que cambie la sucursal seleccionada, se hace la petición
+    if (selectedBranch) {
+      fetchData();
+    }
+  }, [selectedBranch]);
 
   return (
     <div className="container mx-auto ">
@@ -229,6 +274,39 @@ export default function ToolShipment() {
           </div>
         </div>
       </TabsContent>
+
+      <div>
+        <label htmlFor="branch-select">Selecciona :</label>
+        <select
+          className="bg-white"
+          id="branch-select"
+          onChange={handleSelectChange}
+        >
+          <option value="">--Selecciona--</option>
+          {branches.map((branch) => (
+            <option key={branch._id} value={branch._id}>
+              {branch.nombre}
+            </option>
+          ))}
+        </select>
+        <br />
+
+        {/* Mostrar productos si los hay */}
+        {products.length > 0 && (
+          <div>
+            <h2>Productos para {selectedBranch?.nombre}</h2>
+            <ul>
+              {products.map((product) => (
+                <li key={product._id}>
+                  {product.nombre}
+                  <br />
+                  Descripción: {product.descripcion}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

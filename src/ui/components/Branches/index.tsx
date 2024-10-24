@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { BranchCard } from './BranchCard';
 import { store } from '@/app/store';
 import {
+  Branch,
   createBranchs,
   fetchBranches,
   updateBranchs,
@@ -28,22 +29,23 @@ import { Label } from '@radix-ui/react-label';
 import { Link } from 'react-router-dom';
 
 export default function BranchDashboard() {
-  const branches = useAppSelector((state) => state.branches.branches);
+  const branches = useAppSelector((state) => state.branches.data);
 
   console.log(branches, 'branches');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSucursal, setEditingSucursal] = useState(false);
-  const [newBranch, setNewBranch] = useState({
-    _id: '',
-    nombre: '',
-    direccion: '',
-    ciudad: '',
+  const [newBranch, setNewBranch] = useState<Branch>({
+    // _id: '',
     pais: '',
+    ciudad: '',
+    nombre: '',
     telefono: '',
+    direccion: '',
+    description: '',
   });
 
   useEffect(() => {
-    store.dispatch(fetchBranches());
+    store.dispatch(fetchBranches()).unwrap();
   }, []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +60,7 @@ export default function BranchDashboard() {
     setIsDialogOpen(false);
   };
   const handleEdit = (id: string) => {
-    store.dispatch(updateBranchs({ branch: newBranch, id }));
+    // store.dispatch(updateBranchs({ branch: newBranch, id }));
     setEditingSucursal(true);
     setIsDialogOpen(true);
   };
@@ -165,7 +167,7 @@ export default function BranchDashboard() {
               type="submit"
               onClick={() => {
                 if (editingSucursal) {
-                  handleEdit(newBranch._id);
+                  //   handleEdit(newBranch?._id);
                 } else {
                   handleSaveNew();
                 }

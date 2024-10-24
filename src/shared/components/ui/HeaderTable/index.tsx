@@ -35,12 +35,16 @@ export const HeaderTable = () => {
           <TabsTrigger
             className="  text-[#ffffff] font-bold
           border-b-2 border-bg-gray-200 border-opacity-0
+          bg-black
           "
             value="receive"
           >
             Recibir herramientas
           </TabsTrigger>
-          <TabsTrigger className=" text-[#ffffff] font-bold" value="send">
+          <TabsTrigger
+            className="bg-black text-[#ffffff] font-bold"
+            value="send"
+          >
             Enviar herramientas
           </TabsTrigger>
         </TabsList>

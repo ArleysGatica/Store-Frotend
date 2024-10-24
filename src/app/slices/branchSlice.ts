@@ -1,24 +1,46 @@
+// imports necesarios
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import {
   createBranch,
   deleteBranchById,
   getAll,
+  getBranchesById,
   updateBranch,
-} from '@/api/services/branch';
-import { IBranch, IBranchSlice } from '@/interfaces/branchInterfaces';
+} from '../../api/services/branch';
 import { handleAsyncThunkError } from '../../shared/utils/errorHandlers';
+import { ITablaBranch } from '@/interfaces/branchInterfaces';
 
-export const createBranchs = createAsyncThunk(
-  'branches/create',
-  async (branch: IBranch) => {
+export interface Branch {
+  _id?: string;
+  pais: string;
+  ciudad: string;
+  nombre: string;
+  telefono: string;
+  direccion: string;
+  description: string;
+}
+
+interface BranchState {
+  data: Branch[];
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: BranchState = {
+  data: [], // Inicializar como un arreglo vacío
+  loading: false,
+  error: null,
+};
+
+export const fetchBranchesById = createAsyncThunk<ITablaBranch[], string>(
+  'branches/fetchById',
+  async (id: string, { rejectWithValue }) => {
     try {
-      const response = await createBranch(branch);
-      return response as unknown as IBranch;
-    } catch (error) {
-      return (error as AxiosError).response?.status === 404
-        ? []
-        : handleAsyncThunkError(error as Error);
+      const response: ITablaBranch[] = await getBranchesById(id);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Error desconocido');
     }
   }
 );
@@ -26,7 +48,7 @@ export const createBranchs = createAsyncThunk(
 export const fetchBranches = createAsyncThunk('branches/getAll', async () => {
   try {
     const response = await getAll();
-    return response as unknown as IBranch[];
+    return response as unknown as Branch[];
   } catch (error) {
     return (error as AxiosError).response?.status === 404
       ? []
@@ -36,11 +58,11 @@ export const fetchBranches = createAsyncThunk('branches/getAll', async () => {
 
 export const updateBranchs = createAsyncThunk(
   'branches/update',
-  async (payload: { branch: IBranch; id: string }) => {
+  async (payload: { branch: Branch; id: string }) => {
     try {
       const { branch, id } = payload;
       const response = await updateBranch(branch, id);
-      return response as unknown as IBranch;
+      return response as unknown as Branch;
     } catch (error) {
       handleAsyncThunkError(error as Error);
       throw error;
@@ -50,82 +72,71 @@ export const updateBranchs = createAsyncThunk(
 
 export const deleteBranch = createAsyncThunk(
   'branches/delete',
-  async (id: string) => {
+  async ({ _id }: Branch) => {
+    const response = await deleteBranchById(_id!);
+    return response;
+  }
+);
+
+export const createBranchs = createAsyncThunk(
+  'branches/create',
+  async (branch: Branch, { rejectWithValue }) => {
     try {
-      await deleteBranchById(id);
-      return id;
+      const response = await createBranch(branch);
+      return response.data as Branch;
     } catch (error) {
-      return (error as AxiosError).response?.status === 404
-        ? []
-        : handleAsyncThunkError(error as Error);
+      if ((error as AxiosError).response?.status === 404) {
+        return rejectWithValue('El recurso no fue encontrado');
+      }
+      return rejectWithValue(handleAsyncThunkError(error as Error));
     }
   }
 );
 
-const initialState: IBranchSlice = {
-  status: 'idle',
-  branches: [],
-  error: null,
-};
-
-export const BranchSlice = createSlice({
+// Paso 2: Crear el slice
+const branchesSlice = createSlice({
   name: 'branches',
-  initialState: initialState,
+  initialState,
   reducers: {
-    AddingBranchs: (state, action: PayloadAction<IBranch>) => {
-      state.branches.push(action.payload);
-    },
-    deleteBranchs: (state, action: PayloadAction<string>) => {
-      state.branches = state.branches.filter(
-        (branch) => branch._id !== action.payload
-      );
-      console.log(action, 'action');
+    AddingBranchs: (state, action: PayloadAction<Branch>) => {
+      state.data.push(action.payload);
     },
   },
-  extraReducers(builder) {
-    builder.addCase(createBranchs.pending, (state) => {
-      state.status = 'loading';
-    });
-    builder.addCase(createBranchs.fulfilled, (state) => {
-      state.status = 'succeeded';
-    });
-    builder.addCase(createBranchs.rejected, (state, { error }) => {
-      if (error.message) state.error = error.message;
-      state.status = 'failed';
-    });
+  extraReducers: (builder) => {
     builder
       .addCase(fetchBranches.pending, (state) => {
-        state.status = 'loading';
+        state.data = [];
+        state.loading = 'loading' === 'loading';
       })
       .addCase(
         fetchBranches.fulfilled,
-        (state, { payload }: PayloadAction<Array<IBranch>>) => {
-          state.status = 'succeeded';
-          state.branches = payload;
+        (state, { payload }: PayloadAction<Array<Branch>>) => {
+          state.loading = 'succeeded' === 'succeeded';
+          state.data = payload;
         }
       )
       .addCase(fetchBranches.rejected, (state, action) => {
-        state.status = 'failed';
+        state.loading;
         state.error = action.error.message || 'unknown error';
       })
-      .addCase(deleteBranch.fulfilled, (state, { payload }) => {
-        state.status = 'succeeded';
-        state.branches = state.branches.filter(
-          (branch) => branch._id !== payload
-        );
+
+      .addCase(createBranchs.pending, (state) => {
+        state.loading = true; // Cambia a loading
+        state.error = null; // Reinicia el error
       })
       .addCase(
-        updateBranchs.fulfilled,
-        (state, { payload }: PayloadAction<IBranch>) => {
-          const findIndex = state.branches.findIndex(
-            (branch) => branch._id === payload._id
-          );
-          state.branches[findIndex] = payload;
+        createBranchs.fulfilled,
+        (state, action: PayloadAction<Branch>) => {
+          state.loading = false; // Cambia a no loading
+          state.data.push(action.payload); // Agrega la nueva sucursal al estado
         }
-      );
+      )
+      .addCase(createBranchs.rejected, (state, action) => {
+        state.loading = false; // Cambia a no loading
+        state.error = action.error.message || 'unknown error'; // Manejo de errores
+      });
   },
 });
 
-export const { AddingBranchs, deleteBranchs } = BranchSlice.actions;
-
-export const BranchReducer = BranchSlice.reducer;
+// Exportamos el reducer
+export const branchesReducer = branchesSlice.reducer;

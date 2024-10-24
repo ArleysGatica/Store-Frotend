@@ -39,7 +39,7 @@ export function RequireAuth({ children, allowedRoles }: RequireAuthProps) {
     return <>{children}</>;
   }
 
-  return <Navigate to={'/login'} state={{ from: location }} replace />;
+  return <Navigate to={'/login'} state={{ from: location }} />;
 }
 
 export function AlreadyAuthenticated({ children }: RequireAuthProps) {

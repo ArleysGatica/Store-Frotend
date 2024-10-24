@@ -1,15 +1,18 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { BranchReducer } from './slices/branchSlice';
+
 import { loginReducer } from './slices/login';
 import { TablaBranchReducer } from './slices/tablaBranchsSlice';
+import { branchesReducer } from './slices/branchSlice';
+import { productsReducer } from './slices/products';
 
 export const store = configureStore({
   reducer: {
-    branches: BranchReducer,
+    branches: branchesReducer,
     auth: loginReducer,
     inventory: TablaBranchReducer,
+    products: productsReducer,
   },
 });
 
-export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof store.getState>;
