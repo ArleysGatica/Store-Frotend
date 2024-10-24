@@ -1,21 +1,39 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAppSelector } from '../../app/hooks';
-import { RootState } from '../../app/store';
-import { ReactNode } from 'react';
-import { useAuthToken } from '../hooks/useJWT';
+// components/PrivateRoute.tsx
+import { RootState } from '@/app/store';
+import AuthForm from '@/ui/components/Login';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { Navigate, Outlet } from 'react-router-dom';
 
-type RequireAuthProps = {
-  children: ReactNode;
-  path?: string;
-  allowedRoles?: string[];
+interface IPrivateRouteProps {
+  rolesAllowed: Array<'admin' | 'user' | 'root'>;
+}
+
+export const RequireAuth: React.FC<IPrivateRouteProps> = ({ rolesAllowed }) => {
+  const { token, user } = useSelector((state: RootState) => state.auth.signIn);
+
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+  if (user && !rolesAllowed.includes(user.role)) {
+    return <Navigate to="/" />;
+  }
+  return <Outlet />;
+};
+
+export const AlreadyAuthenticated: React.FC = () => {
+  const { token } = useSelector((state: RootState) => state.auth.signIn);
+
+  if (token) {
+    return <Navigate to="/" />;
+  }
+  return <AuthForm />;
 };
 
 export interface IToken {
   token: string;
   role?: string;
-  //   status?: string;
 }
-
 export const getUserDataFromLocalStorage = (): IToken | null => {
   const userDataString = localStorage.getItem('user');
   if (userDataString) {
@@ -24,33 +42,3 @@ export const getUserDataFromLocalStorage = (): IToken | null => {
     return null;
   }
 };
-
-export function RequireAuth({ children, allowedRoles }: RequireAuthProps) {
-  const location = useLocation();
-  const statusLogin = useAppSelector(
-    (state: RootState) => state.auth.signIn.status
-  );
-  const { token } = useAuthToken();
-  const userData = getUserDataFromLocalStorage();
-  const userRole = userData?.role;
-  //   const isAuthorized = allowedRoles?.includes(userRole || '');
-
-  if (statusLogin === 'authenticated' && token) {
-    return <>{children}</>;
-  }
-
-  return <Navigate to={'/login'} state={{ from: location }} />;
-}
-
-export function AlreadyAuthenticated({ children }: RequireAuthProps) {
-  const userData = getUserDataFromLocalStorage();
-  const statusLogin = useAppSelector(
-    (state: RootState) => state.auth.signIn.status
-  );
-
-  return statusLogin === 'authenticated' && userData ? (
-    <Navigate to={'/'} />
-  ) : (
-    <>{children}</>
-  );
-}

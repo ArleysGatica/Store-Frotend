@@ -11,81 +11,53 @@ import {
   RequireAuth,
 } from '../shared/helpers/login.Helper';
 import { TableBranches } from '../ui/components/TableBranchs';
+import RegisterForm from '@/ui/components/Login/RegisterForm';
 
 export const Router = () => {
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={
-          <AlreadyAuthenticated>
-            <AuthForm />
-          </AlreadyAuthenticated>
-        }
-      />
+      <Route path="/login" element={<AlreadyAuthenticated />} />
+
       <Route
         path="/"
-        element={
-          <RequireAuth>
+        element={<RequireAuth rolesAllowed={['admin', 'user', 'root']} />}
+      >
+        <Route
+          path="/"
+          element={
             <Layout>
               <HeaderTable />
             </Layout>
-          </RequireAuth>
-        }
-      />
+          }
+        />
+      </Route>
       <Route
-        path="/dashboard"
-        element={
-          <Layout>
-            <Dashboard />
-          </Layout>
-        }
-      />
-      <Route
-        path="/warehouse"
-        element={
-          <RequireAuth>
+        path="/Dashboard"
+        element={<RequireAuth rolesAllowed={['admin']} />}
+      >
+        <Route
+          path="/Dashboard"
+          element={
             <Layout>
-              <BranchDashboard />
+              <Dashboard />
             </Layout>
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/tabla"
-        element={
-          <RequireAuth>
-            <Layout>
-              <DataTableDemo />
-            </Layout>
-          </RequireAuth>
-        }
-      />
+          }
+        />
+      </Route>
 
-      <Route
-        path="/branches"
-        element={
-          <RequireAuth>
+      <Route path="/register" element={<RequireAuth rolesAllowed={['root']} />}>
+        <Route
+          path="/register"
+          element={
             <Layout>
-              <TableBranches />
+              <RegisterForm />
             </Layout>
-          </RequireAuth>
-        }
-      />
+          }
+        />
+      </Route>
 
-      <Route
-        path="/branches/:Id/products"
-        element={
-          <RequireAuth>
-            <Layout>
-              <DataTableDemo />
-            </Layout>
-          </RequireAuth>
-        }
-      />
-
-      {/* <Route path="/404" element={<Page404 />} />
-      <Route path="*" element={<Navigate to="/404" />} /> */}
+      <Route path="/404" element={<Page404 />} />
+      <Route path="*" element={<Navigate to="/404" />} />
     </Routes>
   );
 };
