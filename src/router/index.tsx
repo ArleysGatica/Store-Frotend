@@ -26,7 +26,7 @@ export const Router = () => {
       <Route
         path="/"
         element={
-          <RequireAuth path="/">
+          <RequireAuth>
             <Layout>
               <HeaderTable />
             </Layout>
@@ -54,27 +54,33 @@ export const Router = () => {
       <Route
         path="/tabla"
         element={
-          <Layout>
-            <DataTableDemo />
-          </Layout>
+          <RequireAuth>
+            <Layout>
+              <DataTableDemo />
+            </Layout>
+          </RequireAuth>
         }
       />
 
       <Route
         path="/branches"
         element={
-          <Layout>
-            <TableBranches />
-          </Layout>
+          <RequireAuth>
+            <Layout>
+              <TableBranches />
+            </Layout>
+          </RequireAuth>
         }
       />
 
       <Route
         path="/branches/:Id/products"
         element={
-          <Layout>
-            <TableBranches />
-          </Layout>
+          <RequireAuth>
+            <Layout>
+              <DataTableDemo />
+            </Layout>
+          </RequireAuth>
         }
       />
 

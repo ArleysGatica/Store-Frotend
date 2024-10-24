@@ -15,6 +15,11 @@ export const Layout = ({ children }: LayoutProps) => {
         <Sidebar
           className="hidden md:block"
           links={[
+            {
+              name: 'Home',
+              path: '/',
+              icon: '🏠',
+            },
             { name: 'dashboard', path: '/dashboard', icon: '🔗' },
             { name: 'tabla', path: '/tabla', icon: '🔗' },
             { name: 'Sucursales', path: '/warehouse', icon: '🔗' },

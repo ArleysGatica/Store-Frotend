@@ -1,7 +1,8 @@
-import { Branch, fetchBranchesById } from '../../app/slices/branchSlice';
+import { fetchBranchesById } from '../../app/slices/branchSlice';
 import { store } from '../../app/store';
+import { ITablaBranch } from '@/interfaces/branchInterfaces';
 
-export const fetchBranches = async (id: string): Promise<Branch[]> => {
+export const GetBranches = async (id: string): Promise<ITablaBranch[]> => {
   try {
     const response = await store.dispatch(fetchBranchesById(id)).unwrap();
     return response;

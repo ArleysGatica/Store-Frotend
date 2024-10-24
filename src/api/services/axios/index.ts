@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 export enum PATH_LIST {
   Login = 'users',
   Branch = 'branches',
-  Ineventory = 'inventory/products',
+  Inventory = 'inventory/products',
   products = 'inventory/products',
 }
 
