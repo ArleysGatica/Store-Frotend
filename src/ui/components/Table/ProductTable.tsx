@@ -19,12 +19,24 @@ import {
 import { Pencil, Trash } from 'lucide-react';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import ProductForm from './ProductForm';
+import { IProductoGroups } from '@/api/services/groups';
 
 interface ProductsTableProps {
   products: ITablaBranch[];
+  handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  selectedGroup: {
+    nombre: string;
+    _id: string;
+  } | null;
+  groups: IProductoGroups[];
 }
 
-const ProductsTable = ({ products }: ProductsTableProps) => {
+const ProductsTable = ({
+  products,
+  handleSelectChange,
+  selectedGroup,
+  groups,
+}: ProductsTableProps) => {
   const [editingProduct, setEditingProduct] = useState<ITablaBranch | null>(
     null
   );
@@ -97,6 +109,9 @@ const ProductsTable = ({ products }: ProductsTableProps) => {
               initialData={editingProduct}
               onSubmit={handleEditProduct}
               sucursalId={editingProduct.sucursalId}
+              handleSelectChange={handleSelectChange}
+              selectedGroup={selectedGroup}
+              groups={groups}
             />
           )}
         </DialogContent>

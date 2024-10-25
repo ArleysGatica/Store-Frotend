@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import ProductForm from './ProductForm';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { IProductoGroups } from '@/api/services/groups';
 
 interface SearchAndFilterProps {
   searchTerm: string;
@@ -27,6 +28,12 @@ interface SearchAndFilterProps {
   setFilterStatus: (statuses: string[]) => void;
   onAddProduct: (newProduct: ITablaBranch) => void;
   sucursalId: string | undefined;
+  handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  selectedGroup: {
+    nombre: string;
+    _id: string;
+  } | null;
+  groups: IProductoGroups[];
 }
 
 const SearchAndFilter = ({
@@ -34,6 +41,9 @@ const SearchAndFilter = ({
   setSearchTerm,
   onAddProduct,
   sucursalId,
+  handleSelectChange,
+  selectedGroup,
+  groups,
 }: SearchAndFilterProps) => {
   return (
     <div className="flex items-center justify-between mb-4">
@@ -100,7 +110,13 @@ const SearchAndFilter = ({
               Enter the details of the new product below.
             </DialogDescription>
           </DialogHeader>
-          <ProductForm onSubmit={onAddProduct} sucursalId={sucursalId!} />
+          <ProductForm
+            handleSelectChange={handleSelectChange}
+            selectedGroup={selectedGroup}
+            groups={groups}
+            onSubmit={onAddProduct}
+            sucursalId={sucursalId!}
+          />
         </DialogContent>
       </Dialog>
     </div>

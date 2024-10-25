@@ -4,11 +4,18 @@ import { DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { useState, useEffect } from 'react';
+import { IProductoGroups } from '@/api/services/groups';
 
 interface ProductFormProps {
   initialData?: ITablaBranch;
   onSubmit: (data: ITablaBranch) => void;
   sucursalId: string;
+  handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  selectedGroup: {
+    nombre: string;
+    _id: string;
+  } | null;
+  groups: IProductoGroups[];
 }
 
 type FormFieldKeys = 'nombre' | 'descripcion' | 'precio' | 'stock';
@@ -17,24 +24,36 @@ const ProductForm = ({
   initialData,
   onSubmit,
   sucursalId,
+  handleSelectChange,
+  selectedGroup,
+  groups,
 }: ProductFormProps) => {
   const [formData, setFormData] = useState({
+    _id: initialData?._id || '',
+    sucursalId: sucursalId,
     nombre: initialData?.nombre || '',
     descripcion: initialData?.descripcion || '',
     precio: initialData?.precio?.$numberDecimal || '',
-    stock: initialData?.stock || 0,
+    stock: initialData?.stock ?? 0,
+    grupoId: selectedGroup?._id || '',
+    monedaId: '671342d4664051db7c1f8792',
   });
 
   useEffect(() => {
     if (initialData) {
       setFormData({
-        nombre: initialData.nombre,
-        descripcion: initialData.descripcion,
+        _id: initialData._id || '',
+        nombre: initialData.nombre || '',
+        descripcion: initialData.descripcion || '',
         precio: initialData.precio?.$numberDecimal || '',
-        stock: initialData.stock,
+        stock: initialData.stock ?? 0,
+        grupoId: selectedGroup?._id || '',
+        sucursalId: initialData.sucursalId || '',
+        monedaId: '671342d4664051db7c1f8792',
       });
     }
   }, [initialData]);
+  console.log(initialData, formData, 'initialData');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,16 +64,14 @@ const ProductForm = ({
     e.preventDefault();
     const productData: ITablaBranch = {
       ...initialData,
+      grupoId: selectedGroup?._id || '',
+      monedaId: '671342d4664051db7c1f8792',
       sucursalId: sucursalId,
       nombre: formData.nombre,
       descripcion: formData.descripcion,
-      precio: {
-        $numberDecimal: parseFloat(formData.precio?.toString() ?? '0'),
-      },
+      //@ts-ignore
+      precio: parseFloat(formData.precio?.toString() ?? '0'),
       stock: parseInt(formData.stock.toString()),
-      createdAt:
-        initialData?.createdAt || new Date().toISOString().split('T')[0],
-      updatedAt: new Date().toISOString().split('T')[0],
     };
 
     onSubmit(productData);
@@ -69,7 +86,7 @@ const ProductForm = ({
   }[] = [
     { id: 'nombre', label: 'Nombre', type: 'text' },
     { id: 'descripcion', label: 'Descripcion', type: 'text' },
-    { id: 'precio', label: 'Precio', type: 'number', step: '0.01', min: '0' },
+    { id: 'precio', label: 'Precio', type: 'number', step: '0', min: '0' },
     { id: 'stock', label: 'Stock', type: 'number', min: '0' },
   ];
   return (
@@ -93,6 +110,22 @@ const ProductForm = ({
             />
           </div>
         ))}
+        <div>
+          <label htmlFor="branch-select">Selecciona :</label>
+          <select
+            className="bg-white"
+            id="branch-select"
+            onChange={handleSelectChange}
+          >
+            <option value="">--Selecciona--</option>
+            {groups.map((data) => (
+              <option key={data._id} value={data._id}>
+                {data.nombre}
+              </option>
+            ))}
+          </select>
+          <br />
+        </div>
       </div>
       <DialogFooter>
         <Button type="submit">
