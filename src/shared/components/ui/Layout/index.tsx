@@ -1,8 +1,7 @@
 import { ReactNode } from 'react';
-import { Sidebar } from '../Sidebar';
 import './styles.scss';
 import { Header } from '../../../../ui/components/header';
-
+import { Sidebar } from '../Sidebar/index';
 interface LayoutProps {
   children: ReactNode;
 }
@@ -24,9 +23,10 @@ export const Layout = ({ children }: LayoutProps) => {
             { name: 'tabla', path: '/tabla', icon: '🔗' },
             { name: 'Sucursales', path: '/warehouse', icon: '🔗' },
             { name: 'Tablabranches', path: '/branches', icon: '🔗' },
-            { name: 'Usuarios', path: '/Login', icon: '🔗' },
+            { name: 'register', path: '/register', icon: '🔗' },
           ]}
         />
+
         <div className="container-Layout">{children}</div>
       </div>
     </div>
