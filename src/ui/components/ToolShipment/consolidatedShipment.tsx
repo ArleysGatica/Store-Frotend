@@ -8,6 +8,7 @@ import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { useAppSelector } from '@/app/hooks';
 import { GetBranches } from '@/shared/helpers/Branchs';
 import { store } from '@/app/store';
+import { ITool } from '.';
 
 export interface IConsolidatedShipment {
   selectedBranch:
@@ -16,11 +17,13 @@ export interface IConsolidatedShipment {
       })
     | null;
   setDestinationBranch: React.Dispatch<React.SetStateAction<string | null>>;
+  setShipmentTools: React.Dispatch<React.SetStateAction<ITool[]>>;
 }
 
 export const ConsolidatedShipment = ({
   selectedBranch,
   setDestinationBranch,
+  setShipmentTools,
 }: IConsolidatedShipment) => {
   const user = useAppSelector((state) => state.auth.signIn.user);
   const [sourceBranch, setSourceBranch] = useState<Branch | null>(null);
@@ -38,11 +41,14 @@ export const ConsolidatedShipment = ({
         })
       );
     }
+
+    setShipmentTools([]);
   };
 
   const handleChangeBranch = (branch: Branch | null) => {
     handleLoadBranch(branch);
     setSourceBranch(branch);
+    setShipmentTools([]);
   };
 
   return (
