@@ -22,6 +22,7 @@ import {
   Branch,
   createBranchs,
   fetchBranches,
+  setSelectedBranch,
   updateBranchs,
 } from '@/app/slices/branchSlice';
 import { useAppSelector } from '@/app/hooks';
@@ -70,6 +71,10 @@ export default function BranchDashboard() {
     setIsDialogOpen(true);
   };
 
+  const handleSelectBranch = (branch: Branch) => {
+    store.dispatch(setSelectedBranch(branch));
+  };
+
   return (
     <div className="container mx-auto ">
       <nav className="flex flex-col mb-6 space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
@@ -94,7 +99,7 @@ export default function BranchDashboard() {
             onClick={() => openDialog(false)}
             className="w-full sm:w-auto"
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="w-4 h-4 mr-2" />
             Agregar Sucursal
           </Button>
         </div>
@@ -182,7 +187,10 @@ export default function BranchDashboard() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
         {branches.length > 0 &&
           branches.map((branch) => (
-            <Link to={`/branches/${branch._id}/products`}>
+            <Link
+              to={`/branches/${branch._id}/products`}
+              onClick={() => handleSelectBranch(branch)}
+            >
               <BranchCard
                 key={branch._id}
                 branch={branch}

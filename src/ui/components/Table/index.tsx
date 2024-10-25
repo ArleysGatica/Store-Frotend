@@ -31,7 +31,6 @@ export function DataTableDemo() {
   const fetchData = async () => {
     if (!Id) return;
     const response = await GetBranches(Id);
-    console.log(response, 'response');
     setProducts(response);
   };
 
@@ -68,7 +67,7 @@ export function DataTableDemo() {
   console.log(products);
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+    <div className="flex flex-col w-full min-h-screen bg-muted/40">
       <main className="flex-1 p-4 md:p-6">
         <Card>
           <CardHeader>
@@ -87,7 +86,7 @@ export function DataTableDemo() {
               sucursalId={Id}
             />
             {filteredProducts.length === 0 ? (
-              <span className="text-center text-sm text-muted-foreground justify-center w-full flex">
+              <span className="flex justify-center w-full text-sm text-center text-muted-foreground">
                 No hay productos en esta sucursal
               </span>
             ) : (
