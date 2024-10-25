@@ -90,7 +90,7 @@ export const ToolTransfer = ({
   }, [sourceBranchId, destinationBranchId]);
 
   return (
-    <div className="flex justify-between mt-4">
+    <div className="flex justify-between">
       <Comment
         comment={toolTransfer.comentarioEnvio}
         handleSaveComment={handleSaveComment}

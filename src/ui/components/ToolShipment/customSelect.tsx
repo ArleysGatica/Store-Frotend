@@ -44,12 +44,12 @@ const CustomSelect = ({
   );
 
   return (
-    <div className="flex flex-col max-w-md px-4 py-3 bg-white border border-gray-[#e4e4e7] rounded-lg shadow-md">
+    <div className="flex flex-col max-w-md px-4 py-1 bg-white border border-gray-[#e4e4e7] rounded-lg shadow-md">
       <div className="flex items-center justify-between w-[280px]">
         <div className="flex items-center justify-between gap-3">
           <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
-              <div className="flex items-center justify-center w-10 h-10 bg-green-700 rounded-full cursor-pointer">
+              <div className="flex items-center justify-center w-8 h-8 bg-green-700 rounded-full cursor-pointer">
                 <span className="text-lg font-semibold text-white">
                   {selectedWarehouse?.nombre.charAt(0) ?? 'A'}
                 </span>

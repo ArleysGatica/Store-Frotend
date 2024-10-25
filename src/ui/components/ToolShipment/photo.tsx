@@ -124,9 +124,9 @@ export default function Images({
                   variant="outline"
                   size="sm"
                   onClick={() => deleteLastImage()}
-                  className="w-[120px]"
+                  className="w-[130px]"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" /> Eliminar fotografía
+                  <Trash2 className="w-4 h-4" /> Eliminar imagen
                 </Button>
               )}
             </div>

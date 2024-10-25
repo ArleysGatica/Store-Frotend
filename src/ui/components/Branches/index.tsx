@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { ChangeEvent, useEffect, useState } from 'react';
 import { MapPin, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,6 @@ import {
   createBranchs,
   fetchBranches,
   setSelectedBranch,
-  updateBranchs,
 } from '@/app/slices/branchSlice';
 import { useAppSelector } from '@/app/hooks';
 import { Label } from '@radix-ui/react-label';
@@ -59,11 +59,6 @@ export default function BranchDashboard() {
   const handleSaveNew = () => {
     store.dispatch(createBranchs(newBranch));
     setIsDialogOpen(false);
-  };
-  const handleEdit = (id: string) => {
-    // store.dispatch(updateBranchs({ branch: newBranch, id }));
-    setEditingSucursal(true);
-    setIsDialogOpen(true);
   };
 
   const openDialog = (isEdit: boolean) => {
@@ -188,6 +183,7 @@ export default function BranchDashboard() {
         {branches.length > 0 &&
           branches.map((branch) => (
             <Link
+              key={branch._id}
               to={`/branches/${branch._id}/products`}
               onClick={() => handleSelectBranch(branch)}
             >

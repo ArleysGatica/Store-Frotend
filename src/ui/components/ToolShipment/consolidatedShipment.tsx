@@ -20,7 +20,7 @@ export const ConsolidatedShipment = ({
   setDestinationBranch,
 }: IConsolidatedShipment) => {
   return (
-    <Card>
+    <Card className="h-[25%]">
       <CardHeader>
         <CardTitle>Consolidado de envío</CardTitle>
       </CardHeader>
@@ -28,7 +28,7 @@ export const ConsolidatedShipment = ({
         <div className="flex items-center justify-between mb-4">
           <Badge
             variant="outline"
-            className="flex items-center justify-center text-base font-semibold w-[250px] max-w-[250px] h-[68px] whitespace-nowrap overflow-hidden text-ellipsis shadow-md"
+            className="flex items-center justify-center text-base font-semibold w-[250px] max-w-[250px] h-[50px] whitespace-nowrap overflow-hidden text-ellipsis shadow-md"
           >
             {selectedBranch?.nombre ?? ''}
           </Badge>

@@ -17,6 +17,7 @@ import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { ConsolidatedShipment } from './consolidatedShipment';
 import { SummaryTools } from './summaryTools';
 import { ToolTransfer } from './toolTransfer';
+import './styles.scss';
 
 export interface ITool extends ITablaBranch {
   quantityToSend: number;
@@ -25,7 +26,7 @@ export interface ITool extends ITablaBranch {
 }
 
 export default function ToolShipment() {
-  const user = useAppSelector((state) => state.auth.signIn.username);
+  const user = useAppSelector((state) => state.auth.signIn.user?._id);
   const selectedBranch = useAppSelector(
     (state) => state.branches.selectedBranch
   );
@@ -120,8 +121,8 @@ export default function ToolShipment() {
   return (
     <div className="container mx-auto ">
       <TabsContent value="send">
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
+        <div className="branch__grid">
+          <Card className="product__list">
             <br />
             <CardContent>
               <div className="relative mb-4">
@@ -178,7 +179,7 @@ export default function ToolShipment() {
               </Table>
             </CardContent>
           </Card>
-          <div className="space-y-6">
+          <div className="branch__consolidate">
             <ConsolidatedShipment
               selectedBranch={selectedBranch}
               setDestinationBranch={setDestinationBranch}
@@ -194,7 +195,7 @@ export default function ToolShipment() {
               destinationBranchId={destinationBranch}
               sourceBranchId={selectedBranch?._id ?? ''}
               shipmentTools={shipmentTools}
-              userId={user}
+              userId={user ?? ''}
             />
           </div>
         </div>

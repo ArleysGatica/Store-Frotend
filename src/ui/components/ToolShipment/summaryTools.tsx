@@ -37,7 +37,7 @@ export const SummaryTools = ({
   }, [tools]);
 
   return (
-    <Card>
+    <Card className="branch__transfer__list">
       <CardHeader>
         <CardTitle>Herramientas</CardTitle>
       </CardHeader>
@@ -47,7 +47,9 @@ export const SummaryTools = ({
             <TableRow>
               <TableHead>Nombre</TableHead>
               <TableHead>Código</TableHead>
-              <TableHead className="flex justify-center">Acciones</TableHead>
+              <TableHead className="flex items-center justify-center">
+                Acciones
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
