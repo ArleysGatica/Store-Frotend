@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import Signature from './signature';
 import Comment from './comment';
@@ -20,6 +21,7 @@ export interface IToolTransferProps {
   destinationBranchId: string | null;
   sourceBranchId: string;
   shipmentTools: ITool[];
+  setShipmentTools: React.Dispatch<React.SetStateAction<ITool[]>>;
 }
 
 export const ToolTransfer = ({
@@ -27,6 +29,7 @@ export const ToolTransfer = ({
   sourceBranchId,
   shipmentTools,
   userId,
+  setShipmentTools,
 }: IToolTransferProps) => {
   const [toolTransfer, setToolTransfer] = useState<IToolTransfer>({
     comentarioEnvio: null,
@@ -62,6 +65,14 @@ export const ToolTransfer = ({
     console.log({
       ...toolTransfer,
       listDetalleTraslado: formattedTools,
+    });
+
+    setShipmentTools([]);
+    setToolTransfer({
+      ...toolTransfer,
+      comentarioEnvio: null,
+      firmaEnvio: '',
+      archivosAdjuntos: [],
     });
   };
 

@@ -206,6 +206,7 @@ export default function ToolShipment() {
             <ConsolidatedShipment
               selectedBranch={selectedBranch}
               setDestinationBranch={setDestinationBranch}
+              setShipmentTools={setShipmentTools}
             />
             <SummaryTools
               tools={shipmentTools}
@@ -219,6 +220,7 @@ export default function ToolShipment() {
               sourceBranchId={selectedBranch?._id ?? ''}
               shipmentTools={shipmentTools}
               userId={user?._id ?? ''}
+              setShipmentTools={setShipmentTools}
             />
           </div>
         </div>
