@@ -67,7 +67,7 @@ export const InicioSesion = createAsyncThunk(
   }
 );
 
-type statusProgressLogin = 'idle' | 'loading' | 'succeeded' | 'failed';
+export type statusProgressLogin = 'idle' | 'loading' | 'succeeded' | 'failed';
 export type statusLoguer =
   | 'authenticated'
   | 'unauthenticated'

@@ -14,26 +14,28 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MoreVertical, Pencil, Trash } from 'lucide-react';
-import { IBranchProps } from '@/interfaces/branchInterfaces';
-import { store } from '@/app/store';
-import { Branch, deleteBranch } from '@/app/slices/branchSlice';
+import { ICategoriesProps } from '@/interfaces/branchInterfaces';
+// import { store } from '@/app/store';
+// import { Branch, deleteBranch } from '@/app/slices/branchSlice';
 
-export const BranchCard = ({ branch, onEdit }: IBranchProps) => {
-  console.log(branch?._id, 'branch');
+export const CategoriesCard = ({
+  categoriesData,
+  onEdit,
+}: ICategoriesProps) => {
+  //   console.log(categoriesData?._id, 'branch');
   const handleOnDelete = () => {
     // store.dispatch(deleteBranch(branch as Branch));
   };
 
   return (
-    <Card key={branch._id} className="flex flex-col justify-between">
+    <Card key={categoriesData._id} className="flex flex-col justify-between">
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
         <div className="flex items-center space-x-2">
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
-            {branch.nombre[0]}
+            {categoriesData.nombre[0]}
           </div>
           <div>
-            <h3 className="font-semibold">{branch.nombre}</h3>
-            <p className="text-sm text-muted-foreground">{branch.ciudad}</p>
+            <h3 className="font-semibold">{categoriesData.nombre}</h3>
           </div>
         </div>
         <DropdownMenu>
@@ -69,7 +71,9 @@ export const BranchCard = ({ branch, onEdit }: IBranchProps) => {
         </div>
         <div className="mt-2">
           <h4 className="text-sm font-semibold">Datos</h4>
-          <p className="text-sm text-muted-foreground">{branch.direccion}</p>
+          <p className="text-sm text-muted-foreground">
+            {categoriesData.descripcion}
+          </p>
         </div>
       </CardContent>
       <CardFooter className="flex flex-wrap justify-between gap-2">

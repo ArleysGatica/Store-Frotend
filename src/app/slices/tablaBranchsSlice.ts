@@ -13,7 +13,6 @@ export const fetchTablaBranches = createAsyncThunk(
   async () => {
     try {
       const response = await inventoryGetAll();
-      console.log(response, 'responseInventory');
       return response as unknown as ITablaBranch[];
     } catch (error) {
       return (error as AxiosError).response?.status === 404

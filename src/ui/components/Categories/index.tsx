@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapPin, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,54 +16,60 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { BranchCard } from './BranchCard';
+import { CategoriesCard } from './Categories';
 import { store } from '@/app/store';
-import {
-  Branch,
-  createBranchs,
-  fetchBranches,
-  setSelectedBranch,
-} from '@/app/slices/branchSlice';
 import { useAppSelector } from '@/app/hooks';
 import { Label } from '@radix-ui/react-label';
 import { Link } from 'react-router-dom';
+import { IProductoGroups } from '@/api/services/groups';
+import {
+  AddingGroups,
+  createGroupSlice,
+  getAllGroupsSlice,
+} from '@/app/slices/groups';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { toast } from 'sonner';
 
-export default function BranchDashboard() {
-  const branches = useAppSelector((state) => state.branches.data);
+export default function Categories() {
+  const branches = useAppSelector((state) => state.categories.groups);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSucursal, setEditingSucursal] = useState(false);
-  const [newBranch, setNewBranch] = useState<Branch>({
-    pais: '',
-    ciudad: '',
+  const [groups, setGroups] = useState<IProductoGroups>({
     nombre: '',
-    telefono: '',
-    direccion: '',
-    description: '',
+    descripcion: '',
   });
 
   useEffect(() => {
-    store.dispatch(fetchBranches()).unwrap();
+    store.dispatch(getAllGroupsSlice()).unwrap();
   }, []);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewBranch({
-      ...newBranch,
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGroups({
+      ...groups,
       [e.target.name]: e.target.value,
     });
   };
+  const handleAddGroup = async (groups: IProductoGroups) => {
+    try {
+      const resultAction = await store.dispatch(createGroupSlice(groups));
+      const result = unwrapResult(resultAction);
+      store.dispatch(AddingGroups(result));
+      toast.success('Categoria creado exitosamente');
+    } catch (error) {
+      toast.error(error as string);
+    }
+  };
 
-  const handleSaveNew = () => {
-    store.dispatch(createBranchs(newBranch));
-    setIsDialogOpen(false);
+  const handleEdit = (id: string) => {
+    // store.dispatch(updateBranchs({ branch: newBranch, id }));
+    setEditingSucursal(true);
+    setIsDialogOpen(true);
   };
 
   const openDialog = (isEdit: boolean) => {
     setEditingSucursal(isEdit);
     setIsDialogOpen(true);
-  };
-
-  const handleSelectBranch = (branch: Branch) => {
-    store.dispatch(setSelectedBranch(branch));
   };
 
   return (
@@ -91,7 +96,7 @@ export default function BranchDashboard() {
             onClick={() => openDialog(false)}
             className="w-full sm:w-auto"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             Agregar Sucursal
           </Button>
         </div>
@@ -109,54 +114,35 @@ export default function BranchDashboard() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingSucursal ? 'Editar Sucursal' : 'Agregar Nueva Sucursal'}
+              {editingSucursal
+                ? 'Editar Categorias'
+                : 'Agregar Nueva Categorias'}
             </DialogTitle>
             <DialogDescription>
               {editingSucursal
-                ? 'Modifica los detalles de la sucursal aquí.'
-                : 'Ingresa los detalles de la nueva sucursal.'}
+                ? 'Modifica los detalles de la Categorias aquí.'
+                : 'Ingresa los detalles de la nueva Categorias.'}
             </DialogDescription>
           </DialogHeader>
 
           <Label htmlFor="nombre">Nombre</Label>
           <Input
+            type="text"
             id="nombre"
             name="nombre"
-            value={newBranch.nombre}
+            value={groups.nombre}
             onChange={handleInputChange}
-            placeholder="Nombre de la sucursal"
+            required
           />
-          <Label htmlFor="direccion">Dirección</Label>
+
+          <Label htmlFor="descripcion">Descripcion</Label>
           <Input
-            id="direccion"
-            name="direccion"
-            value={newBranch.direccion}
+            type="descripcion"
+            id="descripcion"
+            name="descripcion"
+            value={groups.descripcion}
             onChange={handleInputChange}
-            placeholder="Dirección de la sucursal"
-          />
-          <Label htmlFor="ciudad">Ciudad</Label>
-          <Input
-            id="ciudad"
-            name="ciudad"
-            value={newBranch.ciudad}
-            onChange={handleInputChange}
-            placeholder="Ciudad de la sucursal"
-          />
-          <Label htmlFor="pais">País</Label>
-          <Input
-            id="pais"
-            name="pais"
-            value={newBranch.pais}
-            onChange={handleInputChange}
-            placeholder="País de la sucursal"
-          />
-          <Label htmlFor="telefono">Teléfono</Label>
-          <Input
-            id="telefono"
-            name="telefono"
-            value={newBranch.telefono}
-            onChange={handleInputChange}
-            placeholder="Teléfono de la sucursal"
+            required
           />
 
           <DialogFooter>
@@ -166,12 +152,13 @@ export default function BranchDashboard() {
                 if (editingSucursal) {
                   //   handleEdit(newBranch?._id);
                 } else {
-                  handleSaveNew();
+                  handleAddGroup(groups);
                 }
               }}
             >
               Guardar cambios
             </Button>
+            {/* <Button onClick={() => setIsDialogOpen(false)}>Cancelar</Button> */}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -179,14 +166,10 @@ export default function BranchDashboard() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
         {branches.length > 0 &&
           branches.map((branch) => (
-            <Link
-              key={branch._id}
-              to={`/branches/${branch._id}/products`}
-              onClick={() => handleSelectBranch(branch)}
-            >
-              <BranchCard
+            <Link to={`/branches/${branch._id}/products`}>
+              <CategoriesCard
                 key={branch._id}
-                branch={branch}
+                categoriesData={branch}
                 onEdit={() => openDialog(true)}
               />
             </Link>

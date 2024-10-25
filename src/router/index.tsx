@@ -9,6 +9,7 @@ import {
   RequireAuth,
 } from '../shared/helpers/login.Helper';
 import RegisterForm from '@/ui/components/Login/RegisterForm';
+import { PagesCategories } from '@/pages/Categories';
 import { Page } from '@/shared/components/ui/Page';
 import { Products } from '@/ui/components/Table/products';
 
@@ -16,7 +17,6 @@ export const Router = () => {
   return (
     <Routes>
       <Route path="/login" element={<AlreadyAuthenticated />} />
-
       <Route
         path="/"
         element={<RequireAuth rolesAllowed={['admin', 'user', 'root']} />}
@@ -62,7 +62,6 @@ export const Router = () => {
           }
         />
       </Route>
-
       <Route
         path="/branches/:Id/products"
         element={<RequireAuth rolesAllowed={['root']} />}
@@ -101,7 +100,19 @@ export const Router = () => {
           }
         />
       </Route>
-
+      <Route
+        path="/categories"
+        element={<RequireAuth rolesAllowed={['root', 'admin']} />}
+      >
+        <Route
+          path="/categories"
+          element={
+            <Layout>
+              <PagesCategories />
+            </Layout>
+          }
+        />
+      </Route>
       <Route path="/404" element={<Page404 />} />
       <Route path="*" element={<Navigate to="/404" />} />
     </Routes>

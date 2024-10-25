@@ -26,6 +26,7 @@ export interface ITool extends ITablaBranch {
   quantityToSend: number;
   comment: string | null;
   gallery: Array<string>;
+  //
 }
 
 export default function ToolShipment() {

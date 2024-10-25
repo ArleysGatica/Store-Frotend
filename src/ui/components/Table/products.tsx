@@ -86,13 +86,29 @@ export function Products() {
               setFilterStatus={setFilterStatus}
               onAddProduct={handleAddProduct}
               sucursalId={user?.sucursalId?._id}
+              handleSelectChange={function (
+                e: React.ChangeEvent<HTMLSelectElement>
+              ): void {
+                throw new Error('Function not implemented.');
+              }}
+              selectedGroup={null}
+              groups={[]}
             />
             {filteredProducts.length === 0 ? (
               <span className="flex justify-center w-full text-sm text-center text-muted-foreground">
                 No hay productos en esta sucursal
               </span>
             ) : (
-              <ProductsTable products={currentItems} />
+              <ProductsTable
+                products={currentItems}
+                handleSelectChange={function (
+                  e: React.ChangeEvent<HTMLSelectElement>
+                ): void {
+                  throw new Error('Function not implemented.');
+                }}
+                selectedGroup={null}
+                groups={[]}
+              />
             )}
           </CardContent>
           <CardFooter className="flex items-center justify-between">

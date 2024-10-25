@@ -27,8 +27,8 @@ export const getAll = async (): Promise<AxiosResponse> => {
 
 export const getBranchesById = async (id: string): Promise<ITablaBranch[]> => {
   const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Branch);
-  const response = await axiosInstance.get(`/${id}/products`); // Esto devuelve un AxiosResponse
-  return response.data; // Aquí se retorna solo la propiedad data que debería ser un arreglo de Branch
+  const response = await axiosInstance.get(`/${id}/products`);
+  return response.data;
 };
 
 export const updateBranch = async (branch: IBranch, id: string) => {

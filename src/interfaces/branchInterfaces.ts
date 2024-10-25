@@ -1,11 +1,11 @@
-import { Branch } from '../app/slices/branchSlice';
+import { IProductoGroups } from '@/api/services/groups';
+import { Branch } from '@/app/slices/branchSlice';
 
 export interface IBranchSlice {
   status: IStatus;
   error: string | null;
-  //   branches: IBranch[];
 
-  branches: IBranch | null; // La sucursal cargada
+  branches: IBranch | null;
   loading: boolean;
 }
 
@@ -17,6 +17,11 @@ export interface IBranch {
   telefono: string;
   direccion: string;
   description: string;
+}
+
+export interface ICategoriesProps {
+  onEdit: (isEdit: boolean) => void;
+  categoriesData: IProductoGroups;
 }
 
 export interface IBranchProps {

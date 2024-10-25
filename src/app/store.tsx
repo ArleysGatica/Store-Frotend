@@ -4,6 +4,7 @@ import { loginReducer } from './slices/login';
 import { TablaBranchReducer } from './slices/tablaBranchsSlice';
 import { branchesReducer } from './slices/branchSlice';
 import { productsReducer } from './slices/products';
+import { groupsReducer } from './slices/groups';
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     auth: loginReducer,
     inventory: TablaBranchReducer,
     products: productsReducer,
+    categories: groupsReducer,
   },
 });
 
