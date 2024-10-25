@@ -29,7 +29,6 @@ const initialState: ProductState = {
   error: null,
 };
 
-// Paso 2: Crear el slice
 const productsSlice = createSlice({
   name: 'products',
   initialState,
@@ -55,5 +54,4 @@ const productsSlice = createSlice({
   },
 });
 
-// Exportamos el reducer
 export const productsReducer = productsSlice.reducer;

@@ -65,7 +65,6 @@ export default function ToolShipment() {
   );
 
   const branches = useAppSelector((state) => state.branches.data);
-
   const [selectedBranch, setSelectedBranch] = useState<{
     nombre: string;
     _id: string;
@@ -84,21 +83,18 @@ export default function ToolShipment() {
   };
 
   const fetchData = async () => {
-    // Solo procede si hay una sucursal seleccionada
     if (!selectedBranch) return;
 
-    const response = await GetBranches(selectedBranch._id); // Usa solo el ID seleccionado
+    const response = await GetBranches(selectedBranch._id);
     console.log(response, 'response');
     setProducts(response);
   };
 
   useEffect(() => {
-    // Despacha la acción para obtener las sucursales
     store.dispatch(fetchBranches()).unwrap();
   }, []);
 
   useEffect(() => {
-    // Cada vez que cambie la sucursal seleccionada, se hace la petición
     if (selectedBranch) {
       fetchData();
     }

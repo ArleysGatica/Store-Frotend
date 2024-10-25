@@ -31,11 +31,9 @@ import { Link } from 'react-router-dom';
 export default function BranchDashboard() {
   const branches = useAppSelector((state) => state.branches.data);
 
-  console.log(branches, 'branches');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSucursal, setEditingSucursal] = useState(false);
   const [newBranch, setNewBranch] = useState<Branch>({
-    // _id: '',
     pais: '',
     ciudad: '',
     nombre: '',

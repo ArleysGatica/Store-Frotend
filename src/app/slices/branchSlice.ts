@@ -72,7 +72,7 @@ export const updateBranchs = createAsyncThunk(
 
 export const deleteBranch = createAsyncThunk(
   'branches/delete',
-  async ({ _id }: Branch) => {
+  async (_id: string) => {
     const response = await deleteBranchById(_id!);
     return response;
   }
@@ -121,22 +121,30 @@ const branchesSlice = createSlice({
       })
 
       .addCase(createBranchs.pending, (state) => {
-        state.loading = true; // Cambia a loading
-        state.error = null; // Reinicia el error
+        state.loading = true;
+        state.error = null;
       })
       .addCase(
         createBranchs.fulfilled,
         (state, action: PayloadAction<Branch>) => {
-          state.loading = false; // Cambia a no loading
-          state.data.push(action.payload); // Agrega la nueva sucursal al estado
+          state.loading = false;
+          state.data.push(action.payload);
         }
       )
       .addCase(createBranchs.rejected, (state, action) => {
-        state.loading = false; // Cambia a no loading
-        state.error = action.error.message || 'unknown error'; // Manejo de errores
+        state.loading = false;
+        state.error = action.error.message || 'unknown error';
+      })
+
+      .addCase(deleteBranch.fulfilled, (state, { payload }) => {
+        const updAtt = state.data.filter(
+          (item) => item._id !== payload.data._id
+        );
+        state.data = updAtt;
+        state.loading = false;
+        state.error = null;
       });
   },
 });
 
-// Exportamos el reducer
 export const branchesReducer = branchesSlice.reducer;

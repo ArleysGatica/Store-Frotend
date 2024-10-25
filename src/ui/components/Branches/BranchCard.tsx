@@ -16,10 +16,12 @@ import { Button } from '@/components/ui/button';
 import { MoreVertical, Pencil, Trash } from 'lucide-react';
 import { IBranchProps } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
+import { Branch, deleteBranch } from '@/app/slices/branchSlice';
 
 export const BranchCard = ({ branch, onEdit }: IBranchProps) => {
+  console.log(branch?._id, 'branch');
   const handleOnDelete = () => {
-    // store.dispatch(deleteBranch(branch._id));
+    // store.dispatch(deleteBranch(branch as Branch));
   };
 
   return (
