@@ -42,7 +42,7 @@ export interface IProduct {
   _id?: number;
 }
 export interface ITablaBranch {
-  _id?: string;
+  id?: string;
   nombre: string;
   descripcion: string;
   precio: { $numberDecimal: number };
