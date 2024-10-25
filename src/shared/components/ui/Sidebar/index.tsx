@@ -21,38 +21,38 @@ export const Sidebar = ({ links, className }: SidebarProps) => {
     >
       <button
         onClick={toggleSidebar}
-        className="p-2 bg-white rounded shadow-md mb-4 transition-transform duration-200 transform hover:scale-105 justify-items-center w-full"
+        className={`flex w-full p-2 mb-4 transition-transform duration-200 transform bg-white rounded shadow-md hover:scale-105 ${isCollapsed ? 'justify-center' : 'justify-end'}`}
       >
-        <PanelRightOpen />
+        <i className={`${isCollapsed ? 'rotate-180' : ''}`}>
+          <PanelRightOpen />
+        </i>
       </button>
-      <h2
-        className={`text-xl font-bold p-4 transition-opacity duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}
-      >
-        Lorem ipsum
-      </h2>
       <ul
         className={`flex flex-col gap-4 p-4 ${isCollapsed ? 'hidden' : 'flex'}`}
       >
         {links.map((link) => (
-          <li
-            className="h-10 border-b border-border w-full flex items-center justify-between p-2 hover:bg-gray-200 transition-colors duration-200"
+          <Link
             key={link.name}
+            className="flex items-center gap-2 text-lg font-medium text-black"
+            to={link.path}
           >
-            <Link
-              className="text-lg font-medium text-black flex items-center gap-2"
-              to={link.path}
-            >
+            <li className="flex items-center w-full h-10 gap-2 p-2 transition-colors duration-200 border-b rounded-sm border-border hover:bg-gray-200">
               {link.icon && <span className="text-xl">{link.icon}</span>}
               {link.name}
-            </Link>
-          </li>
+            </li>
+          </Link>
         ))}
       </ul>
       {isCollapsed && (
         <ul className="flex flex-col gap-2 p-2">
           {links.map((link) => (
-            <li key={link.name} className="flex items-center justify-center">
-              <Link to={link.path}>{link.icon}</Link>
+            <li
+              key={link.name}
+              className="flex items-center justify-center w-10 h-10"
+            >
+              <Link to={link.path} className="size-5">
+                {link.icon}
+              </Link>
             </li>
           ))}
         </ul>

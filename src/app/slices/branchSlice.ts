@@ -21,9 +21,13 @@ export interface Branch {
   description: string;
 }
 
+export interface IBranchWithProducts extends Branch {
+  products: ITablaBranch[];
+}
+
 interface BranchState {
   data: Branch[];
-  selectedBranch: (Branch & { products: ITablaBranch[] }) | null;
+  selectedBranch: IBranchWithProducts | null;
   loading: boolean;
   error: string | null;
 }
@@ -109,6 +113,12 @@ const branchesSlice = createSlice({
         products: state.selectedBranch?.products ?? [],
       };
     },
+    updateSelectedBranch: (
+      state,
+      action: PayloadAction<IBranchWithProducts | null>
+    ) => {
+      state.selectedBranch = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -156,5 +166,6 @@ const branchesSlice = createSlice({
 });
 
 // Exportamos el reducer
-export const { setSelectedBranch } = branchesSlice.actions;
+export const { setSelectedBranch, updateSelectedBranch } =
+  branchesSlice.actions;
 export const branchesReducer = branchesSlice.reducer;

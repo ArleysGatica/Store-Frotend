@@ -18,6 +18,9 @@ import { ConsolidatedShipment } from './consolidatedShipment';
 import { SummaryTools } from './summaryTools';
 import { ToolTransfer } from './toolTransfer';
 import './styles.scss';
+import { GetBranches } from '@/shared/helpers/Branchs';
+import { store } from '@/app/store';
+import { fetchBranches, updateSelectedBranch } from '@/app/slices/branchSlice';
 
 export interface ITool extends ITablaBranch {
   quantityToSend: number;
@@ -26,7 +29,7 @@ export interface ITool extends ITablaBranch {
 }
 
 export default function ToolShipment() {
-  const user = useAppSelector((state) => state.auth.signIn.user?._id);
+  const user = useAppSelector((state) => state.auth.signIn.user);
   const selectedBranch = useAppSelector(
     (state) => state.branches.selectedBranch
   );
@@ -106,8 +109,23 @@ export default function ToolShipment() {
     setShipmentTools(updatedTools);
   };
 
+  const handleLoadBranch = async () => {
+    if (user?.sucursalId) {
+      const response = await GetBranches(user.sucursalId._id);
+
+      store.dispatch(
+        updateSelectedBranch({
+          ...user.sucursalId,
+          products: response,
+        })
+      );
+    } else {
+      store.dispatch(updateSelectedBranch(null));
+    }
+  };
+
   useEffect(() => {
-    if (!selectedBranch) return;
+    if (!selectedBranch) return setTools([]);
     const formattedTools = selectedBranch.products.map((tool) => ({
       ...tool,
       quantityToSend: 0,
@@ -115,7 +133,11 @@ export default function ToolShipment() {
       gallery: [],
     }));
     setTools(formattedTools);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBranch]);
+
+  useEffect(() => {
+    store.dispatch(fetchBranches()).unwrap();
+    handleLoadBranch();
   }, []);
 
   return (
@@ -195,7 +217,7 @@ export default function ToolShipment() {
               destinationBranchId={destinationBranch}
               sourceBranchId={selectedBranch?._id ?? ''}
               shipmentTools={shipmentTools}
-              userId={user ?? ''}
+              userId={user?._id ?? ''}
             />
           </div>
         </div>

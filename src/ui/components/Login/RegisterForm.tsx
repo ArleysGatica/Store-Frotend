@@ -28,14 +28,12 @@ interface ILoginData {
 
 const RegisterForm = () => {
   const branches = useAppSelector((state) => state.branches.data);
-
-  const authRole = useAppSelector((state) => state.auth.signIn.user?.role);
-  console.log(authRole);
   const [selectedBranch, setSelectedBranch] = useState<{
     nombre: string;
     _id: string;
   } | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const [products, setProducts] = useState<ITablaBranch[]>([]);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -112,12 +110,12 @@ const RegisterForm = () => {
   return (
     <motion.form
       onSubmit={handleSubmit}
-      className="auth-form bg-gray-50 shadow-md rounded-lg p-6 max-w-md mx-auto mt-10 w-full"
+      className="w-full max-w-md p-6 mx-auto mt-10 rounded-lg shadow-md auth-form bg-gray-50"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <h1 className="text-2xl font-bold mb-6 text-center">Registrar Usuario</h1>
+      <h1 className="mb-6 text-2xl font-bold text-center">Registrar Usuario</h1>
 
       <div className="mb-4">
         <label
@@ -135,7 +133,7 @@ const RegisterForm = () => {
           required
         />
       </div>
-      <div className="mb-4 relative">
+      <div className="relative mb-4">
         <label
           htmlFor="password"
           className="block text-sm font-medium text-gray-700"
@@ -201,16 +199,16 @@ const RegisterForm = () => {
       </div>
 
       {errorMessage && (
-        <div className="text-red-500 mb-4 text-center">{errorMessage}</div>
+        <div className="mb-4 text-center text-red-500">{errorMessage}</div>
       )}
       {isSuccess && (
-        <div className="text-green-500 mb-4 text-center">
+        <div className="mb-4 text-center text-green-500">
           Usuario registrado exitosamente.
         </div>
       )}
       <button
         type="submit"
-        className="w-full bg-black text-white hover:bg-blue-700"
+        className="w-full text-white bg-black hover:bg-blue-700"
       >
         Registrar Usuario
       </button>

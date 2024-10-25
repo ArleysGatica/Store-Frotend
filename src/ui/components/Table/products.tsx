@@ -7,7 +7,6 @@ import {
   CardDescription,
   CardContent,
 } from '@/components/ui/card';
-import { useParams } from 'react-router-dom';
 import { toast } from '@/components/hooks/use-toast';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
@@ -16,9 +15,10 @@ import SearchAndFilter from './sear';
 import ProductsTable from './ProductTable';
 import Pagination from '../../../shared/components/ui/Pagination/Pagination';
 import { GetBranches } from '@/shared/helpers/Branchs';
+import { useAppSelector } from '@/app/hooks';
 
-export function DataTableDemo() {
-  const { Id } = useParams<{ Id: string }>();
+export function Products() {
+  const user = useAppSelector((state) => state.auth.signIn.user);
   const [products, setProducts] = useState<ITablaBranch[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string[]>([
@@ -26,12 +26,15 @@ export function DataTableDemo() {
     'draft',
   ]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(20);
+  const [itemsPerPage] = useState(10);
 
   const fetchData = async () => {
-    if (!Id) return;
-    const response = await GetBranches(Id);
-    setProducts(response);
+    if (user?.sucursalId) {
+      const response = await GetBranches(user.sucursalId._id);
+      setProducts(response);
+    } else {
+      console.log('admin user debe obtener productos generales');
+    }
   };
 
   useEffect(() => {
@@ -82,7 +85,7 @@ export function DataTableDemo() {
               filterStatus={filterStatus}
               setFilterStatus={setFilterStatus}
               onAddProduct={handleAddProduct}
-              sucursalId={Id}
+              sucursalId={user?.sucursalId?._id}
             />
             {filteredProducts.length === 0 ? (
               <span className="flex justify-center w-full text-sm text-center text-muted-foreground">

@@ -11,12 +11,14 @@ import { Branch } from '@/app/slices/branchSlice';
 
 export interface ICustomSelect {
   sourceBranchId: string;
-  setDestinationBranch: React.Dispatch<React.SetStateAction<string | null>>;
+  setDestinationBranch?: (id: string | null) => void;
+  handleBranchSelect?: (branch: Branch | null) => void;
 }
 
 const CustomSelect = ({
   setDestinationBranch,
   sourceBranchId,
+  handleBranchSelect,
 }: ICustomSelect) => {
   const branches = useAppSelector((state) => state.branches.data);
   const [isOpen, setIsOpen] = useState(false);
@@ -28,12 +30,14 @@ const CustomSelect = ({
   const handleRemove = (id: string) => {
     const branch = id === selectedWarehouse?._id ? null : selectedWarehouse;
     setSelectedWarehouse(branch);
-    setDestinationBranch(branch?._id ?? null);
+    setDestinationBranch && setDestinationBranch(branch?._id ?? null);
+    handleBranchSelect && handleBranchSelect(null);
   };
 
   const handleWarehouseSelect = (warehouse: Branch) => {
     setSelectedWarehouse(warehouse);
-    setDestinationBranch(warehouse._id ?? null);
+    setDestinationBranch && setDestinationBranch(warehouse._id ?? null);
+    handleBranchSelect && handleBranchSelect(warehouse);
     setIsOpen(false);
   };
 

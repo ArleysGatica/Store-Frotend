@@ -11,26 +11,23 @@ export const HeaderTable = () => {
 
   return (
     <div className="container mx-auto ">
-      <Tabs defaultValue="receive">
-        <TabsList className="mb-4 gap-4 bg-[#ffffff] text-[#ffffff] font-bold">
-          <TabsTrigger
-            className="  text-[#ffffff] font-bold
-          border-b-2 border-bg-gray-200 border-opacity-0
-          bg-black
-          "
-            value="receive"
-          >
-            Recibir herramientas
-          </TabsTrigger>
-          <TabsTrigger
-            className="bg-black text-[#ffffff] font-bold"
-            value="send"
-          >
-            Enviar herramientas
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="send">
         <div className="flex flex-col items-start justify-between gap-4 mb-4 sm:flex-row sm:items-center">
-          <Button variant="outline">Contraer filtros</Button>
+          {/* <Button variant="outline">Contraer filtros</Button> */}
+          <TabsList className="gap-4 font-bold text-white bg-black">
+            <TabsTrigger
+              className="text-[#ffffff] font-bold border-b-2 border-bg-gray-200 border-opacity-0 bg-black"
+              value="send"
+            >
+              Enviar herramientas
+            </TabsTrigger>
+            <TabsTrigger
+              className="bg-black text-[#ffffff] font-bold"
+              value="receive"
+            >
+              Recibir herramientas
+            </TabsTrigger>
+          </TabsList>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline">
               Filtrar por fecha <ChevronDown className="w-4 h-4 ml-2" />
