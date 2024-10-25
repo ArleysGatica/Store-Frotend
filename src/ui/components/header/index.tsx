@@ -3,6 +3,7 @@ import { ProfileUser } from '../../../shared/components/ui/Profile';
 import { store } from '../../../app/store';
 import { logout } from '../../../app/slices/login';
 import { useNavigate } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,9 +26,9 @@ export const Header = () => {
       <div className="flex items-center gap-2">
         <button
           onClick={handleLogout}
-          className="bg-primary-500 text-white px-4 py-2 rounded-md flex items-center"
+          className="flex items-center px-2 py-2 text-white bg-black rounded-md bg-primary-500"
         >
-          <i className="fas fa-sign-in-alt mr-2"></i> salir
+          <LogOut />
         </button>
         <ProfileUser />
         <button onClick={toggleMenu} className="md:hidden">
@@ -35,7 +36,7 @@ export const Header = () => {
         </button>
       </div>
       {isMenuOpen && (
-        <div className="absolute top-16 right-4 bg-white shadow-lg rounded-md md:hidden">
+        <div className="absolute bg-white rounded-md shadow-lg top-16 right-4 md:hidden">
           <button className="block px-4 py-2">Iniciar sesión</button>
         </div>
       )}

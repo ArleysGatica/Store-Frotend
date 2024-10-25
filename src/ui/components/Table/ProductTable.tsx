@@ -66,7 +66,7 @@ const ProductsTable = ({
         </TableHeader>
         <TableBody>
           {products?.map((product) => (
-            <TableRow key={product._id}>
+            <TableRow key={product.id}>
               <TableCell className="font-medium">{product.nombre}</TableCell>
               <TableCell>${product.precio.$numberDecimal}</TableCell>
               <TableCell>{product.descripcion}</TableCell>

@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { createUsers, Iauth, registerUsers } from '../../api/services/auth';
 import { handleAsyncThunkError } from '../../shared/utils/errorHandlers';
+import { IBranch } from '@/interfaces/branchInterfaces';
 
 type IRoles = 'admin' | 'user' | 'root';
 
@@ -12,7 +13,7 @@ export interface IToken {
     username: string;
     role: IRoles;
     password: string;
-    sucursalId?: string;
+    sucursalId?: IBranch;
   };
 }
 
@@ -80,7 +81,7 @@ export interface IAuthSlice {
     _id: string;
     username: string;
     role: IRoles;
-    sucursalId?: string;
+    sucursalId?: IBranch;
   };
   status: statusLoguer;
 }

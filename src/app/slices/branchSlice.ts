@@ -21,14 +21,20 @@ export interface Branch {
   description: string;
 }
 
+export interface IBranchWithProducts extends Branch {
+  products: ITablaBranch[];
+}
+
 interface BranchState {
   data: Branch[];
+  selectedBranch: IBranchWithProducts | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: BranchState = {
   data: [], // Inicializar como un arreglo vacío
+  selectedBranch: null,
   loading: false,
   error: null,
 };
@@ -93,13 +99,24 @@ export const createBranchs = createAsyncThunk(
   }
 );
 
-// Paso 2: Crear el slice
 const branchesSlice = createSlice({
   name: 'branches',
   initialState,
   reducers: {
     AddingBranchs: (state, action: PayloadAction<Branch>) => {
       state.data.push(action.payload);
+    },
+    setSelectedBranch: (state, action: PayloadAction<Branch>) => {
+      state.selectedBranch = {
+        ...action.payload,
+        products: state.selectedBranch?.products ?? [],
+      };
+    },
+    updateSelectedBranch: (
+      state,
+      action: PayloadAction<IBranchWithProducts | null>
+    ) => {
+      state.selectedBranch = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -135,16 +152,18 @@ const branchesSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'unknown error';
       })
-
-      .addCase(deleteBranch.fulfilled, (state, { payload }) => {
-        const updAtt = state.data.filter(
-          (item) => item._id !== payload.data._id
-        );
-        state.data = updAtt;
-        state.loading = false;
-        state.error = null;
-      });
+      .addCase(
+        fetchBranchesById.fulfilled,
+        (state, { payload }: PayloadAction<ITablaBranch[]>) => {
+          state.selectedBranch = {
+            ...state.selectedBranch!,
+            products: payload,
+          };
+        }
+      );
   },
 });
 
+export const { setSelectedBranch, updateSelectedBranch } =
+  branchesSlice.actions;
 export const branchesReducer = branchesSlice.reducer;

@@ -38,7 +38,7 @@ const toolShipments: ToolShipmentData[] = [
     sentBy: 'Pedro Castañeda',
   },
   {
-    id: '1',
+    id: '2',
     status: 'Pendiente',
     consecutive: '1234567890',
     warehouse: 'Nombre de bodega',
@@ -98,13 +98,13 @@ export default function ReceivedTools() {
             <TableCell>
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm">
-                  <Eye className="h-4 w-4 mr-1" />
+                  <Eye className="w-4 h-4 mr-1" />
                   Ver detalles
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm">
-                      <MoreVertical className="h-4 w-4" />
+                      <MoreVertical className="w-4 h-4" />
                       <span className="sr-only">Opciones</span>
                     </Button>
                   </DropdownMenuTrigger>
@@ -115,7 +115,7 @@ export default function ReceivedTools() {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button size="sm">
-                  <ArrowDownToLine className="h-4 w-4 mr-1" />
+                  <ArrowDownToLine className="w-4 h-4 mr-1" />
                   Recibir
                 </Button>
               </div>

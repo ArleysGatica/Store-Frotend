@@ -10,6 +10,8 @@ import {
 } from '../shared/helpers/login.Helper';
 import RegisterForm from '@/ui/components/Login/RegisterForm';
 import { PagesCategories } from '@/pages/Categories';
+import { Page } from '@/shared/components/ui/Page';
+import { Products } from '@/ui/components/Table/products';
 
 export const Router = () => {
   return (
@@ -23,11 +25,16 @@ export const Router = () => {
           path="/"
           element={
             <Layout>
-              <HeaderTable />
+              <Page center>
+                <h1 className="font-mono font-semibold capitalize">
+                  Welcome to Store 🎁
+                </h1>
+              </Page>
             </Layout>
           }
         />
       </Route>
+
       <Route
         path="/warehouse"
         element={<RequireAuth rolesAllowed={['root']} />}
@@ -41,22 +48,16 @@ export const Router = () => {
           }
         />
       </Route>
-      <Route path="/register" element={<RequireAuth rolesAllowed={['root']} />}>
-        <Route
-          path="/register"
-          element={
-            <Layout>
-              <RegisterForm />
-            </Layout>
-          }
-        />
-      </Route>
-      <Route path="/branches" element={<RequireAuth rolesAllowed={['root']} />}>
+
+      <Route
+        path="/branches"
+        element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}
+      >
         <Route
           path="/branches"
           element={
             <Layout>
-              <DataTableDemo />
+              <Products />
             </Layout>
           }
         />
@@ -75,6 +76,30 @@ export const Router = () => {
         />
       </Route>
 
+      <Route
+        path="/orders"
+        element={<RequireAuth rolesAllowed={['admin', 'user', 'root']} />}
+      >
+        <Route
+          path="/orders"
+          element={
+            <Layout>
+              <HeaderTable />
+            </Layout>
+          }
+        />
+      </Route>
+
+      <Route path="/register" element={<RequireAuth rolesAllowed={['root']} />}>
+        <Route
+          path="/register"
+          element={
+            <Layout>
+              <RegisterForm />
+            </Layout>
+          }
+        />
+      </Route>
       <Route
         path="/categories"
         element={<RequireAuth rolesAllowed={['root', 'admin']} />}

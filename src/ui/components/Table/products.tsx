@@ -7,7 +7,6 @@ import {
   CardDescription,
   CardContent,
 } from '@/components/ui/card';
-import { useParams } from 'react-router-dom';
 import { toast } from '@/components/hooks/use-toast';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
@@ -15,13 +14,11 @@ import { createProduct } from '@/app/slices/products';
 import SearchAndFilter from './sear';
 import ProductsTable from './ProductTable';
 import Pagination from '../../../shared/components/ui/Pagination/Pagination';
-import { useAppSelector } from '@/app/hooks';
-import { getAllGroupsSlice } from '@/app/slices/groups';
-import { IProductoGroups } from '@/api/services/groups';
 import { GetBranches } from '@/shared/helpers/Branchs';
+import { useAppSelector } from '@/app/hooks';
 
-export function DataTableDemo() {
-  const { Id } = useParams<{ Id: string }>();
+export function Products() {
+  const user = useAppSelector((state) => state.auth.signIn.user);
   const [products, setProducts] = useState<ITablaBranch[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string[]>([
@@ -29,46 +26,15 @@ export function DataTableDemo() {
     'draft',
   ]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(20);
-
-  const GroupsAll = useAppSelector((state) => state.categories.groups);
-  const [selectedGroup, setSelectedGroup] = useState<{
-    nombre: string;
-    _id: string;
-  } | null>(null);
-
-  const [, setGroups] = useState<IProductoGroups[]>([]);
-
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedBranchId = e.target.value;
-    const branch = GroupsAll.find((b) => b._id === selectedBranchId);
-
-    if (branch) {
-      setSelectedGroup({ nombre: branch.nombre, _id: branch._id ?? '' });
-    }
-  };
-
-  const fetchDataGroup = async () => {
-    if (!selectedGroup) return;
-
-    const response = await GetBranches(selectedGroup._id);
-    setGroups(response);
-  };
-
-  useEffect(() => {
-    store.dispatch(getAllGroupsSlice()).unwrap();
-  }, []);
-
-  useEffect(() => {
-    if (selectedGroup) {
-      fetchDataGroup();
-    }
-  }, [selectedGroup]);
+  const [itemsPerPage] = useState(10);
 
   const fetchData = async () => {
-    if (!Id) return;
-    const response = await GetBranches(Id);
-    setProducts(response);
+    if (user?.sucursalId) {
+      const response = await GetBranches(user.sucursalId._id);
+      setProducts(response);
+    } else {
+      console.log('admin user debe obtener productos generales');
+    }
   };
 
   useEffect(() => {
@@ -91,6 +57,8 @@ export function DataTableDemo() {
   const handleAddProduct = (newProduct: ITablaBranch) => {
     const product: ITablaBranch = {
       ...newProduct,
+      createdAt: new Date().toISOString().split('T')[0],
+      updatedAt: new Date().toISOString().split('T')[0],
     };
     store.dispatch(createProduct(product));
     setProducts((prevProducts) => [...prevProducts, product]);
@@ -117,10 +85,14 @@ export function DataTableDemo() {
               filterStatus={filterStatus}
               setFilterStatus={setFilterStatus}
               onAddProduct={handleAddProduct}
-              sucursalId={Id}
-              handleSelectChange={handleSelectChange}
-              selectedGroup={selectedGroup}
-              groups={GroupsAll}
+              sucursalId={user?.sucursalId?._id}
+              handleSelectChange={function (
+                e: React.ChangeEvent<HTMLSelectElement>
+              ): void {
+                throw new Error('Function not implemented.');
+              }}
+              selectedGroup={null}
+              groups={[]}
             />
             {filteredProducts.length === 0 ? (
               <span className="flex justify-center w-full text-sm text-center text-muted-foreground">
@@ -128,10 +100,14 @@ export function DataTableDemo() {
               </span>
             ) : (
               <ProductsTable
-                handleSelectChange={handleSelectChange}
-                selectedGroup={selectedGroup}
-                groups={GroupsAll}
                 products={currentItems}
+                handleSelectChange={function (
+                  e: React.ChangeEvent<HTMLSelectElement>
+                ): void {
+                  throw new Error('Function not implemented.');
+                }}
+                selectedGroup={null}
+                groups={[]}
               />
             )}
           </CardContent>
