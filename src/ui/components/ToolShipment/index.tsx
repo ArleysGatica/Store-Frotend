@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, X, Camera, MessageSquare, Edit3, Send } from 'lucide-react';
-
+import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -12,103 +11,140 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { TabsContent } from '@/components/ui/tabs';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { useAppSelector } from '@/app/hooks';
-import { store } from '@/app/store';
-import { fetchBranches } from '@/app/slices/branchSlice';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { ConsolidatedShipment } from './consolidatedShipment';
+import { SummaryTools } from './summaryTools';
+import { ToolTransfer } from './toolTransfer';
+import './styles.scss';
 import { GetBranches } from '@/shared/helpers/Branchs';
+import { store } from '@/app/store';
+import { fetchBranches, updateSelectedBranch } from '@/app/slices/branchSlice';
 
-interface Tool {
-  id: string;
-  name: string;
-  code: string;
-  availableQuantity: number;
+export interface ITool extends ITablaBranch {
   quantityToSend: number;
+  comment: string | null;
+  gallery: Array<string>;
 }
-
-interface ShipmentTool extends Tool {
-  photos: number;
-  comments: number;
-}
-
-const initialTools: Tool[] = [
-  {
-    id: '1',
-    name: 'Taladro neumático de mano de 50W',
-    code: '1234567890abcd',
-    availableQuantity: 25,
-    quantityToSend: 0,
-  },
-];
-
-const shipmentTools: ShipmentTool[] = [
-  { ...initialTools[0], photos: 0, comments: 0 },
-  { ...initialTools[1], photos: 1, comments: 0 },
-];
 
 export default function ToolShipment() {
-  const [tools, setTools] = useState<Tool[]>(initialTools);
+  const user = useAppSelector((state) => state.auth.signIn.user);
+  const selectedBranch = useAppSelector(
+    (state) => state.branches.selectedBranch
+  );
+  const [destinationBranch, setDestinationBranch] = useState<string | null>(
+    null
+  );
+  const [tools, setTools] = useState<ITool[]>([]);
+  const [shipmentTools, setShipmentTools] = useState<ITool[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleQuantityChange = (id: string, quantity: number) => {
-    setTools(
-      tools.map((tool) =>
-        tool.id === id ? { ...tool, quantityToSend: quantity } : tool
-      )
-    );
-  };
-
   const filteredTools = tools.filter((tool) =>
-    tool.name.toLowerCase().includes(searchTerm.toLowerCase())
+    tool.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const branches = useAppSelector((state) => state.branches.data);
+  const handleQuantityChange = (id: string, quantity: number) => {
+    const updatedTools = tools.map((tool) =>
+      tool.id === id ? { ...tool, quantityToSend: quantity } : tool
+    );
+    setTools(updatedTools);
+  };
 
-  const [selectedBranch, setSelectedBranch] = useState<{
-    nombre: string;
-    _id: string;
-  } | null>(null);
+  const handleShipmentTool = (tool: ITool) => {
+    const updatedTools = tools.map((tl) =>
+      tl.id === tool.id
+        ? { ...tl, stock: tl.stock - tool.quantityToSend, quantityToSend: 0 }
+        : tl
+    );
 
-  const [products, setProducts] = useState<ITablaBranch[]>([]);
-  console.log(products);
+    let updatedShipmentTools = shipmentTools.map((tl) =>
+      tl.id === tool.id
+        ? { ...tl, quantityToSend: tl.quantityToSend + tool.quantityToSend }
+        : tl
+    );
+    const isShipmentTool = updatedShipmentTools.find((st) => st.id === tool.id);
+    if (!isShipmentTool) {
+      updatedShipmentTools = [...updatedShipmentTools, tool];
+    }
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedBranchId = e.target.value;
-    const branch = branches.find((b) => b._id === selectedBranchId);
+    setShipmentTools(updatedShipmentTools);
+    setTools(updatedTools);
+  };
 
-    if (branch) {
-      setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
+  const handleRemoveShipmentTool = (tool: ITool) => {
+    const updatedTools = tools.map((tl) =>
+      tl.id === tool.id ? { ...tl, stock: tl.stock + tool.quantityToSend } : tl
+    );
+
+    const updatedShipmentTools = shipmentTools.filter(
+      (st) => st.id !== tool.id
+    );
+
+    setShipmentTools(updatedShipmentTools);
+    setTools(updatedTools);
+  };
+
+  const handleRemoveComment = (tool: ITool) => {
+    const updatedTools = shipmentTools.map((tl) =>
+      tl.id === tool.id ? { ...tl, comment: null } : tl
+    );
+
+    setShipmentTools(updatedTools);
+  };
+
+  const handleSaveComment = (toolId: string, comment: string) => {
+    const updatedTools = shipmentTools.map((tl) =>
+      tl.id === toolId ? { ...tl, comment: comment } : tl
+    );
+
+    setShipmentTools(updatedTools);
+  };
+
+  const handleSaveImages = (toolId: string, images: string[]) => {
+    const updatedTools = shipmentTools.map((tl) =>
+      tl.id === toolId ? { ...tl, gallery: images } : tl
+    );
+
+    setShipmentTools(updatedTools);
+  };
+
+  const handleLoadBranch = async () => {
+    if (user?.sucursalId) {
+      const response = await GetBranches(user.sucursalId._id);
+
+      store.dispatch(
+        updateSelectedBranch({
+          ...user.sucursalId,
+          products: response,
+        })
+      );
+    } else {
+      store.dispatch(updateSelectedBranch(null));
     }
   };
 
-  const fetchData = async () => {
-    // Solo procede si hay una sucursal seleccionada
-    if (!selectedBranch) return;
-
-    const response = await GetBranches(selectedBranch._id); // Usa solo el ID seleccionado
-    console.log(response, 'response');
-    setProducts(response);
-  };
-
   useEffect(() => {
-    // Despacha la acción para obtener las sucursales
-    store.dispatch(fetchBranches()).unwrap();
-  }, []);
-
-  useEffect(() => {
-    // Cada vez que cambie la sucursal seleccionada, se hace la petición
-    if (selectedBranch) {
-      fetchData();
-    }
+    if (!selectedBranch) return setTools([]);
+    const formattedTools = selectedBranch.products.map((tool) => ({
+      ...tool,
+      quantityToSend: 0,
+      comment: null,
+      gallery: [],
+    }));
+    setTools(formattedTools);
   }, [selectedBranch]);
+
+  useEffect(() => {
+    store.dispatch(fetchBranches()).unwrap();
+    handleLoadBranch();
+  }, []);
 
   return (
     <div className="container mx-auto ">
       <TabsContent value="send">
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
+        <div className="branch__grid">
+          <Card className="product__list">
             <br />
             <CardContent>
               <div className="relative mb-4">
@@ -133,25 +169,29 @@ export default function ToolShipment() {
                 <TableBody>
                   {filteredTools.map((tool) => (
                     <TableRow key={tool.id}>
-                      <TableCell>{tool.name}</TableCell>
-                      <TableCell>{tool.code}</TableCell>
-                      <TableCell>{tool.availableQuantity} unidades</TableCell>
+                      <TableCell>{tool.nombre}</TableCell>
+                      <TableCell>{tool.id}</TableCell>
+                      <TableCell>{tool.stock} unidades</TableCell>
                       <TableCell>
                         <Input
                           type="number"
                           value={tool.quantityToSend}
                           onChange={(e) =>
                             handleQuantityChange(
-                              tool.id,
+                              tool.id!,
                               parseInt(e.target.value)
                             )
                           }
                           min={0}
-                          max={tool.availableQuantity}
+                          max={tool.stock}
                         />
                       </TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleShipmentTool(tool)}
+                        >
                           Agregar
                         </Button>
                       </TableCell>
@@ -161,152 +201,27 @@ export default function ToolShipment() {
               </Table>
             </CardContent>
           </Card>
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Consolidado de envío</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center mb-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Envía:</p>
-                    <p>Nombre de la bodega que envía</p>
-                  </div>
-                  <div className="flex items-center">
-                    <Badge variant="secondary" className="mr-2">
-                      A
-                    </Badge>
-                    <div>
-                      <p className="font-semibold">Nombre de bodega</p>
-                      <p className="text-sm text-muted-foreground">Ubicación</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div>
-                  <p className="font-semibold mb-2">Transportista</p>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Selecciona el tipo de transportista:
-                  </p>
-                  <div className="flex gap-2 mb-4">
-                    <Button>Externo</Button>
-                    <Button variant="outline">Interno</Button>
-                  </div>
-                  <Input placeholder="Escribe el nombre del transportista externo" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Herramientas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Herramientas</TableHead>
-                      <TableHead>Código</TableHead>
-                      <TableHead>Acciones</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {shipmentTools.map((tool) => (
-                      <TableRow key={tool.id}>
-                        <TableCell>
-                          {tool.name}
-                          <br />
-                          <span className="text-sm text-muted-foreground">
-                            {tool.quantityToSend} unidades
-                          </span>
-                        </TableCell>
-                        <TableCell>{tool.code}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
-                              <Camera className="h-4 w-4 mr-1" />
-                              {tool.photos > 0
-                                ? 'Ver fotografías'
-                                : 'Agregar fotografía'}
-                              {tool.photos > 0 && (
-                                <Badge variant="secondary" className="ml-1">
-                                  {tool.photos}
-                                </Badge>
-                              )}
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <MessageSquare className="h-4 w-4 mr-1" />
-                              {tool.comments > 0
-                                ? 'Ver comentarios'
-                                : 'Agregar comentarios'}
-                              {tool.comments > 0 && (
-                                <Badge variant="secondary" className="ml-1">
-                                  {tool.comments}
-                                </Badge>
-                              )}
-                            </Button>
-                            <Button variant="ghost" size="sm">
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <div className="flex justify-between mt-4">
-                  <Button variant="outline">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Agregar comentarios
-                  </Button>
-                  <Button variant="outline">
-                    <Edit3 className="h-4 w-4 mr-2" />
-                    Agregar firma
-                  </Button>
-                  <Button>
-                    <Send className="h-4 w-4 mr-2" />
-                    Enviar
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="branch__consolidate">
+            <ConsolidatedShipment
+              selectedBranch={selectedBranch}
+              setDestinationBranch={setDestinationBranch}
+            />
+            <SummaryTools
+              tools={shipmentTools}
+              handleRemoveShipmentTool={handleRemoveShipmentTool}
+              handleRemoveComment={handleRemoveComment}
+              handleSaveComment={handleSaveComment}
+              handleSaveImages={handleSaveImages}
+            />
+            <ToolTransfer
+              destinationBranchId={destinationBranch}
+              sourceBranchId={selectedBranch?._id ?? ''}
+              shipmentTools={shipmentTools}
+              userId={user?._id ?? ''}
+            />
           </div>
         </div>
       </TabsContent>
-
-      <div>
-        <label htmlFor="branch-select">Selecciona :</label>
-        <select
-          className="bg-white"
-          id="branch-select"
-          onChange={handleSelectChange}
-        >
-          <option value="">--Selecciona--</option>
-          {branches.map((branch) => (
-            <option key={branch._id} value={branch._id}>
-              {branch.nombre}
-            </option>
-          ))}
-        </select>
-        <br />
-
-        {/* Mostrar productos si los hay */}
-        {products.length > 0 && (
-          <div>
-            <h2>Productos para {selectedBranch?.nombre}</h2>
-            <ul>
-              {products.map((product) => (
-                <li key={product._id}>
-                  {product.nombre}
-                  <br />
-                  Descripción: {product.descripcion}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

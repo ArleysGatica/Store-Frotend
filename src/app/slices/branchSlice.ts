@@ -21,14 +21,20 @@ export interface Branch {
   description: string;
 }
 
+export interface IBranchWithProducts extends Branch {
+  products: ITablaBranch[];
+}
+
 interface BranchState {
   data: Branch[];
+  selectedBranch: IBranchWithProducts | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: BranchState = {
   data: [], // Inicializar como un arreglo vacío
+  selectedBranch: null,
   loading: false,
   error: null,
 };
@@ -101,6 +107,18 @@ const branchesSlice = createSlice({
     AddingBranchs: (state, action: PayloadAction<Branch>) => {
       state.data.push(action.payload);
     },
+    setSelectedBranch: (state, action: PayloadAction<Branch>) => {
+      state.selectedBranch = {
+        ...action.payload,
+        products: state.selectedBranch?.products ?? [],
+      };
+    },
+    updateSelectedBranch: (
+      state,
+      action: PayloadAction<IBranchWithProducts | null>
+    ) => {
+      state.selectedBranch = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -134,9 +152,20 @@ const branchesSlice = createSlice({
       .addCase(createBranchs.rejected, (state, action) => {
         state.loading = false; // Cambia a no loading
         state.error = action.error.message || 'unknown error'; // Manejo de errores
-      });
+      })
+      .addCase(
+        fetchBranchesById.fulfilled,
+        (state, { payload }: PayloadAction<ITablaBranch[]>) => {
+          state.selectedBranch = {
+            ...state.selectedBranch!,
+            products: payload,
+          };
+        }
+      );
   },
 });
 
 // Exportamos el reducer
+export const { setSelectedBranch, updateSelectedBranch } =
+  branchesSlice.actions;
 export const branchesReducer = branchesSlice.reducer;

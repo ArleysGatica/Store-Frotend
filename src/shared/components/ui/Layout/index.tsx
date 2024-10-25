@@ -8,22 +8,21 @@ interface LayoutProps {
 
 export const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="flex flex-col h-screen w-screen bg-gray-100">
+    <div className="flex flex-col w-screen h-screen bg-gray-100">
       <Header />
       <div className="flex flex-1">
         <Sidebar
-          className="hidden md:block"
+          className="hidden capitalize md:block"
           links={[
             {
-              name: 'Home',
+              name: 'INICIO',
               path: '/',
               icon: '🏠',
             },
-            { name: 'dashboard', path: '/dashboard', icon: '🔗' },
-            { name: 'tabla', path: '/tabla', icon: '🔗' },
-            { name: 'Sucursales', path: '/warehouse', icon: '🔗' },
-            { name: 'Tablabranches', path: '/branches', icon: '🔗' },
-            { name: 'register', path: '/register', icon: '🔗' },
+            { name: 'USUARIOS', path: '/register', icon: '👤' },
+            { name: 'SUCURSALES', path: '/warehouse', icon: '🏭' },
+            { name: 'PRODUCTOS', path: '/branches', icon: '📱' },
+            { name: 'PEDIDOS', path: '/orders', icon: '📃' },
           ]}
         />
 

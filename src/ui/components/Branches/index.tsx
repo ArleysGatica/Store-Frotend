@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { ChangeEvent, useEffect, useState } from 'react';
 import { MapPin, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,7 +23,7 @@ import {
   Branch,
   createBranchs,
   fetchBranches,
-  updateBranchs,
+  setSelectedBranch,
 } from '@/app/slices/branchSlice';
 import { useAppSelector } from '@/app/hooks';
 import { Label } from '@radix-ui/react-label';
@@ -30,8 +31,6 @@ import { Link } from 'react-router-dom';
 
 export default function BranchDashboard() {
   const branches = useAppSelector((state) => state.branches.data);
-
-  console.log(branches, 'branches');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSucursal, setEditingSucursal] = useState(false);
   const [newBranch, setNewBranch] = useState<Branch>({
@@ -59,15 +58,14 @@ export default function BranchDashboard() {
     store.dispatch(createBranchs(newBranch));
     setIsDialogOpen(false);
   };
-  const handleEdit = (id: string) => {
-    // store.dispatch(updateBranchs({ branch: newBranch, id }));
-    setEditingSucursal(true);
-    setIsDialogOpen(true);
-  };
 
   const openDialog = (isEdit: boolean) => {
     setEditingSucursal(isEdit);
     setIsDialogOpen(true);
+  };
+
+  const handleSelectBranch = (branch: Branch) => {
+    store.dispatch(setSelectedBranch(branch));
   };
 
   return (
@@ -94,7 +92,7 @@ export default function BranchDashboard() {
             onClick={() => openDialog(false)}
             className="w-full sm:w-auto"
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="w-4 h-4 mr-2" />
             Agregar Sucursal
           </Button>
         </div>
@@ -182,7 +180,11 @@ export default function BranchDashboard() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
         {branches.length > 0 &&
           branches.map((branch) => (
-            <Link to={`/branches/${branch._id}/products`}>
+            <Link
+              key={branch._id}
+              to={`/branches/${branch._id}/products`}
+              onClick={() => handleSelectBranch(branch)}
+            >
               <BranchCard
                 key={branch._id}
                 branch={branch}
