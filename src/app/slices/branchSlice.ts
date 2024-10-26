@@ -8,7 +8,10 @@ import {
   getBranchesById,
   updateBranch,
 } from '../../api/services/branch';
-import { handleAsyncThunkError } from '../../shared/utils/errorHandlers';
+import {
+  handleAsyncThunkError,
+  handleThunkError,
+} from '../../shared/utils/errorHandlers';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 
 export interface Branch {
@@ -91,10 +94,7 @@ export const createBranchs = createAsyncThunk(
       const response = await createBranch(branch);
       return response.data as Branch;
     } catch (error) {
-      if ((error as AxiosError).response?.status === 404) {
-        return rejectWithValue('El recurso no fue encontrado');
-      }
-      return rejectWithValue(handleAsyncThunkError(error as Error));
+      return rejectWithValue(handleThunkError(error));
     }
   }
 );

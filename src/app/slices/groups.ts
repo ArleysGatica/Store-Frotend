@@ -40,14 +40,20 @@ export const getAllGroupsSlice = createAsyncThunk('groups/getAll', async () => {
   }
 });
 
+export interface ICategoriesWithProducts extends IProductoGroups {
+  products: IProductoGroups[];
+}
+
 interface GroupState {
   groups: IProductoGroups[];
+  selectedGroup: ICategoriesWithProducts | null;
   error: string | null;
   status: statusProgressLogin;
 }
 
 const initialState: GroupState = {
   groups: [] as IProductoGroups[],
+  selectedGroup: null,
   error: null,
   status: 'idle',
 };
@@ -58,6 +64,12 @@ const groupsSlice = createSlice({
   reducers: {
     AddingGroups: (state, action: PayloadAction<IProductoGroups>) => {
       state.groups.push(action.payload);
+    },
+    setSelectCategory: (state, action: PayloadAction<IProductoGroups>) => {
+      state.selectedGroup = {
+        ...action.payload,
+        products: state.selectedGroup?.products ?? [],
+      };
     },
   },
   extraReducers: (builder) => {
@@ -80,6 +92,6 @@ const groupsSlice = createSlice({
   },
 });
 
-export const { AddingGroups } = groupsSlice.actions;
+export const { AddingGroups, setSelectCategory } = groupsSlice.actions;
 
 export const groupsReducer = groupsSlice.reducer;

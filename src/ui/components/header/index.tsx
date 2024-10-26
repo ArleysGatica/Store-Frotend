@@ -11,25 +11,11 @@ export const Header = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  const handleLogout = async () => {
-    try {
-      store.dispatch(logout());
-      navigate('/login');
-    } catch (error) {
-      console.error('Error trying to logout: ', error);
-    }
-  };
 
   return (
     <div className="flex items-center justify-between p-4 bg-white">
       <h1 className="text-2xl font-bold">Store</h1>
       <div className="flex items-center gap-2">
-        <button
-          onClick={handleLogout}
-          className="flex items-center px-2 py-2 text-white bg-black rounded-md bg-primary-500"
-        >
-          <LogOut />
-        </button>
         <ProfileUser />
         <button onClick={toggleMenu} className="md:hidden">
           ☰

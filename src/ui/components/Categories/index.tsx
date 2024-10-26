@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
-import { MapPin, Plus } from 'lucide-react';
+import { ChartColumnStacked, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import {
   Dialog,
   DialogContent,
@@ -26,19 +21,20 @@ import {
   AddingGroups,
   createGroupSlice,
   getAllGroupsSlice,
+  setSelectCategory,
 } from '@/app/slices/groups';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { toast } from 'sonner';
 
 export default function Categories() {
-  const branches = useAppSelector((state) => state.categories.groups);
-
+  const categories = useAppSelector((state) => state.categories.groups);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSucursal, setEditingSucursal] = useState(false);
   const [groups, setGroups] = useState<IProductoGroups>({
     nombre: '',
     descripcion: '',
   });
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     store.dispatch(getAllGroupsSlice()).unwrap();
@@ -72,32 +68,39 @@ export default function Categories() {
     setIsDialogOpen(true);
   };
 
+  const handleSelectBranch = (
+    cat: IProductoGroups,
+    e: React.MouseEvent<HTMLAnchorElement>
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('aa');
+    store.dispatch(setSelectCategory(cat));
+  };
+
+  const filteredCategories = categories.filter((branch) =>
+    branch.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="container mx-auto ">
       <nav className="flex flex-col mb-6 space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div className="flex items-center space-x-4">
+          <Input
+            placeholder="Buscar por nombre de la categorias"
+            className="w-full sm:w-64"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           <MapPin className="w-5 h-5" />
-          <Input placeholder="Nombre de la bodega" className="w-full sm:w-64" />
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="hidden sm:inline-flex">
-                Más opciones
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Opción 1</DropdownMenuItem>
-              <DropdownMenuItem>Opción 2</DropdownMenuItem>
-              <DropdownMenuItem>Opción 3</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
           <Button
             onClick={() => openDialog(false)}
             className="w-full sm:w-auto"
           >
-            <Plus className="mr-2 h-4 w-4" />
-            Agregar Sucursal
+            <ChartColumnStacked className="mr-2 h-4 w-4" />
+            Agregar Categoria
           </Button>
         </div>
       </nav>
@@ -158,15 +161,18 @@ export default function Categories() {
             >
               Guardar cambios
             </Button>
-            {/* <Button onClick={() => setIsDialogOpen(false)}>Cancelar</Button> */}
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
-        {branches.length > 0 &&
-          branches.map((branch) => (
-            <Link to={`/branches/${branch._id}/products`}>
+        {filteredCategories.length > 0 &&
+          filteredCategories.map((branch) => (
+            <Link
+              key={branch._id}
+              to={`/branches/${branch._id}/products`}
+              onClick={(e) => handleSelectBranch(branch, e)}
+            >
               <CategoriesCard
                 key={branch._id}
                 categoriesData={branch}

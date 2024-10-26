@@ -1,10 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import axios, { AxiosError } from 'axios';
 import { createUsers, Iauth, registerUsers } from '../../api/services/auth';
-import { handleAsyncThunkError } from '../../shared/utils/errorHandlers';
+import { handleThunkError } from '../../shared/utils/errorHandlers';
 import { IBranch } from '@/interfaces/branchInterfaces';
 
-type IRoles = 'admin' | 'user' | 'root';
+export type IRoles = 'admin' | 'user' | 'root';
 
 export interface IToken {
   token: string;
@@ -37,9 +36,7 @@ export const RegistroUsuario = createAsyncThunk(
       const response = await createUsers(data);
       return response as unknown as IToken;
     } catch (error) {
-      return (error as AxiosError).response?.status === 404
-        ? rejectWithValue('Usuario no encontrado')
-        : handleAsyncThunkError(error as Error);
+      return rejectWithValue(handleThunkError(error));
     }
   }
 );
@@ -52,17 +49,9 @@ export const InicioSesion = createAsyncThunk(
   ) => {
     try {
       const response = await registerUsers(userCredentials);
-      if (response.data.error) {
-        return rejectWithValue(response.data.error);
-      }
       return response.data as IToken;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(
-          error.response?.data?.error || 'Error desconocido'
-        );
-      }
-      return rejectWithValue('Error en la solicitud');
+      return rejectWithValue(handleThunkError(error));
     }
   }
 );

@@ -16,6 +16,8 @@ import ProductsTable from './ProductTable';
 import Pagination from '../../../shared/components/ui/Pagination/Pagination';
 import { GetBranches } from '@/shared/helpers/Branchs';
 import { useAppSelector } from '@/app/hooks';
+import { getAllGroupsSlice } from '@/app/slices/groups';
+import { IProductoGroups } from '@/api/services/groups';
 
 export function Products() {
   const user = useAppSelector((state) => state.auth.signIn.user);
@@ -68,6 +70,40 @@ export function Products() {
     });
   };
 
+  const GroupsAll = useAppSelector((state) => state.categories.groups);
+  const [selectedGroup, setSelectedGroup] = useState<{
+    nombre: string;
+    _id: string;
+  } | null>(null);
+
+  const [, setGroups] = useState<IProductoGroups[]>([]);
+
+  const handleSelectChange = (value: string) => {
+    const selectedBranchId = value;
+    const branch = GroupsAll.find((b) => b._id === selectedBranchId);
+
+    if (branch) {
+      setSelectedGroup({ nombre: branch.nombre, _id: branch._id ?? '' });
+    }
+  };
+
+  const fetchDataGroup = async () => {
+    if (!selectedGroup) return;
+
+    const response = await GetBranches(selectedGroup._id);
+    setGroups(response);
+  };
+
+  useEffect(() => {
+    store.dispatch(getAllGroupsSlice()).unwrap();
+  }, []);
+
+  useEffect(() => {
+    if (selectedGroup) {
+      fetchDataGroup();
+    }
+  }, [selectedGroup]);
+
   return (
     <div className="flex flex-col w-full min-h-screen bg-muted/40">
       <main className="flex-1 p-4 md:p-6">
@@ -86,13 +122,9 @@ export function Products() {
               setFilterStatus={setFilterStatus}
               onAddProduct={handleAddProduct}
               sucursalId={user?.sucursalId?._id}
-              handleSelectChange={function (
-                e: React.ChangeEvent<HTMLSelectElement>
-              ): void {
-                throw new Error('Function not implemented.');
-              }}
-              selectedGroup={null}
-              groups={[]}
+              handleSelectChange={handleSelectChange}
+              selectedGroup={selectedGroup}
+              groups={GroupsAll}
             />
             {filteredProducts.length === 0 ? (
               <span className="flex justify-center w-full text-sm text-center text-muted-foreground">
@@ -101,13 +133,9 @@ export function Products() {
             ) : (
               <ProductsTable
                 products={currentItems}
-                handleSelectChange={function (
-                  e: React.ChangeEvent<HTMLSelectElement>
-                ): void {
-                  throw new Error('Function not implemented.');
-                }}
-                selectedGroup={null}
-                groups={[]}
+                selectedGroup={selectedGroup}
+                groups={GroupsAll}
+                handleSelectChange={handleSelectChange}
               />
             )}
           </CardContent>

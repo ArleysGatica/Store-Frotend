@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Search, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import ReceivedTools from '../../../../ui/components/ReceivedTools';
@@ -13,7 +12,6 @@ export const HeaderTable = () => {
     <div className="container mx-auto ">
       <Tabs defaultValue="send">
         <div className="flex flex-col items-start justify-between gap-4 mb-4 sm:flex-row sm:items-center">
-          {/* <Button variant="outline">Contraer filtros</Button> */}
           <TabsList className="gap-4 font-bold text-white bg-black">
             <TabsTrigger
               className="text-[#ffffff] font-bold border-b-2 border-bg-gray-200 border-opacity-0 bg-black"
@@ -28,17 +26,6 @@ export const HeaderTable = () => {
               Recibir herramientas
             </TabsTrigger>
           </TabsList>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline">
-              Filtrar por fecha <ChevronDown className="w-4 h-4 ml-2" />
-            </Button>
-            <Button variant="outline">
-              Filtrar por código <ChevronDown className="w-4 h-4 ml-2" />
-            </Button>
-            <Button variant="outline">
-              Ordenar <ChevronDown className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
         </div>
         <div className="mb-4">
           <div className="relative">
@@ -52,11 +39,9 @@ export const HeaderTable = () => {
           </div>
         </div>
         <TabsContent value="receive">
-          <h2 className="mb-4 text-2xl font-bold">Recibir Herramientas</h2>
           <ReceivedTools />
         </TabsContent>
         <TabsContent value="send">
-          <h2 className="mb-4 text-2xl font-bold">Enviar Herramientas</h2>
           <ToolShipment />
         </TabsContent>
       </Tabs>

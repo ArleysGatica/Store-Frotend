@@ -3,14 +3,21 @@ import { Input } from '@/components/ui/input';
 import { DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IProductoGroups } from '@/api/services/groups';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface ProductFormProps {
   initialData?: ITablaBranch;
   onSubmit: (data: ITablaBranch) => void;
   sucursalId: string;
-  handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleSelectChange: (value: string) => void;
   selectedGroup: {
     nombre: string;
     _id: string;
@@ -86,7 +93,7 @@ const ProductForm = ({
   }[] = [
     { id: 'nombre', label: 'Nombre', type: 'text' },
     { id: 'descripcion', label: 'Descripcion', type: 'text' },
-    { id: 'precio', label: 'Precio', type: 'number', step: '0', min: '0' },
+    { id: 'precio', label: 'Precio', type: 'number' },
     { id: 'stock', label: 'Stock', type: 'number', min: '0' },
   ];
   return (
@@ -110,21 +117,22 @@ const ProductForm = ({
             />
           </div>
         ))}
-        <div>
-          <label htmlFor="branch-select">Selecciona :</label>
-          <select
-            className="bg-white"
-            id="branch-select"
-            onChange={handleSelectChange}
-          >
-            <option value="">--Selecciona--</option>
-            {groups.map((data) => (
-              <option key={data._id} value={data._id}>
-                {data.nombre}
-              </option>
-            ))}
-          </select>
-          <br />
+        <div className="items-center gap-4 flex">
+          <Label htmlFor="branch-select" className="text-right">
+            Categorias
+          </Label>
+          <Select onValueChange={handleSelectChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecciona" />
+            </SelectTrigger>
+            <SelectContent className="flex flex-col gap-2">
+              {groups.map((branch) => (
+                <SelectItem key={branch._id} value={branch._id as string}>
+                  {branch.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <DialogFooter>
