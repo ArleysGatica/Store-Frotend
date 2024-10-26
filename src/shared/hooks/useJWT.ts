@@ -1,13 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
-import { getUserDataFromLocalStorage, IToken } from '../helpers/login.Helper';
+import { getUserDataFromLocalStorage } from '../helpers/login.Helper';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { updateSignIn } from '../../app/slices/login';
 import { store } from '../../app/store';
 
+export interface IToken {
+  token: string;
+  role?: string;
+}
+
+export interface AuthState {
+  token: string;
+  username: string;
+  password: string;
+  role: string;
+  status: 'authenticated' | 'unauthenticated';
+}
+
 export const useAuthToken = () => {
-  const TOKEN_KEY = getUserDataFromLocalStorage() as IToken;
-  const dateInit = TOKEN_KEY?.token;
-  const [token, setToken] = useState<string | null>(dateInit);
+  const initialToken = useRef(getUserDataFromLocalStorage()?.token || '');
+  const [token, setToken] = useState<string>(initialToken.current);
 
   const navigate = useNavigate();
   const hasCheckedToken = useRef(false);
@@ -15,13 +27,15 @@ export const useAuthToken = () => {
   useEffect(() => {
     const checkToken = async () => {
       if (!token) {
-        return setAuthenticatedUser(dateInit, false, navigate);
+        handleAuthentication('', false, navigate);
+        return;
       }
 
       if (hasTokenExpired(token)) {
-        setAuthenticatedUser(token, false, navigate);
+        handleAuthentication('', false, navigate);
+        setToken('');
       } else {
-        setAuthenticatedUser(token, true, navigate);
+        handleAuthentication(token, true);
       }
     };
 
@@ -29,7 +43,7 @@ export const useAuthToken = () => {
       checkToken();
       hasCheckedToken.current = true;
     }
-  }, []);
+  }, [token, navigate]);
 
   return { token };
 };
@@ -46,21 +60,25 @@ const hasTokenExpired = (token: string): boolean => {
   }
 };
 
-const setAuthenticatedUser = (
+const handleAuthentication = (
   token: string,
   isAuth: boolean,
   navigate?: NavigateFunction
 ) => {
-  //   store.dispatch(
-  //     updateSignIn({
-  //       token: token,
-  //       username: '',
-  //       password: '',
-  //       role: '',
-  //       status: isAuth ? 'authenticated' : 'unauthenticated',
-  //     })
-  //   );
-  if (!isAuth && navigate) return navigate('/login');
+  const initialToken = useRef(getUserDataFromLocalStorage() as AuthState);
+  const authState: AuthState = {
+    token,
+    username: initialToken.current.username,
+    password: initialToken?.current.password,
+    role: initialToken?.current.role,
+    status: isAuth ? 'authenticated' : 'unauthenticated',
+  };
+
+  store.dispatch(updateSignIn(authState));
+
+  if (!isAuth && navigate) {
+    navigate('/login');
+  }
 };
 
 export const Token = () => {

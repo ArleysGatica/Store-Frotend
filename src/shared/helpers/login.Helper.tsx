@@ -1,23 +1,28 @@
 // components/PrivateRoute.tsx
 import { RootState } from '@/app/store';
 import AuthForm from '@/ui/components/Login';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { useAuthToken } from '../hooks/useJWT';
 
 interface IPrivateRouteProps {
   rolesAllowed: Array<'admin' | 'user' | 'root'>;
 }
 
 export const RequireAuth: React.FC<IPrivateRouteProps> = ({ rolesAllowed }) => {
-  const { token, user } = useSelector((state: RootState) => state.auth.signIn);
+  const { token } = useAuthToken();
+  const user = useSelector((state: RootState) => state.auth.signIn.user);
+  const navigate = useNavigate();
 
-  if (!token) {
-    return <Navigate to="/login" />;
-  }
-  if (user && !rolesAllowed.includes(user.role)) {
-    return <Navigate to="/" />;
-  }
+  useEffect(() => {
+    if (!token) {
+      navigate('/login');
+    } else if (user && !rolesAllowed.includes(user.role)) {
+      navigate('/');
+    }
+  }, [token, user, rolesAllowed, navigate]);
+
   return <Outlet />;
 };
 
@@ -36,6 +41,7 @@ export interface IToken {
 }
 export const getUserDataFromLocalStorage = (): IToken | null => {
   const userDataString = localStorage.getItem('user');
+
   if (userDataString) {
     return JSON.parse(userDataString);
   } else {
