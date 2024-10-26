@@ -59,16 +59,7 @@ export const CategoriesCard = ({
         </DropdownMenu>
       </CardHeader>
       <CardContent>
-        <div className="text-sm font-medium">
-          {/* {branch.pendingOrders > 0 && (
-            <p>
-              Pedidos pendientes de recibir{' '}
-              <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-semibold text-red-800 bg-red-100 rounded-full">
-                {branch.pendingOrders}
-              </span>
-            </p>
-          )} */}
-        </div>
+        <div className="text-sm font-medium"></div>
         <div className="mt-2">
           <h4 className="text-sm font-semibold">Datos</h4>
           <p className="text-sm text-muted-foreground">
@@ -76,27 +67,7 @@ export const CategoriesCard = ({
           </p>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-wrap justify-between gap-2">
-        {/* {branch.hasAccess ? (
-          <>
-            <Button variant="outline" size="sm" className="flex-grow">
-              <Warehouse className="w-4 h-4 mr-2" />
-              Alquileres
-            </Button>
-            <Button variant="outline" size="sm" className="flex-grow">
-              Herramientas
-            </Button>
-            <Button variant="outline" size="sm" className="flex-grow">
-              <Package className="w-4 h-4 mr-2" />
-              Materiales
-            </Button>
-          </>
-        ) : (
-          <Button className="w-full" variant="default">
-            Solicitar acceso
-          </Button>
-        )} */}
-      </CardFooter>
+      <CardFooter className="flex flex-wrap justify-between gap-2"></CardFooter>
     </Card>
   );
 };

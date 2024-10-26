@@ -39,8 +39,8 @@ export function DataTableDemo() {
 
   const [, setGroups] = useState<IProductoGroups[]>([]);
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedBranchId = e.target.value;
+  const handleSelectChange = (value: string) => {
+    const selectedBranchId = value;
     const branch = GroupsAll.find((b) => b._id === selectedBranchId);
 
     if (branch) {

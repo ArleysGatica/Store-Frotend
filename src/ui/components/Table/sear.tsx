@@ -1,14 +1,6 @@
-import { ListFilter, PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -28,7 +20,7 @@ interface SearchAndFilterProps {
   setFilterStatus: (statuses: string[]) => void;
   onAddProduct: (newProduct: ITablaBranch) => void;
   sucursalId: string | undefined;
-  handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleSelectChange: (value: string) => void;
   selectedGroup: {
     nombre: string;
     _id: string;
@@ -58,44 +50,7 @@ const SearchAndFilter = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 gap-1">
-              <ListFilter className="h-3.5 w-3.5" />
-              <span>Filter</span>
-            </Button>
-          </DropdownMenuTrigger>
-          {/* <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              checked={filterStatus.includes('active')}
-              onCheckedChange={(checked) =>
-                setFilterStatus(
-                  checked
-                    ? [...filterStatus, 'active']
-                    : filterStatus.filter((s) => s !== 'active')
-                )
-              }
-            >
-              Active
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={filterStatus.includes('draft')}
-              onCheckedChange={(checked) =>
-                setFilterStatus(
-                  checked
-                    ? [...filterStatus, 'draft']
-                    : filterStatus.filter((s) => s !== 'draft')
-                )
-              }
-            >
-              Draft
-            </DropdownMenuCheckboxItem>
-          </DropdownMenuContent> */}
-        </DropdownMenu>
       </div>
-
       <Dialog>
         <DialogTrigger asChild>
           <Button size="sm" className="h-8 gap-1">

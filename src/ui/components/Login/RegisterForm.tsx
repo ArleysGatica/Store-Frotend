@@ -34,7 +34,7 @@ const RegisterForm = () => {
     _id: string;
   } | null>(null);
 
-  const [products, setProducts] = useState<ITablaBranch[]>([]);
+  const [, setProducts] = useState<ITablaBranch[]>([]);
   const [showPassword, setShowPassword] = useState(false);
 
   const [credentials, setCredentials] = useState<ILoginData>({
@@ -179,7 +179,7 @@ const RegisterForm = () => {
             htmlFor="branch-select"
             className="block text-sm font-medium text-gray-700"
           >
-            Selecciona Sucursal:
+            Sucursal:
           </label>
           <Select onValueChange={handleSelectChangeBranch}>
             <SelectTrigger>

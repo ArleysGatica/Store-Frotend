@@ -21,6 +21,5 @@ export const createGroup = async (
 export const getAllGroups = async (): Promise<AxiosResponse> => {
   const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Groups);
   const response = await axiosInstance.get('/');
-  console.log(response.data, 'response');
   return response.data;
 };

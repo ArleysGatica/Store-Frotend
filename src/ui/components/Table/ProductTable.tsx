@@ -6,7 +6,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Table,
@@ -23,7 +22,7 @@ import { IProductoGroups } from '@/api/services/groups';
 
 interface ProductsTableProps {
   products: ITablaBranch[];
-  handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleSelectChange: (value: string) => void;
   selectedGroup: {
     nombre: string;
     _id: string;
