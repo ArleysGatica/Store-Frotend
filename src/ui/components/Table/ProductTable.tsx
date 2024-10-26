@@ -16,9 +16,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Pencil, Trash } from 'lucide-react';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { IBranch, ITablaBranch } from '@/interfaces/branchInterfaces';
 import ProductForm from './ProductForm';
 import { IProductoGroups } from '@/api/services/groups';
+import { IRoles } from '@/app/slices/login';
 
 interface ProductsTableProps {
   products: ITablaBranch[];
@@ -28,6 +29,14 @@ interface ProductsTableProps {
     _id: string;
   } | null;
   groups: IProductoGroups[];
+  userRoles:
+    | {
+        _id: string;
+        username: string;
+        role: IRoles;
+        sucursalId?: IBranch;
+      }
+    | undefined;
 }
 
 const ProductsTable = ({
@@ -35,6 +44,7 @@ const ProductsTable = ({
   handleSelectChange,
   selectedGroup,
   groups,
+  userRoles,
 }: ProductsTableProps) => {
   const [editingProduct, setEditingProduct] = useState<ITablaBranch | null>(
     null
@@ -58,9 +68,11 @@ const ProductsTable = ({
             <TableHead>Created at</TableHead>
             <TableHead>Updated at</TableHead>
             <TableHead>In Stock</TableHead>
-            <TableHead>
-              <span className="">Actions</span>
-            </TableHead>
+            {userRoles?.role !== 'admin' && (
+              <TableHead>
+                <span className="">Actions</span>
+              </TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -73,23 +85,26 @@ const ProductsTable = ({
               <TableCell className="font-medium">{product.updatedAt}</TableCell>
               <TableCell>{product?.stock || '0'}</TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setEditingProduct(product);
-                      setIsEditing(true);
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                    <span className="sr-only">Edit</span>
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Trash className="h-4 w-4" />
-                    <span className="sr-only">Delete</span>
-                  </Button>
-                </div>
+                {userRoles?.role !== 'admin' && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setEditingProduct(product);
+                        setIsEditing(true);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                      <span className="sr-only">Edit</span>
+                    </Button>
+
+                    <Button variant="ghost" size="sm">
+                      <Trash className="h-4 w-4" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </div>
+                )}
               </TableCell>
             </TableRow>
           ))}

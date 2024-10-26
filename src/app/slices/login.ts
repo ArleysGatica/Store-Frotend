@@ -3,7 +3,7 @@ import { createUsers, Iauth, registerUsers } from '../../api/services/auth';
 import { handleThunkError } from '../../shared/utils/errorHandlers';
 import { IBranch } from '@/interfaces/branchInterfaces';
 
-type IRoles = 'admin' | 'user' | 'root';
+export type IRoles = 'admin' | 'user' | 'root';
 
 export interface IToken {
   token: string;

@@ -30,7 +30,7 @@ export function DataTableDemo() {
   ]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
-
+  const userRoles = useAppSelector((state) => state.auth.signIn.user);
   const GroupsAll = useAppSelector((state) => state.categories.groups);
   const [selectedGroup, setSelectedGroup] = useState<{
     nombre: string;
@@ -132,6 +132,7 @@ export function DataTableDemo() {
                 selectedGroup={selectedGroup}
                 groups={GroupsAll}
                 products={currentItems}
+                userRoles={userRoles}
               />
             )}
           </CardContent>

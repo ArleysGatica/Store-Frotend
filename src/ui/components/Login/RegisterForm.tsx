@@ -29,6 +29,11 @@ interface ILoginData {
 
 const RegisterForm = () => {
   const branches = useAppSelector((state) => state.branches.data);
+  const userRoles = useAppSelector((state) => state.auth.signIn.user);
+  const dataFilterID = branches.filter(
+    (branch) => branch._id === userRoles?.sucursalId?._id
+  );
+  const filteredBranche = userRoles?.role === 'root' ? branches : dataFilterID;
   const [selectedBranch, setSelectedBranch] = useState<{
     nombre: string;
     _id: string;
@@ -169,7 +174,9 @@ const RegisterForm = () => {
                 <SelectLabel>Roles</SelectLabel>
                 <SelectItem value="user">Usuario</SelectItem>
                 <SelectItem value="admin">Administrador</SelectItem>
-                <SelectItem value="root">Root</SelectItem>
+                {userRoles?.role !== 'admin' && (
+                  <SelectItem value="root">Root</SelectItem>
+                )}
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -186,7 +193,7 @@ const RegisterForm = () => {
               <SelectValue placeholder="--Selecciona--" />
             </SelectTrigger>
             <SelectContent>
-              {branches.map((branch) => (
+              {filteredBranche.map((branch) => (
                 <SelectItem key={branch._id} value={branch._id as string}>
                   {branch.nombre}
                 </SelectItem>

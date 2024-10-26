@@ -37,7 +37,7 @@ export const Router = () => {
 
       <Route
         path="/warehouse"
-        element={<RequireAuth rolesAllowed={['root']} />}
+        element={<RequireAuth rolesAllowed={['root', 'admin']} />}
       >
         <Route
           path="/warehouse"
@@ -64,7 +64,7 @@ export const Router = () => {
       </Route>
       <Route
         path="/branches/:Id/products"
-        element={<RequireAuth rolesAllowed={['root', 'admin']} />}
+        element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}
       >
         <Route
           path="/branches/:Id/products"
@@ -105,7 +105,7 @@ export const Router = () => {
       </Route>
       <Route
         path="/categories"
-        element={<RequireAuth rolesAllowed={['root', 'admin']} />}
+        element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}
       >
         <Route
           path="/categories"

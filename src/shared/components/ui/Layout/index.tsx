@@ -17,11 +17,13 @@ export const Layout = ({ children }: LayoutProps) => {
       path: '/',
       icon: '🏠',
     },
-    { name: 'SUCURSALES', path: '/warehouse', icon: '🏭' },
+    ...(roleUsers === 'root'
+      ? [{ name: 'SUCURSALES', path: '/warehouse', icon: '🏭' }]
+      : []),
     { name: 'PRODUCTOS', path: '/branches', icon: '📱' },
     { name: 'CATEGORÍAS', path: '/categories', icon: '🧮' },
     { name: 'PEDIDOS', path: '/orders', icon: '📃' },
-    ...(roleUsers === 'root'
+    ...(roleUsers === 'root' || roleUsers === 'admin'
       ? [{ name: 'USUARIOS', path: '/register', icon: '👤' }]
       : []),
   ];
