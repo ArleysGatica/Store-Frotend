@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ChartColumnStacked, MapPin, Plus } from 'lucide-react';
+import { ChartColumnStacked, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import {
   Dialog,
   DialogContent,
@@ -26,6 +21,7 @@ import {
   AddingGroups,
   createGroupSlice,
   getAllGroupsSlice,
+  setSelectCategory,
 } from '@/app/slices/groups';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { toast } from 'sonner';
@@ -72,6 +68,16 @@ export default function Categories() {
     setIsDialogOpen(true);
   };
 
+  const handleSelectBranch = (
+    cat: IProductoGroups,
+    e: React.MouseEvent<HTMLAnchorElement>
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('aa');
+    store.dispatch(setSelectCategory(cat));
+  };
+
   const filteredCategories = categories.filter((branch) =>
     branch.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -81,7 +87,7 @@ export default function Categories() {
       <nav className="flex flex-col mb-6 space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div className="flex items-center space-x-4">
           <Input
-            placeholder="Buscar por nombre de la sucursal"
+            placeholder="Buscar por nombre de la categorias"
             className="w-full sm:w-64"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -155,7 +161,6 @@ export default function Categories() {
             >
               Guardar cambios
             </Button>
-            {/* <Button onClick={() => setIsDialogOpen(false)}>Cancelar</Button> */}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -163,7 +168,11 @@ export default function Categories() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
         {filteredCategories.length > 0 &&
           filteredCategories.map((branch) => (
-            <Link to={`/branches/${branch._id}/products`}>
+            <Link
+              key={branch._id}
+              to={`/branches/${branch._id}/products`}
+              onClick={(e) => handleSelectBranch(branch, e)}
+            >
               <CategoriesCard
                 key={branch._id}
                 categoriesData={branch}

@@ -26,6 +26,12 @@ import { toast, Toaster } from 'sonner';
 
 export default function BranchDashboard() {
   const branches = useAppSelector((state) => state.branches.data);
+  const userRoles = useAppSelector((state) => state.auth.signIn.user);
+  const dataFilterID = branches.filter(
+    (branch) => branch._id === userRoles?.sucursalId?._id
+  );
+  const filteredBranche = userRoles?.role === 'root' ? branches : dataFilterID;
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSucursal, setEditingSucursal] = useState(false);
   const [newBranch, setNewBranch] = useState<Branch>({
@@ -95,16 +101,17 @@ export default function BranchDashboard() {
             />
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
-            <Button
-              onClick={() => openDialog(false)}
-              className="w-full sm:w-auto"
-            >
-              <Store className="w-4 h-4 mr-2" />
-              Agregar Sucursal
-            </Button>
+            {userRoles?.role !== 'admin' && (
+              <Button
+                onClick={() => openDialog(false)}
+                className="w-full sm:w-auto"
+              >
+                <Store className="w-4 h-4 mr-2" />
+                Agregar Sucursal
+              </Button>
+            )}
           </div>
         </nav>
-
         <Dialog
           open={isDialogOpen}
           onOpenChange={(open) => {
