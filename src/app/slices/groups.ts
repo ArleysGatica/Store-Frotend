@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 import { handleAsyncThunkError } from '../../shared/utils/errorHandlers';
 import {
   createGroup,
+  deleteGroup,
   getAllGroups,
   IProductoGroups,
 } from '@/api/services/groups';
@@ -39,6 +40,14 @@ export const getAllGroupsSlice = createAsyncThunk('groups/getAll', async () => {
       : handleAsyncThunkError(error as Error);
   }
 });
+
+export const deleteGroupSlice = createAsyncThunk(
+  'groups/delete',
+  async (_id: string): Promise<IProductoGroups> => {
+    const response = await deleteGroup(_id);
+    return response.data as IProductoGroups;
+  }
+);
 
 export interface ICategoriesWithProducts extends IProductoGroups {
   products: IProductoGroups[];
@@ -86,6 +95,23 @@ const groupsSlice = createSlice({
         }
       )
       .addCase(getAllGroupsSlice.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'unknown error';
+      })
+      .addCase(deleteGroupSlice.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(
+        deleteGroupSlice.fulfilled,
+        (state, { payload }: PayloadAction<IProductoGroups>) => {
+          state.status = 'succeeded';
+          state.groups = state.groups.filter(
+            (group) => group._id !== payload._id
+          );
+        }
+      )
+      .addCase(deleteGroupSlice.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'unknown error';
       });

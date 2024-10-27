@@ -13,6 +13,9 @@ export interface ICommentProps {
   comment: string | null;
   handleRemoveComment?: () => void;
   handleSaveComment?: (comment: string) => void;
+  title?: string;
+  placeholder?: string;
+  buttonText?: string;
 }
 
 const Comment = ({
@@ -20,6 +23,9 @@ const Comment = ({
   comment,
   handleRemoveComment,
   handleSaveComment,
+  title = 'Comentario',
+  placeholder = 'Descripción del comentario',
+  buttonText = 'Agregar comentario',
 }: ICommentProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -38,11 +44,7 @@ const Comment = ({
   };
 
   const handleClose = (isOpen: boolean) => {
-    if (!isOpen) {
-      setIsOpen(false);
-    } else {
-      setIsOpen(isOpen);
-    }
+    setIsOpen(isOpen);
     setIsEditing(false);
   };
 
@@ -58,7 +60,7 @@ const Comment = ({
         ) : (
           <Button variant="outline">
             <MessageSquare className="w-4 h-4 mr-1" />
-            {!comment ? 'Agregar comentario' : 'Ver comentario'}
+            {!comment ? buttonText : 'Ver comentario'}
           </Button>
         )}
       </PopoverTrigger>
@@ -68,7 +70,7 @@ const Comment = ({
             <div className="flex items-center justify-center w-8 h-8 font-semibold rounded-full bg-primary text-primary-foreground">
               A
             </div>
-            <h4 className="font-medium leading-none">Comentario</h4>
+            <h4 className="font-medium leading-none">{title}</h4>
             {comment && !isEditing && (
               <div className="ml-auto space-x-2">
                 <Button
@@ -92,14 +94,14 @@ const Comment = ({
           </div>
           {!comment || isEditing ? (
             <Textarea
-              placeholder="Descripción del comentario"
+              placeholder={placeholder}
               value={comentario ?? ''}
               onChange={(e) => setComentario(e.target.value)}
               className="min-h-[100px]"
             />
           ) : (
             <p className="text-sm text-muted-foreground">
-              {comment || 'Descripción del comentario'}
+              {comment || placeholder}
             </p>
           )}
           {!comment || isEditing ? (

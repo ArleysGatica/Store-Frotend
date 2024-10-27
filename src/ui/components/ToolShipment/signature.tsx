@@ -16,12 +16,20 @@ import { Pen, Trash2 } from 'lucide-react';
 
 export interface ISignature {
   handleSignature: (signature: string | null) => void;
-  savedSignature: string | null;
+  savedSignature?: string | null;
+  canvasWidth?: number;
+  canvasHeight?: number;
+  buttonText?: string;
+  title?: string;
 }
 
 export default function Signature({
-  savedSignature,
+  savedSignature = null,
   handleSignature,
+  canvasWidth = 350,
+  canvasHeight = 200,
+  buttonText = 'Gestionar firma',
+  title = 'Dibuje su firma',
 }: ISignature) {
   const [isOpen, setIsOpen] = useState(false);
   const [firma, setFirma] = useState<string | null>(null);
@@ -50,7 +58,6 @@ export default function Signature({
     if (canvasRef.current) {
       const canvas = canvasRef.current;
       const dataURL = canvas.toDataURL();
-
       setFirma(dataURL);
     }
   };
@@ -93,7 +100,7 @@ export default function Signature({
     <Popover open={isOpen} onOpenChange={handleOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline">
-          <Pen className="w-4 h-4 mr-2" /> Gestionar firma
+          <Pen className="w-4 h-4 mr-2" /> {buttonText}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0">
@@ -102,7 +109,7 @@ export default function Signature({
             <div className="flex items-center justify-center w-8 h-8 font-semibold rounded-full bg-primary text-primary-foreground">
               A
             </div>
-            <CardTitle>Dibuje su firma</CardTitle>
+            <CardTitle>{title}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="p-2 mb-2 border rounded-md">
@@ -111,8 +118,8 @@ export default function Signature({
               ) : (
                 <canvas
                   ref={canvasRef}
-                  width={350}
-                  height={200}
+                  width={canvasWidth}
+                  height={canvasHeight}
                   onMouseDown={startDrawing}
                   onMouseUp={stopDrawing}
                   onMouseMove={draw}

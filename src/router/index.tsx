@@ -36,11 +36,11 @@ export const Router = () => {
       </Route>
 
       <Route
-        path="/warehouse"
+        path="/branches"
         element={<RequireAuth rolesAllowed={['root', 'admin']} />}
       >
         <Route
-          path="/warehouse"
+          path="/branches"
           element={
             <Layout>
               <BranchDashboard />
@@ -50,11 +50,11 @@ export const Router = () => {
       </Route>
 
       <Route
-        path="/branches"
+        path="/products"
         element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}
       >
         <Route
-          path="/branches"
+          path="/products"
           element={
             <Layout>
               <Products />
