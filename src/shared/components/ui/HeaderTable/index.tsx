@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import ReceivedTools from '../../../../ui/components/ReceivedTools';
+import ReceivedTools from '../../../../ui/components/ReceivedTools/NotUse';
 import ToolShipment from '../../../../ui/components/ToolShipment';
+import ReceivedTools2 from '@/ui/components/ReceivedTools';
 
 export const HeaderTable = () => {
   return (
@@ -27,7 +28,7 @@ export const HeaderTable = () => {
         </div>
 
         <TabsContent value="receive">
-          <ReceivedTools />
+          <ReceivedTools2 />
         </TabsContent>
         <TabsContent value="send">
           <ToolShipment />

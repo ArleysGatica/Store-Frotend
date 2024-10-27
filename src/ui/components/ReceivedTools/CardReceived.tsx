@@ -1,8 +1,9 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { OrderReceived } from '.';
+import { OrderReceived } from './NotUse';
+import { ToolShipmentData } from '.';
 
 interface IOrder {
-  orders: OrderReceived[];
+  orders: ToolShipmentData[];
 }
 
 export const CardReceived = ({ orders }: IOrder) => {
@@ -26,16 +27,16 @@ export const CardReceived = ({ orders }: IOrder) => {
                 Total Received
               </h3>
               <p className="text-3xl font-bold">
-                {orders.filter((o) => o.status === 'Solicitado').length}
+                {orders.filter((o) => o.status === 'Pendiente').length}
               </p>
               <p className="text-sm">
                 $
-                {orders
-                  .filter((o) => o.status === 'Solicitado')
+                {/* {orders
+                  .filter((o) => o.status === 'Pendiente')
                   .reduce(
                     (acc, curr) => acc + parseInt(curr.value.slice(1)),
                     0
-                  )}{' '}
+                  )}{' '} */}
                 Revenue
               </p>
               <p className="text-sm text-gray-500">Last 7 days</p>
@@ -45,16 +46,16 @@ export const CardReceived = ({ orders }: IOrder) => {
                 Total Returned
               </h3>
               <p className="text-3xl font-bold">
-                {orders.filter((o) => o.status === 'Terminado').length}
+                {orders.filter((o) => o.status === 'Pendiente').length}
               </p>
               <p className="text-sm">
                 $
-                {orders
-                  .filter((o) => o.status === 'Terminado')
+                {/* {orders
+                  .filter((o) => o.status === 'Pendiente')
                   .reduce(
                     (acc, curr) => acc + parseInt(curr.value.slice(1)),
                     0
-                  )}{' '}
+                  )}{' '} */}
                 Cost
               </p>
               <p className="text-sm text-gray-500">Last 7 days</p>
@@ -62,16 +63,16 @@ export const CardReceived = ({ orders }: IOrder) => {
             <div>
               <h3 className="text-lg font-semibold text-red-500">On the way</h3>
               <p className="text-3xl font-bold">
-                {orders.filter((o) => o.status === 'Imcompleto').length}
+                {orders.filter((o) => o.status === 'Pendiente').length}
               </p>
               <p className="text-sm">
                 $
-                {orders
-                  .filter((o) => o.status === 'Imcompleto')
+                {/* {orders
+                  .filter((o) => o.status === 'Pendiente')
                   .reduce(
                     (acc, curr) => acc + parseInt(curr.value.slice(1)),
                     0
-                  )}{' '}
+                  )} */}
                 Cost
               </p>
               <p className="text-sm text-gray-500">Ordered</p>
