@@ -12,6 +12,7 @@ import RegisterForm from '@/ui/components/Login/RegisterForm';
 import { PagesCategories } from '@/pages/Categories';
 import { Page } from '@/shared/components/ui/Page';
 import { Products } from '@/ui/components/Table/products';
+import { OrdersReceived } from '@/ui/components/OrdersReceived';
 
 export const Router = () => {
   return (
@@ -76,6 +77,19 @@ export const Router = () => {
         />
       </Route>
 
+      <Route
+        path="/transfer/recibido/:Id/itemdepedido"
+        element={<RequireAuth rolesAllowed={['root', 'admin', 'user']} />}
+      >
+        <Route
+          path="/transfer/recibido/:Id/itemdepedido"
+          element={
+            <Layout>
+              <OrdersReceived />
+            </Layout>
+          }
+        />
+      </Route>
       <Route
         path="/orders"
         element={<RequireAuth rolesAllowed={['root', 'admin', 'user']} />}

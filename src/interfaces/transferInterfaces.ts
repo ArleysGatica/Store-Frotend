@@ -4,8 +4,8 @@ import { IStatus, ITablaBranch } from './branchInterfaces';
 export interface IShippedOrder {
   _id: string;
   nombre: string;
-  fechaRegistro: string;
-  fechaRecepcion: string;
+  fechaRegistro: Date;
+  fechaRecepcion: Date;
   sucursalOrigenId: {
     _id: string;
     nombre: string;
@@ -47,7 +47,7 @@ export interface IShippedOrder {
   deleted_at: string | null;
   created_at: string;
   update_at: string;
-  fechaEnvio: string;
+  fechaEnvio: Date;
   usuarioIdEnvia: {
     _id: string;
     username: string;

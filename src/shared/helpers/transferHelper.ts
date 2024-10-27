@@ -38,6 +38,7 @@ export const incomingShipmentTableHeaders = [
 ];
 
 export const getFormatedDate = (date: Date) => {
+  if (date === null) return '-';
   const fecha = new Date(date);
   const opciones: Intl.DateTimeFormatOptions = {
     weekday: 'short' as 'short',
