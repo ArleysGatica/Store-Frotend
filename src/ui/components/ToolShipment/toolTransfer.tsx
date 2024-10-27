@@ -1,28 +1,18 @@
-import React from 'react';
 import { Button } from '@/components/ui/button';
 import Signature from './signature';
 import Comment from './comment';
 import { Send } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { ITool } from '.';
 import Images from './photo';
-
-export interface IToolTransfer {
-  sucursalOrigenId: string;
-  sucursalDestinoId: string | null;
-  comentarioEnvio: string | null;
-  firmaEnvio: string | null;
-  archivosAdjuntos: string[];
-  usuarioIdEnvia: string;
-}
-
-export interface IToolTransferProps {
-  userId: string;
-  destinationBranchId: string | null;
-  sourceBranchId: string;
-  shipmentTools: ITool[];
-  setShipmentTools: React.Dispatch<React.SetStateAction<ITool[]>>;
-}
+import {
+  ITransferDetails,
+  IToolTransferProps,
+} from '@/interfaces/transferInterfaces';
+import { createProductTransfer } from '@/app/slices/transferSlice';
+import { store } from '@/app/store';
+import { Toaster, toast } from 'sonner';
+import { useAppSelector } from '@/app/hooks';
+import { isValidTransfer } from '@/shared/helpers/transferHelper';
 
 export const ToolTransfer = ({
   destinationBranchId,
@@ -31,7 +21,9 @@ export const ToolTransfer = ({
   userId,
   setShipmentTools,
 }: IToolTransferProps) => {
-  const [toolTransfer, setToolTransfer] = useState<IToolTransfer>({
+  const transferStatus = useAppSelector((state) => state.transfer.status);
+  const [sending, setSending] = useState(false);
+  const [toolTransfer, setToolTransfer] = useState<ITransferDetails>({
     comentarioEnvio: null,
     firmaEnvio: '',
     sucursalOrigenId: '',
@@ -54,26 +46,45 @@ export const ToolTransfer = ({
     });
   };
 
-  const handleSendTransfer = () => {
+  const handleSendTransfer = async () => {
+    setSending(true);
+
+    const validTransfer = isValidTransfer(toolTransfer, shipmentTools.length);
+    if (!validTransfer) return setSending(false);
+
     const formattedTools = shipmentTools.map((tool) => ({
-      invetarioSucursalId: tool.id,
+      inventarioSucursalId: tool.id,
       cantidad: tool.quantityToSend,
       comentarioEnvio: tool.comment,
       archivosAdjuntos: tool.gallery,
     }));
 
-    console.log({
-      ...toolTransfer,
-      listDetalleTraslado: formattedTools,
+    const request = store
+      .dispatch(
+        createProductTransfer({
+          ...toolTransfer,
+          listDetalleTraslado: formattedTools,
+        })
+      )
+      .unwrap();
+
+    toast.promise(request, {
+      loading: 'Enviando...',
+      success: '¡Transferencia enviada!',
+      error: (err) => `Error al enviar transferencia: ${err}`,
     });
 
-    setShipmentTools([]);
-    setToolTransfer({
-      ...toolTransfer,
-      comentarioEnvio: null,
-      firmaEnvio: '',
-      archivosAdjuntos: [],
-    });
+    if (transferStatus === 'succeeded') {
+      setShipmentTools([]);
+      setToolTransfer({
+        ...toolTransfer,
+        comentarioEnvio: null,
+        firmaEnvio: '',
+        archivosAdjuntos: [],
+      });
+    }
+
+    setSending(false);
   };
 
   const handleSignature = (signature: string | null) => {
@@ -117,10 +128,11 @@ export const ToolTransfer = ({
         savedSignature={toolTransfer.firmaEnvio}
         handleSignature={handleSignature}
       />
-      <Button onClick={handleSendTransfer}>
+      <Button disabled={sending} onClick={handleSendTransfer}>
         <Send className="w-4 h-4 mr-2" />
         Enviar
       </Button>
+      <Toaster richColors position="bottom-right" />
     </div>
   );
 };
