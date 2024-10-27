@@ -1,7 +1,65 @@
 import React from 'react';
 import { IStatus, ITablaBranch } from './branchInterfaces';
 
+export interface IShippedOrder {
+  _id: string;
+  nombre: string;
+  fechaRegistro: string;
+  fechaRecepcion: string;
+  sucursalOrigenId: {
+    _id: string;
+    nombre: string;
+    direccion: string;
+    ciudad: string;
+    pais: string;
+    telefono: string;
+    deleted_at: string | null;
+    createdAt: string;
+    updatedAt: string;
+  };
+  sucursalDestinoId: {
+    _id: string;
+    nombre: string;
+    direccion: string;
+    ciudad: string;
+    pais: string;
+    telefono: string;
+    deleted_at: string | null;
+    createdAt: string;
+    updatedAt: string;
+  };
+  usuarioIdRecibe: {
+    _id: string;
+    username: string;
+    password: string;
+    role: string;
+    sucursalId: string | null;
+    deleted_at: string | null;
+  };
+  estado: boolean;
+  comentarioEnvio: string;
+  consecutivo: number;
+  comentarioRecepcion: string;
+  estatusTraslado: IStatusTransfer;
+  archivosAdjuntos: string[] | null;
+  firmaEnvio: string;
+  firmaRecepcion: string;
+  deleted_at: string | null;
+  created_at: string;
+  update_at: string;
+  fechaEnvio: string;
+  usuarioIdEnvia: {
+    _id: string;
+    username: string;
+    password: string;
+    role: string;
+    sucursalId: string | null;
+    deleted_at: string | null;
+  };
+}
+
 export interface ITransferSlice {
+  data: IShippedOrder[];
   sent: ITransfer[];
   received: ITransfer[];
   pending: IPendingTransfer[];

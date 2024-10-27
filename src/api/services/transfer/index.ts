@@ -11,10 +11,26 @@ export const createTransfer = async ({
   return response;
 };
 
+export const getAllTransfer = async (
+  sucursalId: string
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Transfer);
+  const response = await axiosInstance.get(`/${sucursalId}/enviados`);
+  return response.data;
+};
+
 export const fetchPendingTransfers = async (
   sucursalId: string
 ): Promise<AxiosResponse> => {
   const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Transfer);
   const response = await axiosInstance.get(`/recibir/${sucursalId}`);
   return response;
+};
+
+export const getAllOrdersReceipts = async (
+  sucursalId: string
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Transfer);
+  const response = await axiosInstance.get(`/${sucursalId}/recibidos`);
+  return response.data;
 };
