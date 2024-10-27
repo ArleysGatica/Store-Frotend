@@ -8,7 +8,10 @@ import {
   ITransferDetails,
   IToolTransferProps,
 } from '@/interfaces/transferInterfaces';
-import { createProductTransfer } from '@/app/slices/transferSlice';
+import {
+  createProductTransfer,
+  updateStatus,
+} from '@/app/slices/transferSlice';
 import { store } from '@/app/store';
 import { Toaster, toast } from 'sonner';
 import { useAppSelector } from '@/app/hooks';
@@ -84,6 +87,7 @@ export const ToolTransfer = ({
       });
     }
 
+    store.dispatch(updateStatus('idle'));
     setSending(false);
   };
 
