@@ -28,6 +28,13 @@ import {
 } from '@/interfaces/transferInterfaces';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
+interface IImageGridCardProps {
+  images: string[];
+  title: string;
+  subtitle: string;
+  description?: string;
+}
+
 export default function ReceivedTools2() {
   const user = useAppSelector((state) => state.auth.signIn.user);
   const pendingTransfer = useAppSelector((state) => state.transfer.pending);
@@ -143,13 +150,13 @@ const IncomingShipmentTable = ({
   );
 };
 
-export const PendingShipmentDetails = ({
-  pendingShipment,
-}: IPendingShipmentDetailsProps) => {
-  const imageCount = pendingShipment.archivosAdjuntos?.length ?? 0;
-  const archivosAdjuntos = pendingShipment.archivosAdjuntos ?? [];
-  const firma = pendingShipment.firmaEnvio ?? '';
-  const images = [firma, ...archivosAdjuntos];
+export const ImageGridCard = ({
+  images,
+  title,
+  subtitle,
+  description,
+}: IImageGridCardProps) => {
+  const imageCount = images.length;
 
   const getGridClass = () => {
     switch (imageCount) {
@@ -171,18 +178,16 @@ export const PendingShipmentDetails = ({
       <CardHeader className="flex flex-row items-center space-x-4">
         <div className="flex items-center justify-center w-12 h-12 bg-green-700 rounded-full cursor-pointer">
           <span className="text-lg font-semibold text-white">
-            {pendingShipment.usuarioIdEnvia.charAt(0) ?? 'A'}
+            {title.charAt(0) ?? 'A'}
           </span>
         </div>
         <div>
-          <h3 className="font-semibold">{pendingShipment.usuarioIdEnvia}</h3>
-          <p className="text-sm text-muted-foreground">
-            {getTimeElapsed(pendingShipment.fechaEnvio)}
-          </p>
+          <h3 className="font-semibold">{title}</h3>
+          <p className="text-sm text-muted-foreground">{subtitle}</p>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-sm">{pendingShipment.comentarioEnvio}</p>
+        {description && <p className="text-sm">{description}</p>}
         {imageCount > 0 && (
           <div className={`grid ${getGridClass()} gap-1`}>
             {images.slice(0, 6).map((src, index) => (
@@ -208,5 +213,23 @@ export const PendingShipmentDetails = ({
         )}
       </CardContent>
     </Card>
+  );
+};
+
+export const PendingShipmentDetails = ({
+  pendingShipment,
+}: IPendingShipmentDetailsProps) => {
+  const imageSources = [
+    pendingShipment.firmaEnvio ?? '',
+    ...(pendingShipment.archivosAdjuntos ?? []),
+  ];
+
+  return (
+    <ImageGridCard
+      images={imageSources}
+      title={pendingShipment.usuarioIdEnvia}
+      subtitle={getTimeElapsed(pendingShipment.fechaEnvio)}
+      description={pendingShipment.comentarioEnvio}
+    />
   );
 };

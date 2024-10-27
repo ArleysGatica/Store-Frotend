@@ -4,7 +4,6 @@ import {
   getAllProductTransfer,
 } from '@/app/slices/transferSlice';
 import { store } from '@/app/store';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,14 +21,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { getFormatedDate } from '@/shared/helpers/transferHelper';
 import { useEffect, useState } from 'react';
+import { MapIndex } from './mapIndex';
+import { Link } from 'react-router-dom';
 
 export const ShippedOrders = () => {
   const DataAlls = useAppSelector((state) => state.transfer.data);
@@ -43,11 +37,11 @@ export const ShippedOrders = () => {
     nombre: string;
     _id: string;
   } | null>(null);
+  console.log(filteredBranche.map((branch) => branch.nombre));
 
   useEffect(() => {
     if (selectedBranch) {
       store.dispatch(clearTransferData());
-
       store.dispatch(getAllProductTransfer(selectedBranch._id)).unwrap();
     }
   }, [selectedBranch]);
@@ -58,6 +52,12 @@ export const ShippedOrders = () => {
       setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
     }
   };
+  useEffect(() => {
+    if (filteredBranche.length === 1) {
+      const branch = filteredBranche[0];
+      setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
+    }
+  }, []);
 
   return (
     <div>
@@ -79,10 +79,6 @@ export const ShippedOrders = () => {
                   className="max-w-sm"
                 />
                 <div className="mb-4">
-                  <label
-                    htmlFor="branch-select"
-                    className="block text-sm font-medium text-gray-700"
-                  ></label>
                   <Select onValueChange={handleSelectChangeBranch}>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccione Sucursal" />
@@ -106,54 +102,21 @@ export const ShippedOrders = () => {
                 <TableRow>
                   <TableCell>ID</TableCell>
                   <TableCell>Nombre</TableCell>
-                  <TableCell>Fecha de Registro</TableCell>
-                  <TableCell>Sucursal Origen</TableCell>
+                  <TableCell>Fecha de envío</TableCell>
+                  <TableCell>Sucursal Envia</TableCell>
                   <TableCell>Sucursal Destino</TableCell>
-                  <TableCell>Estatus Traslado</TableCell>
-                  <TableCell>Usuario que Envia</TableCell>
+                  <TableCell>Estado</TableCell>
+                  <TableCell>Enviado por</TableCell>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {DataAlls.map((order) => (
-                  <TableRow key={order._id}>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          {order._id.slice(0, 8)}...
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <TableCell>{order._id}</TableCell>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
-                    <TableCell>{order.nombre}</TableCell>
-                    <TableCell>
-                      {getFormatedDate(new Date(order.fechaRecepcion))}
-                    </TableCell>
-                    <TableCell>{`${order.sucursalOrigenId.nombre}, ${order.sucursalOrigenId.ciudad}`}</TableCell>
-                    <TableCell>{`${order.sucursalDestinoId.nombre}, ${order.sucursalDestinoId.ciudad}`}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          order.estatusTraslado === 'En Proceso'
-                            ? 'secondary'
-                            : order.estatusTraslado === 'Terminado'
-                              ? 'default'
-                              : 'outline'
-                        }
-                      >
-                        {order.estatusTraslado === 'En Proceso'
-                          ? 'Pendiente'
-                          : order.estatusTraslado === 'Terminado'
-                            ? 'Recibido'
-                            : order.estatusTraslado === 'Terminado incompleto'
-                              ? 'Incompleto'
-                              : 'Solicitado'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{order.usuarioIdEnvia.username}</TableCell>
-                  </TableRow>
+                  //   <Link
+                  //     key={order._id}
+                  //     to={`/transfer/recibido/${order._id}/itemdepedido`}
+                  //   >
+                  <MapIndex order={order} key={order._id} />
+                  //   </Link>
                 ))}
               </TableBody>
             </Table>
