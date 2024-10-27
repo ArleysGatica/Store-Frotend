@@ -6,14 +6,41 @@ export interface IShippedOrder {
   nombre: string;
   fechaRegistro: string;
   fechaRecepcion: string;
-  sucursalOrigenId: string;
-  sucursalDestinoId: string;
-  usuarioIdRecibe: string;
+  sucursalOrigenId: {
+    _id: string;
+    nombre: string;
+    direccion: string;
+    ciudad: string;
+    pais: string;
+    telefono: string;
+    deleted_at: string | null;
+    createdAt: string;
+    updatedAt: string;
+  };
+  sucursalDestinoId: {
+    _id: string;
+    nombre: string;
+    direccion: string;
+    ciudad: string;
+    pais: string;
+    telefono: string;
+    deleted_at: string | null;
+    createdAt: string;
+    updatedAt: string;
+  };
+  usuarioIdRecibe: {
+    _id: string;
+    username: string;
+    password: string;
+    role: string;
+    sucursalId: string | null;
+    deleted_at: string | null;
+  };
   estado: boolean;
   comentarioEnvio: string;
   consecutivo: number;
   comentarioRecepcion: string;
-  estatusTraslado: 'TerminadoIncompleto' | 'EnProceso' | 'Cancelado';
+  estatusTraslado: IStatusTransfer;
   archivosAdjuntos: string[] | null;
   firmaEnvio: string;
   firmaRecepcion: string;
@@ -21,8 +48,14 @@ export interface IShippedOrder {
   created_at: string;
   update_at: string;
   fechaEnvio: string;
-  usuarioIdEnvia: string;
-  __v: number;
+  usuarioIdEnvia: {
+    _id: string;
+    username: string;
+    password: string;
+    role: string;
+    sucursalId: string | null;
+    deleted_at: string | null;
+  };
 }
 
 export interface ITransferSlice {

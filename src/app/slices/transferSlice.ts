@@ -10,6 +10,7 @@ import {
 import {
   createTransfer,
   fetchPendingTransfers,
+  getAllOrdersReceipts,
   getAllTransfer,
 } from '@/api/services/transfer';
 import { IStatus } from '@/interfaces/branchInterfaces';
@@ -36,7 +37,7 @@ export const createProductTransfer = createAsyncThunk(
 );
 
 export const getAllProductTransfer = createAsyncThunk(
-  'transfer/getAll',
+  'transfer/Send',
   async (_id: string) => {
     const response = await getAllTransfer(_id);
     return response;
@@ -47,6 +48,18 @@ export const getPendingTransfers = createAsyncThunk(
   async (sucursalId: string, { rejectWithValue }) => {
     try {
       const response = await fetchPendingTransfers(sucursalId);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
+export const receiveTransfer = createAsyncThunk(
+  'transfer/receive',
+  async (sucursalId: string, { rejectWithValue }) => {
+    try {
+      const response = await getAllOrdersReceipts(sucursalId);
       return response.data;
     } catch (error) {
       return rejectWithValue(handleThunkError(error));
@@ -102,6 +115,13 @@ const transferSlice = createSlice({
       })
       .addCase(
         getPendingTransfers.fulfilled,
+        (state, { payload }: PayloadAction<IPendingTransfer[]>) => {
+          state.status = 'succeeded';
+          state.pending = payload;
+        }
+      )
+      .addCase(
+        receiveTransfer.fulfilled,
         (state, { payload }: PayloadAction<IPendingTransfer[]>) => {
           state.status = 'succeeded';
           state.pending = payload;
