@@ -8,7 +8,7 @@ import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { useAppSelector } from '@/app/hooks';
 import { GetBranches } from '@/shared/helpers/Branchs';
 import { store } from '@/app/store';
-import { ITool } from '.';
+import { ITool } from '@/interfaces/transferInterfaces';
 
 export interface IConsolidatedShipment {
   selectedBranch:

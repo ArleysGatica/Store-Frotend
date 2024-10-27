@@ -6,6 +6,7 @@ export enum PATH_LIST {
   Inventory = 'inventory/products',
   products = 'inventory/products',
   Groups = 'inventory/groups',
+  Transfer = 'transfer',
 }
 
 export const createAxiosInstance = (

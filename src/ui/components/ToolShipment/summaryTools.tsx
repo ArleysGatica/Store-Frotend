@@ -11,8 +11,8 @@ import Images from './photo';
 import Comment from './comment';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, X } from 'lucide-react';
-import { ITool } from '.';
 import { useEffect, useState } from 'react';
+import { ITool } from '@/interfaces/transferInterfaces';
 
 export interface ISummaryTools {
   tools: ITool[];
