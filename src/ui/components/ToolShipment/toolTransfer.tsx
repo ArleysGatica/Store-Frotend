@@ -53,7 +53,7 @@ export const ToolTransfer = ({
     if (!validTransfer) return setSending(false);
 
     const formattedTools = shipmentTools.map((tool) => ({
-      inventarioSucursalId: tool.id,
+      inventarioSucursalId: tool.inventarioSucursalId,
       cantidad: tool.quantityToSend,
       comentarioEnvio: tool.comment,
       archivosAdjuntos: tool.gallery,
