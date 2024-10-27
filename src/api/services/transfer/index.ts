@@ -10,3 +10,11 @@ export const createTransfer = async ({
   const response = await axiosInstance.post('/', transfer);
   return response;
 };
+
+export const fetchPendingTransfers = async (
+  sucursalId: string
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Transfer);
+  const response = await axiosInstance.get(`/recibir/${sucursalId}`);
+  return response;
+};

@@ -1,15 +1,18 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { handleThunkError } from '../../shared/utils/errorHandlers';
 import {
+  IPendingTransfer,
   ITransfer,
   ITransferPost,
   ITransferSlice,
 } from '@/interfaces/transferInterfaces';
-import { createTransfer } from '@/api/services/transfer';
+import { createTransfer, fetchPendingTransfers } from '@/api/services/transfer';
+import { IStatus } from '@/interfaces/branchInterfaces';
 
 const initialState: ITransferSlice = {
   sent: [],
   received: [],
+  pending: [],
   status: 'idle',
   error: null,
 };
@@ -26,10 +29,26 @@ export const createProductTransfer = createAsyncThunk(
   }
 );
 
+export const getPendingTransfers = createAsyncThunk(
+  'transfer/getPending',
+  async (sucursalId: string, { rejectWithValue }) => {
+    try {
+      const response = await fetchPendingTransfers(sucursalId);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
 const transferSlice = createSlice({
   name: 'transfer',
   initialState,
-  reducers: {},
+  reducers: {
+    updateStatus: (state, action: PayloadAction<IStatus>) => {
+      state.status = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createProductTransfer.pending, (state) => {
@@ -45,10 +64,16 @@ const transferSlice = createSlice({
       .addCase(createProductTransfer.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'unknown error';
-      });
+      })
+      .addCase(
+        getPendingTransfers.fulfilled,
+        (state, { payload }: PayloadAction<IPendingTransfer[]>) => {
+          state.status = 'succeeded';
+          state.pending = payload;
+        }
+      );
   },
 });
 
-// eslint-disable-next-line no-empty-pattern
-export const {} = transferSlice.actions;
+export const { updateStatus } = transferSlice.actions;
 export const transferReducer = transferSlice.reducer;

@@ -57,4 +57,5 @@ export interface ITablaBranch {
   sucursalId: string;
   updatedAt?: string;
   createdAt?: string;
+  inventarioSucursalId?: string;
 }
