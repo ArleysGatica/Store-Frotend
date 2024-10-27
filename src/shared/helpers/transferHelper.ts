@@ -27,3 +27,48 @@ export const isValidTransfer = (
 
   return true;
 };
+
+export const incomingShipmentTableHeaders = [
+  { key: 'estado', label: 'Estado' },
+  { key: 'consecutivo', label: 'Consecutivo' },
+  { key: 'bodegaEnvia', label: 'Bodega que envía' },
+  { key: 'fechaEnvio', label: 'Fecha de envío' },
+  { key: 'enviadoPor', label: 'Enviado por' },
+  { key: 'acciones', label: 'Acciones' },
+];
+
+export const getFormatedDate = (date: Date) => {
+  const fecha = new Date(date);
+  const opciones: Intl.DateTimeFormatOptions = {
+    weekday: 'short' as 'short',
+    day: 'numeric' as 'numeric',
+    month: 'short' as 'short',
+    year: 'numeric' as 'numeric',
+  };
+  const fechaFormateada = fecha.toLocaleDateString('es-ES', opciones);
+  return fechaFormateada;
+};
+
+export const getTimeElapsed = (date: Date): string => {
+  const fecha = new Date(date);
+  const ahora = new Date();
+  const segundos = Math.floor((ahora.getTime() - fecha.getTime()) / 1000);
+
+  const unidades = [
+    { nombre: 'año', segundos: 31536000 },
+    { nombre: 'mes', segundos: 2592000 },
+    { nombre: 'día', segundos: 86400 },
+    { nombre: 'hora', segundos: 3600 },
+    { nombre: 'minuto', segundos: 60 },
+    { nombre: 'segundo', segundos: 1 },
+  ];
+
+  for (let unidad of unidades) {
+    const intervalo = Math.floor(segundos / unidad.segundos);
+    if (intervalo >= 1) {
+      return `Hace ${intervalo} ${unidad.nombre}${intervalo > 1 ? 's' : ''}`;
+    }
+  }
+
+  return 'Hace unos segundos';
+};
