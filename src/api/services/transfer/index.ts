@@ -10,3 +10,9 @@ export const createTransfer = async ({
   const response = await axiosInstance.post('/', transfer);
   return response;
 };
+
+export const getAllTransfer = async (id: string): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Transfer);
+  const response = await axiosInstance.get(`/${id}/enviados`);
+  return response.data;
+};

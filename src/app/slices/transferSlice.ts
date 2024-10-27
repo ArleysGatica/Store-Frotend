@@ -1,13 +1,15 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { handleThunkError } from '../../shared/utils/errorHandlers';
 import {
+  IShippedOrder,
   ITransfer,
   ITransferPost,
   ITransferSlice,
 } from '@/interfaces/transferInterfaces';
-import { createTransfer } from '@/api/services/transfer';
+import { createTransfer, getAllTransfer } from '@/api/services/transfer';
 
 const initialState: ITransferSlice = {
+  data: [],
   sent: [],
   received: [],
   status: 'idle',
@@ -26,10 +28,26 @@ export const createProductTransfer = createAsyncThunk(
   }
 );
 
+export const getAllProductTransfer = createAsyncThunk(
+  'transfer/getAll',
+  async (_id: string) => {
+    const response = await getAllTransfer(_id);
+    return response;
+  }
+);
+
 const transferSlice = createSlice({
   name: 'transfer',
   initialState,
-  reducers: {},
+  reducers: {
+    setTransferData(state, action: PayloadAction<IShippedOrder[]>) {
+      state.data = action.payload;
+    },
+    clearTransferData(state) {
+      state.data = [];
+    },
+  },
+
   extraReducers: (builder) => {
     builder
       .addCase(createProductTransfer.pending, (state) => {
@@ -45,10 +63,25 @@ const transferSlice = createSlice({
       .addCase(createProductTransfer.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'unknown error';
+      })
+      .addCase(getAllProductTransfer.pending, (state) => {
+        state.status = 'loading';
+      })
+
+      .addCase(getAllProductTransfer.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'unknown error';
+      })
+
+      .addCase(getAllProductTransfer.fulfilled, (state, payload) => {
+        state.status = 'succeeded';
+        state.data = [
+          ...state.data,
+          ...(payload.payload as unknown as IShippedOrder[]),
+        ];
       });
   },
 });
 
-// eslint-disable-next-line no-empty-pattern
-export const {} = transferSlice.actions;
+export const { setTransferData, clearTransferData } = transferSlice.actions;
 export const transferReducer = transferSlice.reducer;
