@@ -1,13 +1,8 @@
 import { useState } from 'react';
 import { ProfileUser } from '../../../shared/components/ui/Profile';
-import { store } from '../../../app/store';
-import { logout } from '../../../app/slices/login';
-import { useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
