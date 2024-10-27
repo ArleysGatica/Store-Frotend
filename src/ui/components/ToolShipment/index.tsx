@@ -13,7 +13,6 @@ import {
 import { TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAppSelector } from '@/app/hooks';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { ConsolidatedShipment } from './consolidatedShipment';
 import { SummaryTools } from './summaryTools';
 import { ToolTransfer } from './toolTransfer';
@@ -21,13 +20,7 @@ import './styles.scss';
 import { GetBranches } from '@/shared/helpers/Branchs';
 import { store } from '@/app/store';
 import { fetchBranches, updateSelectedBranch } from '@/app/slices/branchSlice';
-
-export interface ITool extends ITablaBranch {
-  quantityToSend: number;
-  comment: string | null;
-  gallery: Array<string>;
-  //
-}
+import { ITool } from '@/interfaces/transferInterfaces';
 
 export default function ToolShipment() {
   const user = useAppSelector((state) => state.auth.signIn.user);
