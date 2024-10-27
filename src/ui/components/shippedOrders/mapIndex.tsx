@@ -15,7 +15,7 @@ import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { Eye } from 'lucide-react';
 import { ImageGridCard } from '../ReceivedTools';
 import { IShippedOrder } from '@/interfaces/transferInterfaces';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface IOrder {
   order: IShippedOrder;
@@ -26,62 +26,66 @@ export const MapIndex = ({ order }: IOrder) => {
     ...(order.archivosAdjuntos ?? []),
   ];
 
+  const navigate = useNavigate();
+
   return (
-    <TableRow key={order._id}>
-      <Link key={order._id} to={`/transfer/recibido/${order._id}/itemdepedido`}>
-        <TableCell>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>{order._id.slice(0, 8)}...</TooltipTrigger>
-              <TooltipContent>{order._id}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </TableCell>
-        <TableCell>{order.nombre}</TableCell>
-        <TableCell>{getFormatedDate(order.fechaEnvio)}</TableCell>
-        <TableCell>{order.sucursalOrigenId.nombre}</TableCell>
-        <TableCell>{order.sucursalDestinoId.nombre}</TableCell>
-        <TableCell>
-          <Badge
-            variant={
-              order.estatusTraslado === 'En Proceso'
-                ? 'secondary'
-                : order.estatusTraslado === 'Terminado'
-                  ? 'default'
-                  : 'outline'
-            }
-          >
-            {order.estatusTraslado === 'En Proceso'
-              ? 'Pendiente'
+    <TableRow
+      key={order._id}
+      className="cursor-pointer"
+      onClick={() => navigate(`/transfer/recibido/${order._id}/itemdepedido`)}
+    >
+      <TableCell>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>{order._id.slice(0, 8)}...</TooltipTrigger>
+            <TooltipContent>{order._id}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </TableCell>
+      <TableCell>{order.nombre}</TableCell>
+      <TableCell>{getFormatedDate(order.fechaEnvio)}</TableCell>
+      <TableCell>{order.sucursalOrigenId.nombre}</TableCell>
+      <TableCell>{order.sucursalDestinoId.nombre}</TableCell>
+      <TableCell>
+        <Badge
+          variant={
+            order.estatusTraslado === 'En Proceso'
+              ? 'secondary'
               : order.estatusTraslado === 'Terminado'
-                ? 'Recibido'
-                : order.estatusTraslado === 'Terminado incompleto'
-                  ? 'Incompleto'
-                  : 'Solicitado'}
-          </Badge>
-        </TableCell>
-        <TableCell>{order.usuarioIdEnvia.username}</TableCell>
-        <TableCell>
-          <div className="flex items-center justify-center gap-2">
-            <Dialog>
-              <DialogTrigger>
-                <Button variant="ghost" size="sm">
-                  <Eye className="w-4 h-4 mr-1" />
-                  Ver detalles
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="p-3">
-                <ImageGridCard
-                  images={imageSources ?? []}
-                  title={order.usuarioIdEnvia.username}
-                  subtitle={getTimeElapsed(new Date(order.fechaEnvio))}
-                  description={order.comentarioEnvio}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </TableCell>
-      </Link>
+                ? 'default'
+                : 'outline'
+          }
+        >
+          {order.estatusTraslado === 'En Proceso'
+            ? 'Pendiente'
+            : order.estatusTraslado === 'Terminado'
+              ? 'Recibido'
+              : order.estatusTraslado === 'Terminado incompleto'
+                ? 'Incompleto'
+                : 'Solicitado'}
+        </Badge>
+      </TableCell>
+      <TableCell>{order.usuarioIdEnvia.username}</TableCell>
+      <TableCell>
+        <div className="flex items-center justify-center gap-2">
+          <Dialog>
+            <DialogTrigger>
+              <Button variant="ghost" size="sm">
+                <Eye className="w-4 h-4 mr-1" />
+                Ver detalles
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="p-3">
+              <ImageGridCard
+                images={imageSources ?? []}
+                title={order.usuarioIdEnvia.username}
+                subtitle={getTimeElapsed(new Date(order.fechaEnvio))}
+                description={order.comentarioEnvio}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </TableCell>
     </TableRow>
   );
 };

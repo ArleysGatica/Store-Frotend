@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/table';
 import { useEffect, useState } from 'react';
 import { MapIndex } from './mapIndex';
-import { Link } from 'react-router-dom';
 
 export const ShippedOrders = () => {
   const DataAlls = useAppSelector((state) => state.transfer.data);
@@ -111,12 +110,7 @@ export const ShippedOrders = () => {
               </TableHeader>
               <TableBody>
                 {DataAlls.map((order) => (
-                  //   <Link
-                  //     key={order._id}
-                  //     to={`/transfer/recibido/${order._id}/itemdepedido`}
-                  //   >
                   <MapIndex order={order} key={order._id} />
-                  //   </Link>
                 ))}
               </TableBody>
             </Table>
