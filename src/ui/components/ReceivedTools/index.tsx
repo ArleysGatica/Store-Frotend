@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { Eye, MoreVertical, ArrowDownToLine } from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -10,127 +8,207 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Tabs } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { CardReceived } from './CardReceived';
+import { Info } from 'lucide-react';
+import { TableReceived } from './tablaReceived';
+import './styles.scss';
 
-interface ToolShipmentData {
+const statusColors = {
+  Solicitado: 'text-orange-500',
+  'En Progreso': 'text-blue-500',
+  Terminado: 'text-green-500',
+  Imcompleto: 'text-gray-500',
+};
+
+export type OrderReceived = {
+  product: string;
+  value: string;
+  quantity: string;
   id: string;
-  status: 'Pendiente' | 'En tránsito' | 'Recibido';
-  consecutive: string;
-  warehouse: string;
-  date: string;
-  sentBy: string;
-}
-
-const toolShipments: ToolShipmentData[] = [
-  {
-    id: '1',
-    status: 'Pendiente',
-    consecutive: '1234567890',
-    warehouse: 'Nombre de bodega',
-    date: '10/10/23',
-    sentBy: 'Pedro Castañeda',
-  },
-  {
-    id: '2',
-    status: 'Pendiente',
-    consecutive: '1234567890',
-    warehouse: 'Nombre de bodega',
-    date: '10/10/23',
-    sentBy: 'Pedro Cdweastañeda',
-  },
-];
+  delivery: string;
+  status: string;
+};
 
 export default function ReceivedTools() {
-  const [searchTerm] = useState('');
+  const [orders, setOrders] = useState<OrderReceived[]>([
+    {
+      product: 'Horlicks',
+      value: '$5370',
+      quantity: '5 PrODUCTOS',
+      id: '2427',
+      delivery: '9/1/23',
+      status: 'Solicitado',
+    },
+    {
+      product: 'Coca-Cola',
+      value: '$450',
+      quantity: '3 Packets',
+      id: '2428',
+      delivery: '9/1/23',
+      status: 'En Progreso',
+    },
+    {
+      product: 'Pepsi',
+      value: '$320',
+      quantity: '2 Packets',
+      id: '2429',
+      delivery: '9/1/23',
+      status: 'Imcompleto',
+    },
+    {
+      product: 'Sprite',
+      value: '$250',
+      quantity: '4 Packets',
+      id: '2430',
+      delivery: '9/1/23',
+      status: 'Terminado',
+    },
+  ]);
 
-  const filteredShipments = toolShipments.filter(
-    (shipment) =>
-      shipment.consecutive.includes(searchTerm) ||
-      shipment.warehouse.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      shipment.sentBy.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const tableHeaders = [
-    { key: 'estado', label: 'Estado' },
-    { key: 'consecutivo', label: 'Consecutivo' },
-    { key: 'bodegaEnvia', label: 'Bodega que envía' },
-    { key: 'fechaEnvio', label: 'Fecha de envío' },
-    { key: 'enviadoPor', label: 'Enviado por' },
-    { key: 'acciones', label: 'Acciones' },
-  ];
+  const ordersPerPage = 10;
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
 
-  const ShipmentTable = ({ shipments }: { shipments: ToolShipmentData[] }) => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          {tableHeaders.map((header) => (
-            <TableHead key={header.key}>{header.label}</TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {shipments.map((shipment) => (
-          <TableRow key={shipment.id}>
-            <TableCell>
-              <Badge
-                variant={
-                  shipment.status === 'Pendiente'
-                    ? 'secondary'
-                    : shipment.status === 'En tránsito'
-                      ? 'default'
-                      : 'outline'
-                }
-              >
-                {shipment.status}
-              </Badge>
-            </TableCell>
-            <TableCell>{shipment.consecutive}</TableCell>
-            <TableCell>{shipment.warehouse}</TableCell>
-            <TableCell>{shipment.date}</TableCell>
-            <TableCell>{shipment.sentBy}</TableCell>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm">
-                  <Eye className="w-4 h-4 mr-1" />
-                  Ver detalles
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <MoreVertical className="w-4 h-4" />
-                      <span className="sr-only">Opciones</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Opción 1</DropdownMenuItem>
-                    <DropdownMenuItem>Opción 2</DropdownMenuItem>
-                    <DropdownMenuItem>Opción 3</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button size="sm">
-                  <ArrowDownToLine className="w-4 h-4 mr-1" />
-                  Recibir
-                </Button>
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
+  const receiveOrder = (id: string) => {
+    setOrders(
+      orders.map((order) =>
+        order.id === id ? { ...order, status: 'Received' } : order
+      )
+    );
+  };
 
   return (
-    <div className="container mx-auto ">
-      <Tabs defaultValue="receive">
-        <ShipmentTable shipments={filteredShipments} />
-      </Tabs>
+    <div className="container mx-auto p-4 space-y-6">
+      <CardReceived orders={orders} />
+      <Card>
+        <CardHeader>
+          <CardTitle>Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-between mb-4">
+            <div className="flex space-x-2">
+              <Button variant="outline">Filters</Button>
+              <Button variant="outline">Order History</Button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Input type="text" placeholder="Search..." className="max-w-sm" />
+            </div>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Date sended</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Recibir</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {orders.map((order, index) => (
+                <TableRow key={index}>
+                  <TableCell className="flex items-center space-x-2">
+                    {order.id}
+                    <div className="flex items-center space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="p-0">
+                            <Info className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="dialogContent">
+                          <DialogHeader>
+                            <DialogTitle> Details</DialogTitle>
+                          </DialogHeader>
+                          <div className="py-4">
+                            <TableReceived />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </TableCell>
+                  <TableCell>{order.quantity}</TableCell>
+
+                  <TableCell>{order.delivery}</TableCell>
+                  <TableCell
+                    className={
+                      statusColors[order.status as keyof typeof statusColors]
+                    }
+                  >
+                    {order.status}
+                  </TableCell>
+
+                  <TableCell>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          Recibir
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Recibir Pedido</DialogTitle>
+                        </DialogHeader>
+                        <div className="py-4">
+                          <p>
+                            ¿Está seguro que desea marcar este pedido como
+                            recibido?
+                          </p>
+                          <p>Producto: {order.product}</p>
+                          <p>Valor: {order.value}</p>
+                          <p>Cantidad: {order.quantity}</p>
+                          <div className="flex w-full justify-between">
+                            <Button onClick={() => receiveOrder(order.id)}>
+                              Comentarios
+                            </Button>
+                            <br />
+                            <Button onClick={() => receiveOrder(order.id)}>
+                              Imagen
+                            </Button>
+                          </div>
+                        </div>
+
+                        <Button onClick={() => receiveOrder(order.id)}>
+                          Confirmar Recepción
+                        </Button>
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div className="flex justify-between items-center mt-4">
+            <Button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

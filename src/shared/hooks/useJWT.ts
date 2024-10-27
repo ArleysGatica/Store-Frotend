@@ -20,7 +20,6 @@ export interface AuthState {
 export const useAuthToken = () => {
   const initialToken = useRef(getUserDataFromLocalStorage()?.token || '');
   const [token, setToken] = useState<string>(initialToken.current);
-
   const navigate = useNavigate();
   const hasCheckedToken = useRef(false);
 
@@ -32,10 +31,9 @@ export const useAuthToken = () => {
       }
 
       if (hasTokenExpired(token)) {
+        alert('TOKEN EXPIRADO');
         handleAuthentication('', false, navigate);
         setToken('');
-      } else {
-        handleAuthentication(token, true);
       }
     };
 
@@ -65,12 +63,11 @@ const handleAuthentication = (
   isAuth: boolean,
   navigate?: NavigateFunction
 ) => {
-  const initialToken = useRef(getUserDataFromLocalStorage() as AuthState);
   const authState: AuthState = {
     token,
-    username: initialToken.current.username,
-    password: initialToken?.current.password,
-    role: initialToken?.current.role,
+    username: '',
+    password: '',
+    role: '',
     status: isAuth ? 'authenticated' : 'unauthenticated',
   };
 

@@ -22,6 +22,8 @@ export interface IImages {
   savedImages: string[];
   className?: string;
   showTitle?: boolean;
+  maxImages?: number;
+  title?: string;
 }
 
 export default function Images({
@@ -29,6 +31,8 @@ export default function Images({
   handleSaveImages,
   className,
   showTitle,
+  maxImages = 6,
+  title = 'Fotografía',
 }: IImages) {
   const [isOpen, setIsOpen] = useState(false);
   const [fotos, setFotos] = useState<string[]>([]);
@@ -38,7 +42,7 @@ export default function Images({
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFotos([...fotos, reader.result as string]);
+        setFotos((prevFotos) => [...prevFotos, reader.result as string]);
       };
       reader.readAsDataURL(file);
     } else {
@@ -46,9 +50,7 @@ export default function Images({
     }
   };
 
-  const deleteLastImage = () => {
-    setFotos(fotos.slice(0, -1));
-  };
+  const deleteLastImage = () => setFotos((prevFotos) => prevFotos.slice(0, -1));
 
   const saveImages = () => {
     handleSaveImages(fotos);
@@ -56,7 +58,7 @@ export default function Images({
   };
 
   useEffect(() => {
-    setFotos(savedImages ?? []);
+    setFotos(savedImages);
   }, [savedImages]);
 
   return (
@@ -78,12 +80,12 @@ export default function Images({
             <div className="flex items-center justify-center w-8 h-8 font-semibold rounded-full bg-primary text-primary-foreground">
               A
             </div>
-            <CardTitle>Fotografía</CardTitle>
+            <CardTitle>{title}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-1">
               {fotos.map((foto, index) => (
-                <div key={index} className={'col-span-1'}>
+                <div key={index} className="col-span-1">
                   <img
                     src={foto}
                     alt={`Foto ${index}`}
@@ -95,7 +97,7 @@ export default function Images({
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <div className="flex justify-between w-full">
-              {fotos.length < 6 && (
+              {fotos.length < maxImages && (
                 <div className="grid items-center w-[120px]">
                   <Label htmlFor="picture" className="sr-only">
                     Agregar más
@@ -123,7 +125,7 @@ export default function Images({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => deleteLastImage()}
+                  onClick={deleteLastImage}
                   className="w-[130px]"
                 >
                   <Trash2 className="w-4 h-4" /> Eliminar imagen

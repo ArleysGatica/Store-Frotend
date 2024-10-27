@@ -6,8 +6,6 @@ import ReceivedTools from '../../../../ui/components/ReceivedTools';
 import ToolShipment from '../../../../ui/components/ToolShipment';
 
 export const HeaderTable = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-
   return (
     <div className="container mx-auto ">
       <Tabs defaultValue="send">
@@ -27,17 +25,7 @@ export const HeaderTable = () => {
             </TabsTrigger>
           </TabsList>
         </div>
-        <div className="mb-4">
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por consecutivo, bodega o enviado por..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
+
         <TabsContent value="receive">
           <ReceivedTools />
         </TabsContent>

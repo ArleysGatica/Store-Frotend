@@ -23,3 +23,9 @@ export const getAllGroups = async (): Promise<AxiosResponse> => {
   const response = await axiosInstance.get('/');
   return response.data;
 };
+
+export const deleteGroup = async (id: string): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Groups);
+  const response = await axiosInstance.delete(`/${id}`);
+  return response;
+};
