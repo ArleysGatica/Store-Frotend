@@ -20,6 +20,8 @@ const initialState: ITransferSlice = {
   sent: [],
   received: [],
   pending: [],
+  selectedPending: null,
+  selectedPendingProducts: null,
   status: 'idle',
   error: null,
 };
@@ -80,6 +82,9 @@ const transferSlice = createSlice({
     clearTransferData(state) {
       state.data = [];
     },
+    setPendingSelected(state, action: PayloadAction<IPendingTransfer | null>) {
+      state.selectedPending = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -130,7 +135,11 @@ const transferSlice = createSlice({
   },
 });
 
-export const { setTransferData, clearTransferData, updateStatus } =
-  transferSlice.actions;
+export const {
+  setTransferData,
+  clearTransferData,
+  updateStatus,
+  setPendingSelected,
+} = transferSlice.actions;
 
 export const transferReducer = transferSlice.reducer;

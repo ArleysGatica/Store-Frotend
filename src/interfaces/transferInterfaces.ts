@@ -64,6 +64,8 @@ export interface ITransferSlice {
   sent: ITransfer[];
   received: ITransfer[];
   pending: IPendingTransfer[];
+  selectedPending: IPendingTransfer | null;
+  selectedPendingProducts: any[] | null;
   status: IStatus;
   error: string | null;
 }
