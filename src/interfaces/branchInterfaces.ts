@@ -47,7 +47,7 @@ export interface IProduct {
   _id?: number;
 }
 export interface ITablaBranch {
-  id?: string;
+  _id?: string;
   nombre: string;
   descripcion: string;
   precio: { $numberDecimal: number };

@@ -14,13 +14,19 @@ import {
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { Eye } from 'lucide-react';
 import { ImageGridCard } from '../ReceivedTools';
-import { IShippedOrder } from '@/interfaces/transferInterfaces';
+import {
+  IDetalleSelected,
+  IShippedOrder,
+} from '@/interfaces/transferInterfaces';
 import { useNavigate } from 'react-router-dom';
+import { store } from '@/app/store';
+import { setSelectItemDetail } from '@/app/slices/transferSlice';
 
 interface IOrder {
   order: IShippedOrder;
+  items: IDetalleSelected;
 }
-export const MapIndex = ({ order }: IOrder) => {
+export const MapIndex = ({ order, items }: IOrder) => {
   const imageSources = [
     order.firmaEnvio ?? '',
     ...(order.archivosAdjuntos ?? []),
@@ -28,13 +34,64 @@ export const MapIndex = ({ order }: IOrder) => {
 
   const navigate = useNavigate();
 
+  const handleSelectItem = (items: IDetalleSelected) => {
+    console.log(items, 'items');
+    store.dispatch(setSelectItemDetail(items));
+  };
+
   return (
     <TableRow
       key={order._id}
       className="cursor-pointer"
-      onClick={() => navigate(`/transfer/recibido/${order._id}/itemdepedido`)}
+      onClick={() =>
+        handleSelectItem({
+          ...items,
+          listItemDePedido: [],
+          traslado: {
+            _id: '',
+            nombre: '',
+            fechaRegistro: new Date(),
+            fechaEnvio: new Date(),
+            fechaRecepcion: new Date(),
+            sucursalOrigenId: {
+              _id: '',
+              nombre: '',
+              direccion: '',
+              ciudad: '',
+              pais: '',
+              telefono: '',
+              deleted_at: null,
+              createdAt: '',
+              updatedAt: '',
+            },
+            sucursalDestinoId: {
+              _id: '',
+              nombre: '',
+              direccion: '',
+              ciudad: '',
+              pais: '',
+              telefono: '',
+              deleted_at: null,
+              createdAt: '',
+              updatedAt: '',
+            },
+            usuarioIdEnvia: '',
+            usuarioIdRecibe: null,
+            estado: '',
+            comentarioEnvio: '',
+            comentarioRecepcion: null,
+            archivosAdjuntos: null,
+            firmaEnvio: '',
+            firmaRecepcion: '',
+            deleted_at: null,
+          },
+        })
+      }
     >
-      <TableCell>
+      <TableCell
+        className="cursor-pointer"
+        onClick={() => navigate(`/transfer/recibido/${order._id}/itemdepedido`)}
+      >
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>{order._id.slice(0, 8)}...</TooltipTrigger>

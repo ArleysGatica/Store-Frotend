@@ -40,24 +40,26 @@ export default function ToolShipment() {
 
   const handleQuantityChange = (id: string, quantity: number) => {
     const updatedTools = tools.map((tool) =>
-      tool.id === id ? { ...tool, quantityToSend: quantity } : tool
+      tool._id === id ? { ...tool, quantityToSend: quantity } : tool
     );
     setTools(updatedTools);
   };
 
   const handleShipmentTool = (tool: ITool) => {
     const updatedTools = tools.map((tl) =>
-      tl.id === tool.id
+      tl._id === tool._id
         ? { ...tl, stock: tl.stock - tool.quantityToSend, quantityToSend: 0 }
         : tl
     );
 
     let updatedShipmentTools = shipmentTools.map((tl) =>
-      tl.id === tool.id
+      tl._id === tool._id
         ? { ...tl, quantityToSend: tl.quantityToSend + tool.quantityToSend }
         : tl
     );
-    const isShipmentTool = updatedShipmentTools.find((st) => st.id === tool.id);
+    const isShipmentTool = updatedShipmentTools.find(
+      (st) => st._id === tool._id
+    );
     if (!isShipmentTool) {
       updatedShipmentTools = [...updatedShipmentTools, tool];
     }
@@ -68,11 +70,13 @@ export default function ToolShipment() {
 
   const handleRemoveShipmentTool = (tool: ITool) => {
     const updatedTools = tools.map((tl) =>
-      tl.id === tool.id ? { ...tl, stock: tl.stock + tool.quantityToSend } : tl
+      tl._id === tool._id
+        ? { ...tl, stock: tl.stock + tool.quantityToSend }
+        : tl
     );
 
     const updatedShipmentTools = shipmentTools.filter(
-      (st) => st.id !== tool.id
+      (st) => st._id !== tool._id
     );
 
     setShipmentTools(updatedShipmentTools);
@@ -81,7 +85,7 @@ export default function ToolShipment() {
 
   const handleRemoveComment = (tool: ITool) => {
     const updatedTools = shipmentTools.map((tl) =>
-      tl.id === tool.id ? { ...tl, comment: null } : tl
+      tl._id === tool._id ? { ...tl, comment: null } : tl
     );
 
     setShipmentTools(updatedTools);
@@ -89,7 +93,7 @@ export default function ToolShipment() {
 
   const handleSaveComment = (toolId: string, comment: string) => {
     const updatedTools = shipmentTools.map((tl) =>
-      tl.id === toolId ? { ...tl, comment: comment } : tl
+      tl._id === toolId ? { ...tl, comment: comment } : tl
     );
 
     setShipmentTools(updatedTools);
@@ -97,7 +101,7 @@ export default function ToolShipment() {
 
   const handleSaveImages = (toolId: string, images: string[]) => {
     const updatedTools = shipmentTools.map((tl) =>
-      tl.id === toolId ? { ...tl, gallery: images } : tl
+      tl._id === toolId ? { ...tl, gallery: images } : tl
     );
 
     setShipmentTools(updatedTools);
@@ -162,9 +166,9 @@ export default function ToolShipment() {
                 </TableHeader>
                 <TableBody>
                   {filteredTools.map((tool) => (
-                    <TableRow key={tool.id}>
+                    <TableRow key={tool._id}>
                       <TableCell>{tool.nombre}</TableCell>
-                      <TableCell>{tool.id}</TableCell>
+                      <TableCell>{tool._id}</TableCell>
                       <TableCell>{tool.stock} unidades</TableCell>
                       <TableCell>
                         <Input
@@ -172,7 +176,7 @@ export default function ToolShipment() {
                           value={tool.quantityToSend}
                           onChange={(e) =>
                             handleQuantityChange(
-                              tool.id!,
+                              tool._id!,
                               parseInt(e.target.value)
                             )
                           }
