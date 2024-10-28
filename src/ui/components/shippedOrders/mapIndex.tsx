@@ -13,7 +13,6 @@ import {
 } from '@/shared/helpers/transferHelper';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { Eye } from 'lucide-react';
-import { ImageGridCard } from '../ReceivedTools';
 import {
   IDetalleSelected,
   IShippedOrder,
@@ -21,6 +20,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { store } from '@/app/store';
 import { setSelectItemDetail } from '@/app/slices/transferSlice';
+import { ImageGridCard } from '../PendingTools';
 
 interface IOrder {
   order: IShippedOrder;
@@ -40,54 +40,7 @@ export const MapIndex = ({ order, items }: IOrder) => {
   };
 
   return (
-    <TableRow
-      key={order._id}
-      className="cursor-pointer"
-      onClick={() =>
-        handleSelectItem({
-          ...items,
-          listItemDePedido: [],
-          traslado: {
-            _id: '',
-            nombre: '',
-            fechaRegistro: new Date(),
-            fechaEnvio: new Date(),
-            fechaRecepcion: new Date(),
-            sucursalOrigenId: {
-              _id: '',
-              nombre: '',
-              direccion: '',
-              ciudad: '',
-              pais: '',
-              telefono: '',
-              deleted_at: null,
-              createdAt: '',
-              updatedAt: '',
-            },
-            sucursalDestinoId: {
-              _id: '',
-              nombre: '',
-              direccion: '',
-              ciudad: '',
-              pais: '',
-              telefono: '',
-              deleted_at: null,
-              createdAt: '',
-              updatedAt: '',
-            },
-            usuarioIdEnvia: '',
-            usuarioIdRecibe: null,
-            estado: '',
-            comentarioEnvio: '',
-            comentarioRecepcion: null,
-            archivosAdjuntos: null,
-            firmaEnvio: '',
-            firmaRecepcion: '',
-            deleted_at: null,
-          },
-        })
-      }
-    >
+    <TableRow key={order._id} className="cursor-pointer">
       <TableCell
         className="cursor-pointer"
         onClick={() => navigate(`/transfer/recibido/${order._id}/itemdepedido`)}

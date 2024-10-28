@@ -13,6 +13,7 @@ import { PagesCategories } from '@/pages/Categories';
 import { Page } from '@/shared/components/ui/Page';
 import { Products } from '@/ui/components/Table/products';
 import { OrdersReceived } from '@/ui/components/OrdersReceived';
+import PendingProductsByTransfer from '@/ui/components/PendingTools/products';
 
 export const Router = () => {
   return (
@@ -126,6 +127,20 @@ export const Router = () => {
           element={
             <Layout>
               <PagesCategories />
+            </Layout>
+          }
+        />
+      </Route>
+
+      <Route
+        path="/transfer/pending/:Id/itemdepedido"
+        element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}
+      >
+        <Route
+          path="/transfer/pending/:Id/itemdepedido"
+          element={
+            <Layout>
+              <PendingProductsByTransfer />
             </Layout>
           }
         />

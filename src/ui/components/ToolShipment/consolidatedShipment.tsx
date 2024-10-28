@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SendHorizonal } from 'lucide-react';
 import CustomSelect from './customSelect';
-import { Badge } from '@/components/ui/badge';
 import { Branch, updateSelectedBranch } from '@/app/slices/branchSlice';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { useAppSelector } from '@/app/hooks';
 import { GetBranches } from '@/shared/helpers/Branchs';
 import { store } from '@/app/store';
 import { ITool } from '@/interfaces/transferInterfaces';
+import { Select, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export interface IConsolidatedShipment {
   selectedBranch:
@@ -59,12 +59,11 @@ export const ConsolidatedShipment = ({
       <CardContent>
         <div className="flex items-center justify-between mb-4">
           {user?.sucursalId ? (
-            <Badge
-              variant="outline"
-              className="flex items-center justify-center text-base font-semibold w-[250px] max-w-[250px] h-[50px] whitespace-nowrap overflow-hidden text-ellipsis shadow-md"
-            >
-              {selectedBranch?.nombre ?? ''}
-            </Badge>
+            <Select>
+              <SelectTrigger className="w-[300px]" disabled>
+                <SelectValue placeholder={user.sucursalId.nombre} />
+              </SelectTrigger>
+            </Select>
           ) : (
             <CustomSelect
               sourceBranchId={sourceBranch?._id ?? ''}

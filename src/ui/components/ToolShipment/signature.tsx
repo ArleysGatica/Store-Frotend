@@ -103,7 +103,7 @@ export default function Signature({
           <Pen className="w-4 h-4 mr-2" /> {buttonText}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0">
+      <PopoverContent className="w-[400px] p-0" side="top">
         <Card className="border-0 shadow-none">
           <CardHeader className="flex flex-row items-center pb-2 space-x-2">
             <div className="flex items-center justify-center w-8 h-8 font-semibold rounded-full bg-primary text-primary-foreground">

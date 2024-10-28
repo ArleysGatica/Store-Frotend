@@ -5,15 +5,17 @@ import { IBranch } from '@/interfaces/branchInterfaces';
 
 export type IRoles = 'admin' | 'user' | 'root';
 
+export interface IUser {
+  _id: string;
+  username: string;
+  role: IRoles;
+  password: string;
+  sucursalId?: IBranch;
+}
+
 export interface IToken {
   token: string;
-  user?: {
-    _id: string;
-    username: string;
-    role: IRoles;
-    password: string;
-    sucursalId?: IBranch;
-  };
+  user?: IUser;
 }
 
 const saveToLocalStorage = (key: string, value: any) => {
