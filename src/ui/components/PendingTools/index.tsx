@@ -27,6 +27,7 @@ import {
   IPendingTransfer,
 } from '@/interfaces/transferInterfaces';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Link } from 'react-router-dom';
 
 interface IImageGridCardProps {
   images: string[];
@@ -35,7 +36,7 @@ interface IImageGridCardProps {
   description?: string;
 }
 
-export default function ReceivedTools2() {
+export default function PendingTools() {
   const user = useAppSelector((state) => state.auth.signIn.user);
   const pendingTransfer = useAppSelector((state) => state.transfer.pending);
   const [searchTerm, setSearchTerm] = useState('');
@@ -44,10 +45,12 @@ export default function ReceivedTools2() {
     (shipment) =>
       (shipment.consecutivo &&
         shipment.consecutivo?.toString().includes(searchTerm)) ||
-      shipment.sucursalDestinoId
+      shipment.sucursalDestinoId.nombre
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      shipment.usuarioIdEnvia.toLowerCase().includes(searchTerm.toLowerCase())
+      shipment.usuarioIdEnvia.username
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
 
   useEffect(() => {
@@ -121,9 +124,9 @@ const IncomingShipmentTable = ({
               </Badge>
             </TableCell>
             <TableCell>{shipment.consecutivo}</TableCell>
-            <TableCell>{shipment.sucursalDestinoId}</TableCell>
+            <TableCell>{shipment.sucursalDestinoId.nombre}</TableCell>
             <TableCell>{getFormatedDate(shipment.fechaEnvio)}</TableCell>
-            <TableCell>{shipment.usuarioIdEnvia}</TableCell>
+            <TableCell>{shipment.usuarioIdEnvia.username}</TableCell>
             <TableCell>
               <div className="flex items-center justify-center gap-2">
                 <Dialog>
@@ -137,10 +140,12 @@ const IncomingShipmentTable = ({
                     <PendingShipmentDetails pendingShipment={shipment} />
                   </DialogContent>
                 </Dialog>
-                <Button variant="outline" size="sm">
-                  Recibir
-                  <ArrowDown />
-                </Button>
+                <Link to={`/transfer/pending/${shipment._id}/itemdepedido`}>
+                  <Button variant="outline" size="sm" className="text-black">
+                    Recibir
+                    <ArrowDown />
+                  </Button>
+                </Link>
               </div>
             </TableCell>
           </TableRow>
@@ -227,7 +232,7 @@ export const PendingShipmentDetails = ({
   return (
     <ImageGridCard
       images={imageSources}
-      title={pendingShipment.usuarioIdEnvia}
+      title={pendingShipment.usuarioIdEnvia.username}
       subtitle={getTimeElapsed(pendingShipment.fechaEnvio)}
       description={pendingShipment.comentarioEnvio}
     />

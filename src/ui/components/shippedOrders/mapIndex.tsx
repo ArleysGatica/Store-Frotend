@@ -13,7 +13,7 @@ import {
 } from '@/shared/helpers/transferHelper';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { Eye } from 'lucide-react';
-import { ImageGridCard } from '../ReceivedTools';
+import { ImageGridCard } from '../PendingTools';
 import { IShippedOrder } from '@/interfaces/transferInterfaces';
 import { useNavigate } from 'react-router-dom';
 

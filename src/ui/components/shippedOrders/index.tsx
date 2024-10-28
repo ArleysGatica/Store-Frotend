@@ -60,7 +60,7 @@ export const ShippedOrders = () => {
 
   return (
     <div>
-      <div className="container mx-auto p-4 space-y-6">
+      <div className="container p-4 mx-auto space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Orders</CardTitle>
@@ -71,7 +71,7 @@ export const ShippedOrders = () => {
                 <Button variant="outline">Filters</Button>
                 <Button variant="outline">Order History</Button>
               </div>
-              <div className="flex  space-x-2">
+              <div className="flex space-x-2">
                 <Input
                   type="text"
                   placeholder="Search..."
