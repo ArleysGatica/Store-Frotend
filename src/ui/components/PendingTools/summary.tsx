@@ -1,13 +1,56 @@
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ListItemDePedido } from '@/interfaces/transferInterfaces';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
+import { Image, MessageSquare, MessageSquareMore } from 'lucide-react';
+import Images from '../ToolShipment/photo';
+import Comment from '../ToolShipment/comment';
+import { Badge } from '@/components/ui/badge';
 
-export const SummaryPendingTools = () => {
+const productStates = [
+  { id: 1, value: 'Buen estado' },
+  { id: 2, value: 'Regular' },
+  { id: 3, value: 'Malo' },
+  { id: 4, value: 'Incompleto' },
+  { id: 5, value: 'Extraviado' },
+];
+
+export interface ISummaryPendingTools {
+  products: ListItemDePedido[];
+}
+
+export const SummaryPendingTools = ({ products }: ISummaryPendingTools) => {
+  const handleSaveComment = (comment: string) => {
+    console.log(comment);
+  };
+
+  const handleRemoveComment = () => {};
+
+  const handleSaveImages = (images: string[]) => {
+    console.log(images);
+  };
+
   return (
     <Card className="branch__transfer__list">
       <CardHeader>
@@ -17,57 +60,114 @@ export const SummaryPendingTools = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Enviado</TableHead>
-              <TableHead>Recibido</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Detalles</TableHead>
-              <TableHead>Acciones</TableHead>
+              <TableHead className="w-[12%]">Código</TableHead>
+              <TableHead className="w-[15%]">Nombre</TableHead>
+              <TableHead className="w-[10%]">Enviado</TableHead>
+              <TableHead className="w-[10%]">Recibido</TableHead>
+              <TableHead className="w-[10%]">Precio ud.</TableHead>
+              <TableHead className="w-[13%]">Estado</TableHead>
+              <TableHead className=" text-center w-[15%]">Detalles</TableHead>
+              <TableHead className="text-center w-[15%]">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {/* {shipmentTools.map((tool) => (
-              <TableRow key={tool.id}>
+            {products.map((product) => (
+              <TableRow key={product._id}>
                 <TableCell>
-                  {tool.nombre}
-                  <br />
-                  <span className="text-sm text-muted-foreground">
-                    {tool.quantityToSend}{' '}
-                    {tool.quantityToSend === 1 ? 'unidad' : 'unidades'}
-                  </span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        {product.inventarioSucursalId.productoId._id.slice(
+                          0,
+                          10
+                        )}
+                        ...
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {product.inventarioSucursalId.productoId._id}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
-                <TableCell>{tool.id}</TableCell>
                 <TableCell>
-                  <div className="flex items-center justify-between gap-2">
+                  {product.inventarioSucursalId.productoId.nombre}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant={'secondary'}
+                    className="flex items-center justify-center h-[36px] w-[50%]"
+                  >
+                    {product.cantidad}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
+                    min={0}
+                    className="text-center w-[50%]"
+                    value={0}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
+                    min={0}
+                    className="text-center w-[50%]"
+                    value={0}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Select>
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="Seleccione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {productStates.map((state) => (
+                        <SelectItem key={state.id} value={state.value}>
+                          {state.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-center gap-2">
                     <Images
-                      savedImages={tool.gallery}
-                      handleSaveImages={(images) =>
-                        handleSaveImages(tool.id!, images)
-                      }
+                      savedImages={product.archivosAdjuntos ?? []}
+                      handleSaveImages={() => handleSaveImages([])}
+                      icon={<Image className="w-4 h-4 mr-1" />}
+                      readonly
                     />
                     <Comment
-                      comment={tool.comment}
-                      handleRemoveComment={() => handleRemoveComment(tool)}
-                      handleSaveComment={(comment) =>
-                        handleSaveComment(tool.id!, comment)
-                      }
+                      comment={product.comentarioEnvio ?? ''}
+                      placeholder="No hay comentario"
+                      readonly
+                    >
+                      <Button variant="outline" size="sm">
+                        <MessageSquareMore className="w-4 h-4 mr-1" />
+                      </Button>
+                    </Comment>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-center gap-2">
+                    <Images
+                      savedImages={[]}
+                      handleSaveImages={() => handleSaveImages([])}
+                    />
+                    <Comment
+                      comment={''}
+                      handleRemoveComment={() => handleRemoveComment()}
+                      handleSaveComment={() => handleSaveComment('')}
                     >
                       <Button variant="outline" size="sm">
                         <MessageSquare className="w-4 h-4 mr-1" />
                       </Button>
                     </Comment>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleRemoveShipmentTool(tool)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
-            ))} */}
+            ))}
           </TableBody>
         </Table>
       </CardContent>

@@ -64,6 +64,7 @@ export interface ITransferSlice {
   sent: ITransfer[];
   received: ITransfer[];
   pending: IPendingTransfer[];
+  selectedPending: IDetalleSelected | null;
   status: IStatus;
   error: string | null;
   selectedItem: IDetalleSelected;

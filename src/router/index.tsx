@@ -133,11 +133,11 @@ export const Router = () => {
       </Route>
 
       <Route
-        path="/transfer/pending/:Id/itemdepedido"
+        path="/transfer/pending/:id/itemdepedido"
         element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}
       >
         <Route
-          path="/transfer/pending/:Id/itemdepedido"
+          path="/transfer/pending/:id/itemdepedido"
           element={
             <Layout>
               <PendingProductsByTransfer />
