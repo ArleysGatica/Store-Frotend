@@ -1,10 +1,11 @@
+import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/app/hooks';
+import { store } from '@/app/store';
 import {
   clearTransferData,
   getAllProductTransfer,
   OrdersReceivedById,
 } from '@/app/slices/transferSlice';
-import { store } from '@/app/store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,10 +23,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useEffect, useState } from 'react';
 import { MapIndex } from './mapIndex';
 import { IDetalleSelected } from '@/interfaces/transferInterfaces';
 import { useParams } from 'react-router-dom';
+import { Loader } from '@/shared/components/ui/Loader';
 
 export const ShippedOrders = () => {
   const DataAlls = useAppSelector((state) => state.transfer.data);
@@ -39,12 +40,33 @@ export const ShippedOrders = () => {
     nombre: string;
     _id: string;
   } | null>(null);
-  console.log(filteredBranche.map((branch) => branch.nombre));
+  const [items, setItems] = useState<IDetalleSelected | null>(null);
+  const [loading, setLoading] = useState(false);
+  const { Id } = useParams<{ Id: string }>();
+
+  const fetchData = async () => {
+    if (!Id) return;
+    setLoading(true);
+    const response = await store.dispatch(OrdersReceivedById(Id));
+    setItems(response.payload as IDetalleSelected);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (filteredBranche.length === 1 && !selectedBranch) {
+      const branch = filteredBranche[0];
+      setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
+    }
+  }, [filteredBranche, selectedBranch]);
 
   useEffect(() => {
     if (selectedBranch) {
+      setLoading(true);
       store.dispatch(clearTransferData());
-      store.dispatch(getAllProductTransfer(selectedBranch._id)).unwrap();
+      store
+        .dispatch(getAllProductTransfer(selectedBranch._id))
+        .unwrap()
+        .finally(() => setLoading(false));
     }
   }, [selectedBranch]);
 
@@ -54,87 +76,26 @@ export const ShippedOrders = () => {
       setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
     }
   };
-  useEffect(() => {
-    if (filteredBranche.length === 1) {
-      const branch = filteredBranche[0];
-      setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
-    }
-  }, []);
 
-  console.log(DataAlls);
-
-  const [items, setItems] = useState<IDetalleSelected>({
-    listItemDePedido: [],
-    traslado: {
-      _id: '',
-      nombre: '',
-      fechaRegistro: new Date(),
-      fechaEnvio: new Date(),
-      fechaRecepcion: new Date(),
-      sucursalOrigenId: {
-        _id: '',
-        nombre: '',
-        direccion: '',
-        ciudad: '',
-        pais: '',
-        telefono: '',
-        deleted_at: null,
-        createdAt: '',
-        updatedAt: '',
-      },
-      sucursalDestinoId: {
-        _id: '',
-        nombre: '',
-        direccion: '',
-        ciudad: '',
-        pais: '',
-        telefono: '',
-        deleted_at: null,
-        createdAt: '',
-        updatedAt: '',
-      },
-      usuarioIdEnvia: '',
-      usuarioIdRecibe: null,
-      estado: '',
-      comentarioEnvio: '',
-      comentarioRecepcion: null,
-      archivosAdjuntos: null,
-      firmaEnvio: '',
-      firmaRecepcion: '',
-      deleted_at: null,
-    },
-  });
-
-  const { Id } = useParams<{ Id: string }>();
-  const fetchData = async () => {
-    if (!Id) return;
-    const response = await store.dispatch(OrdersReceivedById(Id));
-    setItems(response.payload as IDetalleSelected);
-  };
-  console.log(items, 'itemsTbale');
   useEffect(() => {
     fetchData();
   }, [Id]);
 
   return (
-    <div>
-      <div className="container p-4 mx-auto space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between mb-4">
-              <div className="flex space-x-2">
-                <Button variant="outline">Filters</Button>
-                <Button variant="outline">Order History</Button>
-              </div>
-              <div className="flex space-x-2">
-                <Input
-                  type="text"
-                  placeholder="Search..."
-                  className="max-w-sm"
-                />
+    <div className="container p-4 mx-auto space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-between mb-4">
+            <div className="flex space-x-2">
+              <Button variant="outline">Filters</Button>
+              <Button variant="outline">Order History</Button>
+            </div>
+            <div className="flex space-x-2">
+              <Input type="text" placeholder="Search..." className="max-w-sm" />
+              {userRoles?.role === 'root' && (
                 <div className="mb-4">
                   <Select onValueChange={handleSelectChangeBranch}>
                     <SelectTrigger>
@@ -152,8 +113,15 @@ export const ShippedOrders = () => {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
+              )}
             </div>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center items-center h-40">
+              <Loader />
+            </div>
+          ) : selectedBranch ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -167,14 +135,26 @@ export const ShippedOrders = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {DataAlls.map((order) => (
-                  <MapIndex order={order} items={items} key={order._id} />
-                ))}
+                {DataAlls && DataAlls.length > 0 ? (
+                  DataAlls.map((order) => (
+                    <MapIndex order={order} items={items} key={order._id} />
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center">
+                      No hay órdenes para mostrar.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
-      </div>
+          ) : (
+            <div className="flex justify-center items-center h-40 text-red-600">
+              Seleccione una sucursal
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

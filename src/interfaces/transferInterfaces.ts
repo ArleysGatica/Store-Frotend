@@ -67,7 +67,7 @@ export interface ITransferSlice {
   selectedPending: IDetalleSelected | null;
   status: IStatus;
   error: string | null;
-  selectedItem: IDetalleSelected;
+  selectedItem: IDetalleSelected | null;
 }
 
 export interface ITransfer extends ITransferDetails {

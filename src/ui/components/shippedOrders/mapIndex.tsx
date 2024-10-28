@@ -24,7 +24,7 @@ import { ImageGridCard } from '../PendingTools';
 
 interface IOrder {
   order: IShippedOrder;
-  items: IDetalleSelected;
+  items: IDetalleSelected | null;
 }
 export const MapIndex = ({ order, items }: IOrder) => {
   const imageSources = [
@@ -87,7 +87,7 @@ export const MapIndex = ({ order, items }: IOrder) => {
             </DialogTrigger>
             <DialogContent className="p-3">
               <ImageGridCard
-                images={imageSources ?? []}
+                images={imageSources ?? ''}
                 title={order.usuarioIdEnvia.username}
                 subtitle={getTimeElapsed(new Date(order.fechaEnvio))}
                 description={order.comentarioEnvio}

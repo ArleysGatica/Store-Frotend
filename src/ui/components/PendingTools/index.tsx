@@ -167,18 +167,10 @@ export const ImageGridCard = ({
   const imageCount = images.length;
 
   const getGridClass = () => {
-    switch (imageCount) {
-      case 1:
-        return 'grid-cols-1';
-      case 2:
-        return 'grid-cols-2';
-      case 3:
-        return 'grid-cols-2';
-      case 4:
-        return 'grid-cols-2';
-      default:
-        return 'grid-cols-3';
-    }
+    if (imageCount === 1) return 'grid-cols-1';
+    if (imageCount <= 3) return 'grid-cols-2';
+    if (imageCount === 4) return 'grid-cols-2';
+    return 'grid-cols-3';
   };
 
   return (
@@ -196,28 +188,32 @@ export const ImageGridCard = ({
       </CardHeader>
       <CardContent className="space-y-4">
         {description && <p className="text-sm">{description}</p>}
-        {imageCount > 0 && (
+        {imageCount > 0 ? (
           <div className={`grid ${getGridClass()} gap-1`}>
             {images.slice(0, 6).map((src, index) => (
               <div
                 key={index}
                 className={`
-                ${imageCount === 3 && index === 2 ? 'col-span-2' : ''}
-                ${imageCount >= 5 && index >= 3 ? 'col-span-1' : ''}
-                ${imageCount === 1 ? 'col-span-1' : ''}
-                relative aspect-square overflow-hidden rounded-lg
-                ${index === 0 ? 'border border-gray-300' : ''}
-              `}
+                  ${imageCount === 3 && index === 2 ? 'col-span-2' : ''}
+                  ${imageCount >= 5 && index >= 3 ? 'col-span-1' : ''}
+                  ${imageCount === 1 ? 'col-span-1' : ''}
+                  relative aspect-square overflow-hidden rounded-lg
+                  ${index === 0 ? 'border border-gray-300' : ''}
+                `}
               >
                 <img
                   src={src}
                   alt={index === 0 ? 'Firma' : `Imagen adjunta ${index}`}
-                  className="object-cover w-full h-full"
+                  className="object-contain w-full h-full"
                   loading="lazy"
                 />
               </div>
             ))}
           </div>
+        ) : (
+          <p className="text-center text-gray-500">
+            No hay imágenes disponibles
+          </p>
         )}
       </CardContent>
     </Card>

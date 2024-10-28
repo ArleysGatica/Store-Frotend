@@ -12,7 +12,7 @@ import {
   ListItemDePedido,
 } from '@/interfaces/transferInterfaces';
 import DetallesEnvio from '@/shared/components/ui/Details';
-import { Eye } from 'lucide-react';
+import { Eye, PenTool } from 'lucide-react';
 
 interface IOrder {
   dataTable: ListItemDePedido;
@@ -20,20 +20,22 @@ interface IOrder {
 }
 
 export const AuxiliarMap = ({ dataTable, dataAuxiliar }: IOrder) => {
-  console.log(dataAuxiliar, dataTable, 'dataTable');
-
   const originBranch = dataAuxiliar?.sucursalOrigenId.nombre;
   const destinationBranch = dataAuxiliar?.sucursalDestinoId.nombre;
+
   return (
     <TableRow key={dataTable._id}>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger>{dataTable._id.slice(0, 8)}...</TooltipTrigger>
-          <TooltipContent>
-            <TableCell>{dataTable._id}</TableCell>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <TableCell>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>{dataTable._id.slice(0, 8)}...</TooltipTrigger>
+            <TooltipContent>
+              <TableCell>{dataTable._id}</TableCell>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </TableCell>
+
       <TableCell>{dataTable.inventarioSucursalId.productoId.nombre}</TableCell>
       <TableCell>
         {dataTable.inventarioSucursalId.precio.$numberDecimal}
@@ -41,30 +43,34 @@ export const AuxiliarMap = ({ dataTable, dataAuxiliar }: IOrder) => {
       <TableCell> {dataTable.cantidad}</TableCell>
       <TableCell> {dataTable.recibido ? 'Si' : 'No'}</TableCell>
       <TableCell>
+        <Dialog>
+          <DialogTrigger>
+            <Button variant="ghost" size="sm">
+              <Eye className="w-4 h-4 mr-1" />
+              Ver detalles
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DetallesEnvio
+              pedidoId={dataAuxiliar?.nombre ?? ''}
+              fechaCreacion={dataAuxiliar?.fechaRegistro ?? new Date()}
+              origen={originBranch ?? ''}
+              destino={destinationBranch ?? ''}
+              fechaEnvio={dataAuxiliar?.fechaEnvio ?? new Date()}
+              fechaRecepcion={dataAuxiliar?.fechaRecepcion ?? new Date()}
+              productos={dataTable.archivosAdjuntos ?? []}
+              firmaRecepcion={dataAuxiliar?.firmaEnvio ?? ''}
+              comentarioEnvio={dataAuxiliar?.comentarioEnvio ?? ''}
+            />
+          </DialogContent>
+        </Dialog>
+      </TableCell>
+      <TableCell>
         <div className="flex items-center justify-center gap-2">
-          <Dialog>
-            <DialogTrigger>
-              <Button variant="ghost" size="sm">
-                <Eye className="w-4 h-4 mr-1" />
-                Ver detalles
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="p-3">
-              <DetallesEnvio
-                pedidoId={dataAuxiliar?.nombre ?? ''}
-                fechaCreacion={dataAuxiliar?.fechaRegistro ?? new Date()}
-                origen={originBranch ?? ''}
-                destino={destinationBranch ?? ''}
-                fechaEnvio={dataAuxiliar?.fechaEnvio ?? new Date()}
-                fechaRecepcion={dataAuxiliar?.fechaRecepcion ?? new Date()}
-                productos={dataTable.archivosAdjuntos}
-                comentarioEnvio={
-                  dataAuxiliar?.comentarioEnvio ?? 'No comentario enviado'
-                }
-                firmaRecepcion={dataAuxiliar?.firmaEnvio ?? ''}
-              />
-            </DialogContent>
-          </Dialog>
+          <Button variant="ghost" size="sm">
+            <PenTool className="w-4 h-4 mr-1" />
+            Editar
+          </Button>
         </div>
       </TableCell>
     </TableRow>
