@@ -4,33 +4,39 @@ import { Tabs } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { store } from '@/app/store';
-import { getPendingTransfers } from '@/app/slices/transferSlice';
+import {
+  getPendingProductsByTransfer,
+  setPendingSelected,
+} from '@/app/slices/transferSlice';
 import { useAppSelector } from '@/app/hooks';
 import { SummaryPendingTools } from './summary';
 import { PendingProductsActions } from './actions';
+import { useParams } from 'react-router-dom';
 
 export default function PendingProductsByTransfer() {
-  const user = useAppSelector((state) => state.auth.signIn.user);
-  const pendingTransfer = useAppSelector((state) => state.transfer.pending);
+  const { id } = useParams<{ id: string }>();
+  const pendingTransfer = useAppSelector(
+    (state) => state.transfer.selectedPending
+  );
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredShipments = pendingTransfer.filter(
+  const ShipmentList = pendingTransfer?.listItemDePedido.filter(
     (shipment) =>
-      (shipment.consecutivo &&
-        shipment.consecutivo?.toString().includes(searchTerm)) ||
-      shipment.sucursalDestinoId.nombre
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      shipment.usuarioIdEnvia.username
+      shipment.inventarioSucursalId &&
+      shipment.inventarioSucursalId.productoId.nombre
+        ?.toString()
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
   );
 
   useEffect(() => {
-    if (!user?.sucursalId) return;
-    store.dispatch(getPendingTransfers(user.sucursalId._id));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!id) return;
+    store.dispatch(getPendingProductsByTransfer(id));
+
+    return () => {
+      store.dispatch(setPendingSelected(null));
+    };
+  }, [id]);
 
   return (
     <div className="container mx-auto ">
@@ -47,8 +53,12 @@ export default function PendingProductsByTransfer() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <SummaryPendingTools />
-            <PendingProductsActions />
+            {pendingTransfer && (
+              <>
+                <SummaryPendingTools products={ShipmentList ?? []} />
+                <PendingProductsActions />
+              </>
+            )}
           </CardContent>
         </Card>
       </Tabs>

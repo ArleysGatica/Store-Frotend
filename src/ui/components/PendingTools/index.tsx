@@ -20,10 +20,7 @@ import {
   incomingShipmentTableHeaders,
 } from '@/shared/helpers/transferHelper';
 import { store } from '@/app/store';
-import {
-  getPendingTransfers,
-  setPendingSelected,
-} from '@/app/slices/transferSlice';
+import { getPendingTransfers } from '@/app/slices/transferSlice';
 import { useAppSelector } from '@/app/hooks';
 import {
   IPendingShipmentDetailsProps,
@@ -145,9 +142,9 @@ const IncomingShipmentTable = ({
                 </Dialog>
                 <Link
                   to={`/transfer/pending/${shipment._id}/itemdepedido`}
-                  onClick={() => store.dispatch(setPendingSelected(shipment))}
+                  state={{ id: shipment._id }}
                 >
-                  <Button variant="outline" size="sm" className="text-black">
+                  <Button size="sm" className="text-white">
                     Recibir
                     <ArrowDown />
                   </Button>

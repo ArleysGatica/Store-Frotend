@@ -24,6 +24,8 @@ export interface IImages {
   showTitle?: boolean;
   maxImages?: number;
   title?: string;
+  icon?: React.ReactNode;
+  readonly?: boolean;
 }
 
 export default function Images({
@@ -33,6 +35,8 @@ export default function Images({
   showTitle,
   maxImages = 6,
   title = 'Fotografía',
+  icon,
+  readonly,
 }: IImages) {
   const [isOpen, setIsOpen] = useState(false);
   const [fotos, setFotos] = useState<string[]>([]);
@@ -65,7 +69,7 @@ export default function Images({
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className={className}>
-          <Camera className="w-4 h-4 mr-1" />
+          {icon ?? <Camera className="w-4 h-4 mr-1" />}
           {showTitle && <span className="px-1">Gestionar imágenes</span>}
           {fotos.length > 0 && (
             <Badge variant="secondary" className="ml-1">
@@ -80,71 +84,79 @@ export default function Images({
             <div className="flex items-center justify-center w-8 h-8 font-semibold rounded-full bg-primary text-primary-foreground">
               A
             </div>
-            <CardTitle>{title}</CardTitle>
+            <CardTitle className="card__title">{title}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-1">
-              {fotos.map((foto, index) => (
-                <div key={index} className="col-span-1">
-                  <img
-                    src={foto}
-                    alt={`Foto ${index}`}
-                    className="object-cover w-full h-full rounded-md"
-                  />
-                </div>
-              ))}
+              {fotos.length > 0 ? (
+                fotos.map((foto, index) => (
+                  <div key={index} className="col-span-1">
+                    <img
+                      src={foto}
+                      alt={`Foto ${index}`}
+                      className="object-cover w-full h-full rounded-md"
+                    />
+                  </div>
+                ))
+              ) : (
+                <span className="pl-1 font-sans text-sm text-gray-500 ">
+                  No hay imágenes
+                </span>
+              )}
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
-            <div className="flex justify-between w-full">
-              {fotos.length < maxImages && (
-                <div className="grid items-center w-[120px]">
-                  <Label htmlFor="picture" className="sr-only">
-                    Agregar más
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="picture"
-                      type="file"
-                      className="sr-only"
-                      aria-hidden="true"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                    />
-                    <label
-                      htmlFor="picture"
-                      className="h-[30px] flex items-center justify-center font-semibold text-xs text-black bg-white border border-gray-300 rounded cursor-pointer hover:bg-gray-50 shadow-sm"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      <span>Agregar más</span>
-                    </label>
+          {readonly ? null : (
+            <CardFooter className="flex flex-col space-y-2">
+              <div className="flex justify-between w-full">
+                {fotos.length < maxImages && (
+                  <div className="grid items-center w-[120px]">
+                    <Label htmlFor="picture" className="sr-only">
+                      Agregar más
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="picture"
+                        type="file"
+                        className="sr-only"
+                        aria-hidden="true"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                      />
+                      <label
+                        htmlFor="picture"
+                        className="h-[30px] flex items-center justify-center font-semibold text-xs text-black bg-white border border-gray-300 rounded cursor-pointer hover:bg-gray-50 shadow-sm"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        <span>Agregar más</span>
+                      </label>
+                    </div>
                   </div>
-                </div>
-              )}
-              {fotos.length > 0 && (
+                )}
+                {fotos.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={deleteLastImage}
+                    className="w-[130px]"
+                  >
+                    <Trash2 className="w-4 h-4" /> Eliminar imagen
+                  </Button>
+                )}
+              </div>
+              <div className="flex justify-between w-full">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={deleteLastImage}
-                  className="w-[130px]"
+                  onClick={() => setIsOpen(false)}
                 >
-                  <Trash2 className="w-4 h-4" /> Eliminar imagen
+                  Cancelar
                 </Button>
-              )}
-            </div>
-            <div className="flex justify-between w-full">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsOpen(false)}
-              >
-                Cerrar
-              </Button>
-              <Button size="sm" onClick={saveImages}>
-                Guardar
-              </Button>
-            </div>
-          </CardFooter>
+                <Button size="sm" onClick={saveImages}>
+                  Guardar
+                </Button>
+              </div>
+            </CardFooter>
+          )}
         </Card>
       </PopoverContent>
     </Popover>

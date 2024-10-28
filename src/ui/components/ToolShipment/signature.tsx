@@ -144,7 +144,7 @@ export default function Signature({
               size="sm"
               onClick={() => setIsOpen(false)}
             >
-              Cerrar
+              Cancelar
             </Button>
             <Button size="sm" onClick={guardar}>
               Guardar
