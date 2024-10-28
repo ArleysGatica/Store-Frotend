@@ -1,5 +1,6 @@
 import React from 'react';
-import { IStatus, ITablaBranch } from './branchInterfaces';
+import { IBranch, IStatus, ITablaBranch } from './branchInterfaces';
+import { IUser } from '@/app/slices/login';
 
 export interface IShippedOrder {
   _id: string;
@@ -113,10 +114,10 @@ export interface IPendingTransfer {
   fechaRegistro: Date;
   fechaEnvio: Date;
   fechaRecepcion: Date | null;
-  sucursalOrigenId: string;
-  sucursalDestinoId: string;
-  usuarioIdEnvia: string;
-  usuarioIdRecibe: string | null;
+  sucursalOrigenId: IBranch;
+  sucursalDestinoId: IBranch;
+  usuarioIdEnvia: IUser;
+  usuarioIdRecibe: IUser | null;
   estado: string;
   comentarioEnvio: string;
   consecutivo?: number;
