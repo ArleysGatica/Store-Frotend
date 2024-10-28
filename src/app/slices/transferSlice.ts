@@ -6,11 +6,13 @@ import {
   ITransfer,
   ITransferPost,
   ITransferSlice,
+  IDetalleSelected,
 } from '@/interfaces/transferInterfaces';
 import {
   createTransfer,
   fetchPendingTransfers,
   getAllOrdersReceipts,
+  getAllOrdersReceivedById,
   getAllTransfer,
 } from '@/api/services/transfer';
 import { IStatus } from '@/interfaces/branchInterfaces';
@@ -20,6 +22,47 @@ const initialState: ITransferSlice = {
   sent: [],
   received: [],
   pending: [],
+  selectedItem: {
+    traslado: {
+      _id: '',
+      nombre: '',
+      fechaRegistro: new Date(),
+      fechaEnvio: new Date(),
+      fechaRecepcion: new Date(),
+      sucursalOrigenId: {
+        _id: '',
+        nombre: '',
+        direccion: '',
+        ciudad: '',
+        pais: '',
+        telefono: '',
+        deleted_at: null,
+        createdAt: '',
+        updatedAt: '',
+      },
+      sucursalDestinoId: {
+        _id: '',
+        nombre: '',
+        direccion: '',
+        ciudad: '',
+        pais: '',
+        telefono: '',
+        deleted_at: null,
+        createdAt: '',
+        updatedAt: '',
+      },
+      usuarioIdEnvia: '',
+      usuarioIdRecibe: null,
+      estado: '',
+      comentarioEnvio: '',
+      comentarioRecepcion: null,
+      archivosAdjuntos: null,
+      firmaEnvio: '',
+      firmaRecepcion: '',
+      deleted_at: null,
+    },
+    listItemDePedido: [],
+  },
   status: 'idle',
   error: null,
 };
@@ -67,6 +110,18 @@ export const receiveTransfer = createAsyncThunk(
   }
 );
 
+export const OrdersReceivedById = createAsyncThunk(
+  'transfer/OrdersReceivedById',
+  async (sucursalId: string, { rejectWithValue }) => {
+    try {
+      const response = await getAllOrdersReceivedById(sucursalId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
 const transferSlice = createSlice({
   name: 'transfer',
   initialState,
@@ -79,6 +134,12 @@ const transferSlice = createSlice({
     },
     clearTransferData(state) {
       state.data = [];
+    },
+    setSelectItemDetail: (state, action: PayloadAction<IDetalleSelected>) => {
+      state.selectedItem = {
+        traslado: action.payload.traslado,
+        listItemDePedido: action.payload.listItemDePedido,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -126,11 +187,23 @@ const transferSlice = createSlice({
           state.status = 'succeeded';
           state.pending = payload;
         }
-      );
+      )
+      .addCase(OrdersReceivedById.fulfilled, (state, { payload }) => {
+        state.status = 'succeeded';
+
+        state.selectedItem = {
+          traslado: payload.data?.traslado,
+          listItemDePedido: payload.data?.listItemDePedido,
+        };
+      });
   },
 });
 
-export const { setTransferData, clearTransferData, updateStatus } =
-  transferSlice.actions;
+export const {
+  setTransferData,
+  setSelectItemDetail,
+  clearTransferData,
+  updateStatus,
+} = transferSlice.actions;
 
 export const transferReducer = transferSlice.reducer;

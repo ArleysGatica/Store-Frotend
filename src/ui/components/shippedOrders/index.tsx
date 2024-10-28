@@ -2,6 +2,7 @@ import { useAppSelector } from '@/app/hooks';
 import {
   clearTransferData,
   getAllProductTransfer,
+  OrdersReceivedById,
 } from '@/app/slices/transferSlice';
 import { store } from '@/app/store';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,8 @@ import {
 } from '@/components/ui/table';
 import { useEffect, useState } from 'react';
 import { MapIndex } from './mapIndex';
+import { IDetalleSelected } from '@/interfaces/transferInterfaces';
+import { useParams } from 'react-router-dom';
 
 export const ShippedOrders = () => {
   const DataAlls = useAppSelector((state) => state.transfer.data);
@@ -57,6 +60,61 @@ export const ShippedOrders = () => {
       setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
     }
   }, []);
+
+  console.log(DataAlls);
+
+  const [items, setItems] = useState<IDetalleSelected>({
+    listItemDePedido: [],
+    traslado: {
+      _id: '',
+      nombre: '',
+      fechaRegistro: new Date(),
+      fechaEnvio: new Date(),
+      fechaRecepcion: new Date(),
+      sucursalOrigenId: {
+        _id: '',
+        nombre: '',
+        direccion: '',
+        ciudad: '',
+        pais: '',
+        telefono: '',
+        deleted_at: null,
+        createdAt: '',
+        updatedAt: '',
+      },
+      sucursalDestinoId: {
+        _id: '',
+        nombre: '',
+        direccion: '',
+        ciudad: '',
+        pais: '',
+        telefono: '',
+        deleted_at: null,
+        createdAt: '',
+        updatedAt: '',
+      },
+      usuarioIdEnvia: '',
+      usuarioIdRecibe: null,
+      estado: '',
+      comentarioEnvio: '',
+      comentarioRecepcion: null,
+      archivosAdjuntos: null,
+      firmaEnvio: '',
+      firmaRecepcion: '',
+      deleted_at: null,
+    },
+  });
+
+  const { Id } = useParams<{ Id: string }>();
+  const fetchData = async () => {
+    if (!Id) return;
+    const response = await store.dispatch(OrdersReceivedById(Id));
+    setItems(response.payload as IDetalleSelected);
+  };
+  console.log(items, 'itemsTbale');
+  useEffect(() => {
+    fetchData();
+  }, [Id]);
 
   return (
     <div>
@@ -110,7 +168,7 @@ export const ShippedOrders = () => {
               </TableHeader>
               <TableBody>
                 {DataAlls.map((order) => (
-                  <MapIndex order={order} key={order._id} />
+                  <MapIndex order={order} items={items} key={order._id} />
                 ))}
               </TableBody>
             </Table>

@@ -36,7 +36,7 @@ const ProductForm = ({
   groups,
 }: ProductFormProps) => {
   const [formData, setFormData] = useState({
-    _id: initialData?._id || '',
+    _id: initialData?.id || '',
     sucursalId: sucursalId,
     nombre: initialData?.nombre || '',
     descripcion: initialData?.descripcion || '',
@@ -49,7 +49,7 @@ const ProductForm = ({
   useEffect(() => {
     if (initialData) {
       setFormData({
-        _id: initialData._id || '',
+        _id: initialData.id || '',
         nombre: initialData.nombre || '',
         descripcion: initialData.descripcion || '',
         precio: initialData.precio?.$numberDecimal || '',

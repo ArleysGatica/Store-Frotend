@@ -13,14 +13,20 @@ import {
 } from '@/shared/helpers/transferHelper';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { Eye } from 'lucide-react';
-import { ImageGridCard } from '../PendingTools';
-import { IShippedOrder } from '@/interfaces/transferInterfaces';
+import {
+  IDetalleSelected,
+  IShippedOrder,
+} from '@/interfaces/transferInterfaces';
 import { useNavigate } from 'react-router-dom';
+import { store } from '@/app/store';
+import { setSelectItemDetail } from '@/app/slices/transferSlice';
+import { ImageGridCard } from '../PendingTools';
 
 interface IOrder {
   order: IShippedOrder;
+  items: IDetalleSelected;
 }
-export const MapIndex = ({ order }: IOrder) => {
+export const MapIndex = ({ order, items }: IOrder) => {
   const imageSources = [
     order.firmaEnvio ?? '',
     ...(order.archivosAdjuntos ?? []),
@@ -28,13 +34,17 @@ export const MapIndex = ({ order }: IOrder) => {
 
   const navigate = useNavigate();
 
+  const handleSelectItem = (items: IDetalleSelected) => {
+    console.log(items, 'items');
+    store.dispatch(setSelectItemDetail(items));
+  };
+
   return (
-    <TableRow
-      key={order._id}
-      className="cursor-pointer"
-      onClick={() => navigate(`/transfer/recibido/${order._id}/itemdepedido`)}
-    >
-      <TableCell>
+    <TableRow key={order._id} className="cursor-pointer">
+      <TableCell
+        className="cursor-pointer"
+        onClick={() => navigate(`/transfer/recibido/${order._id}/itemdepedido`)}
+      >
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>{order._id.slice(0, 8)}...</TooltipTrigger>

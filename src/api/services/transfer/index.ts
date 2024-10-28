@@ -34,3 +34,12 @@ export const getAllOrdersReceipts = async (
   const response = await axiosInstance.get(`/${sucursalId}/recibidos`);
   return response.data;
 };
+
+export const getAllOrdersReceivedById = async (
+  sucursalId: string
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Transfer);
+  const response = await axiosInstance.get(`/${sucursalId}/itemdepedido`);
+
+  return response.data;
+};
