@@ -10,10 +10,6 @@ import {
   PenTool,
 } from 'lucide-react';
 
-interface Producto {
-  imagen: string;
-}
-
 interface DetallesEnvioProps {
   pedidoId: string;
   fechaCreacion: Date;
@@ -21,7 +17,7 @@ interface DetallesEnvioProps {
   destino: string;
   fechaEnvio: Date;
   fechaRecepcion: Date;
-  productos: Producto[] | null;
+  productos: string[];
   comentarioEnvio: string;
   firmaRecepcion: string;
 }
@@ -50,7 +46,7 @@ export default function DetallesEnvio({
             fechaRecepcion={getFormatedDate(fechaRecepcion)}
           />
           <Separator className="border-gray-300" />
-          <ListaProductos productos={productos} />
+          <ListaProductos images={productos} />
           <Separator className="border-gray-300" />
           <Comentario comentario={comentarioEnvio} />
           <Separator className="border-gray-300" />
@@ -130,20 +126,20 @@ function FechasEnvioRecepcion({
   );
 }
 
-function ListaProductos({ productos }: { productos: Producto[] }) {
+function ListaProductos({ images }: { images: string[] }) {
   return (
     <div>
       <h3 className="text-xl font-semibold mb-4 text-gray-800">Productos</h3>
       <div
-        className={`grid gap-4 ${productos.length > 2 ? 'grid-cols-3' : 'grid-cols-2'}`}
+        className={`grid gap-4 ${images.length > 2 ? 'grid-cols-3' : 'grid-cols-2'}`}
       >
-        {productos.map((producto, idx) => (
+        {images.map((producto, idx) => (
           <div
             key={idx}
-            className="flex flex-col items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition duration-200"
+            className="flex flex-col items-center p-2 border rounded-lg shadow-sm hover:shadow-md transition duration-200 max-h-fit"
           >
             <img
-              src={producto.imagen}
+              src={producto}
               className="w-full h-auto object-cover rounded-md mb-2"
               alt={`Producto ${idx + 1}`}
             />

@@ -14,57 +14,20 @@ import { IDetalleSelected } from '@/interfaces/transferInterfaces';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AuxiliarMap } from './auxiMap';
+import { Loader } from '@/shared/components/ui/Loader';
 
 export const OrdersReceived = () => {
-  const [items, setItems] = useState<IDetalleSelected>({
-    listItemDePedido: [],
-    traslado: {
-      _id: '',
-      nombre: '',
-      fechaRegistro: new Date(),
-      fechaEnvio: new Date(),
-      fechaRecepcion: new Date(),
-      sucursalOrigenId: {
-        _id: '',
-        nombre: '',
-        direccion: '',
-        ciudad: '',
-        pais: '',
-        telefono: '',
-        deleted_at: null,
-        createdAt: '',
-        updatedAt: '',
-      },
-      sucursalDestinoId: {
-        _id: '',
-        nombre: '',
-        direccion: '',
-        ciudad: '',
-        pais: '',
-        telefono: '',
-        deleted_at: null,
-        createdAt: '',
-        updatedAt: '',
-      },
-      usuarioIdEnvia: '',
-      usuarioIdRecibe: null,
-      estado: '',
-      comentarioEnvio: '',
-      comentarioRecepcion: null,
-      archivosAdjuntos: null,
-      firmaEnvio: '',
-      firmaRecepcion: '',
-      deleted_at: null,
-    },
-  });
-  const dataGeneral = items.listItemDePedido;
-  const dataAuxiliar = items.traslado;
-
+  const [items, setItems] = useState<IDetalleSelected | null>(null);
+  const dataGeneral = items?.listItemDePedido;
+  const dataAuxiliar = items?.traslado;
   const { Id } = useParams<{ Id: string }>();
+  const [loading, setLoading] = useState(true);
+
   const fetchData = async () => {
     if (!Id) return;
     const response = await store.dispatch(OrdersReceivedById(Id));
     setItems(response.payload as IDetalleSelected);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -101,16 +64,25 @@ export const OrdersReceived = () => {
                   <TableCell>Stock</TableCell>
                   <TableCell>Recibido</TableCell>
                   <TableCell>Acciones</TableCell>
+                  <TableCell>Estatus</TableCell>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {dataGeneral.map((order) => (
-                  <AuxiliarMap
-                    dataTable={order}
-                    dataAuxiliar={dataAuxiliar}
-                    key={order._id}
-                  />
-                ))}
+                {loading ? (
+                  <div className="loader">
+                    <Loader />
+                  </div>
+                ) : dataGeneral && dataGeneral.length > 0 ? (
+                  dataGeneral.map((order) => (
+                    <AuxiliarMap
+                      dataTable={order}
+                      dataAuxiliar={dataAuxiliar}
+                      key={order._id}
+                    />
+                  ))
+                ) : (
+                  <div>No hay datos disponibles.</div>
+                )}
               </TableBody>
             </Table>
           </CardContent>
