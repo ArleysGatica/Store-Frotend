@@ -140,8 +140,11 @@ const IncomingShipmentTable = ({
                     <PendingShipmentDetails pendingShipment={shipment} />
                   </DialogContent>
                 </Dialog>
-                <Link to={`/transfer/pending/${shipment._id}/itemdepedido`}>
-                  <Button variant="outline" size="sm" className="text-black">
+                <Link
+                  to={`/transfer/pending/${shipment._id}/itemdepedido`}
+                  state={{ id: shipment._id }}
+                >
+                  <Button size="sm" className="text-white">
                     Recibir
                     <ArrowDown />
                   </Button>

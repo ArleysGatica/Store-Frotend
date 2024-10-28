@@ -16,6 +16,7 @@ export interface ICommentProps {
   title?: string;
   placeholder?: string;
   buttonText?: string;
+  readonly?: boolean;
 }
 
 const Comment = ({
@@ -26,6 +27,7 @@ const Comment = ({
   title = 'Comentario',
   placeholder = 'Descripción del comentario',
   buttonText = 'Agregar comentario',
+  readonly,
 }: ICommentProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -71,7 +73,7 @@ const Comment = ({
               A
             </div>
             <h4 className="font-medium leading-none">{title}</h4>
-            {comment && !isEditing && (
+            {comment && !isEditing && !readonly && (
               <div className="ml-auto space-x-2">
                 <Button
                   variant="ghost"
@@ -92,7 +94,7 @@ const Comment = ({
               </div>
             )}
           </div>
-          {!comment || isEditing ? (
+          {(!readonly && !comment) || (!readonly && isEditing) ? (
             <Textarea
               placeholder={placeholder}
               value={comentario ?? ''}
@@ -100,18 +102,18 @@ const Comment = ({
               className="min-h-[100px]"
             />
           ) : (
-            <p className="text-sm text-muted-foreground">
+            <p className="pl-1 text-sm text-muted-foreground">
               {comment || placeholder}
             </p>
           )}
-          {!comment || isEditing ? (
+          {(!readonly && !comment) || (!readonly && isEditing) ? (
             <div className="flex justify-between">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleClose(false)}
               >
-                Cerrar
+                Cancelar
               </Button>
               <Button size="sm" onClick={handleSave}>
                 Guardar

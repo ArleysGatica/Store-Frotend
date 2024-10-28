@@ -23,6 +23,7 @@ const initialState: ITransferSlice = {
   received: [],
   pending: [],
   selectedItem: null,
+  selectedPending: null,
   status: 'idle',
   error: null,
 };
@@ -82,6 +83,18 @@ export const OrdersReceivedById = createAsyncThunk(
   }
 );
 
+export const getPendingProductsByTransfer = createAsyncThunk(
+  'transfer/productsByTransfer',
+  async (transferId: string, { rejectWithValue }) => {
+    try {
+      const response = await getAllOrdersReceivedById(transferId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
 const transferSlice = createSlice({
   name: 'transfer',
   initialState,
@@ -94,6 +107,9 @@ const transferSlice = createSlice({
     },
     clearTransferData(state) {
       state.data = [];
+    },
+    setPendingSelected(state, action: PayloadAction<IDetalleSelected | null>) {
+      state.selectedPending = action.payload;
     },
     setSelectItemDetail: (state, action: PayloadAction<IDetalleSelected>) => {
       state.selectedItem = {
@@ -155,15 +171,25 @@ const transferSlice = createSlice({
           traslado: payload.data?.traslado,
           listItemDePedido: payload.data?.listItemDePedido,
         };
+      })
+      .addCase(getPendingProductsByTransfer.fulfilled, (state, { payload }) => {
+        state.status = 'succeeded';
+        const data = payload as unknown as IDetalleSelected;
+
+        state.selectedPending = {
+          traslado: data.traslado,
+          listItemDePedido: data.listItemDePedido,
+        };
       });
   },
 });
 
 export const {
   setTransferData,
-  setSelectItemDetail,
   clearTransferData,
   updateStatus,
+  setPendingSelected,
+  setSelectItemDetail,
 } = transferSlice.actions;
 
 export const transferReducer = transferSlice.reducer;

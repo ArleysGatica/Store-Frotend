@@ -29,3 +29,7 @@
     @apply hidden #{!important};
   }
 }
+
+.card__title {
+  @apply mt-0 #{!important};
+}
