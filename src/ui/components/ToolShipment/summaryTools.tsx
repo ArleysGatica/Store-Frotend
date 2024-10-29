@@ -10,7 +10,7 @@ import {
 import Images from './photo';
 import Comment from './comment';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, X } from 'lucide-react';
+import { MessageSquare, MessageSquareMore, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ITool } from '@/interfaces/transferInterfaces';
 
@@ -79,9 +79,15 @@ export const SummaryTools = ({
                         handleSaveComment(tool.id!, comment)
                       }
                     >
-                      <Button variant="outline" size="sm">
-                        <MessageSquare className="w-4 h-4 mr-1" />
-                      </Button>
+                      {!tool.comment ? (
+                        <Button variant="outline" size="sm">
+                          <MessageSquare className="w-4 h-4 mr-1" />
+                        </Button>
+                      ) : (
+                        <Button variant="outline" size="sm">
+                          <MessageSquareMore className="w-4 h-4 mr-1" />
+                        </Button>
+                      )}
                     </Comment>
                     <Button
                       variant="outline"

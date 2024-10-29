@@ -15,8 +15,8 @@ import { useParams } from 'react-router-dom';
 
 export default function PendingProductsByTransfer() {
   const { id } = useParams<{ id: string }>();
-  const pendingTransfer = useAppSelector(
-    (state) => state.transfer.selectedPending
+  const { selectedPending: pendingTransfer, status } = useAppSelector(
+    (state) => state.transfer
   );
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -53,12 +53,11 @@ export default function PendingProductsByTransfer() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            {pendingTransfer && (
-              <>
-                <SummaryPendingTools products={ShipmentList ?? []} />
-                <PendingProductsActions />
-              </>
-            )}
+            <SummaryPendingTools
+              products={ShipmentList ?? []}
+              status={status}
+            />
+            <PendingProductsActions />
           </CardContent>
         </Card>
       </Tabs>

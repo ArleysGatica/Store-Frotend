@@ -152,6 +152,9 @@ const branchesSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'unknown error';
       })
+      .addCase(fetchBranchesById.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(
         fetchBranchesById.fulfilled,
         (state, { payload }: PayloadAction<ITablaBranch[]>) => {
@@ -159,6 +162,7 @@ const branchesSlice = createSlice({
             ...state.selectedBranch!,
             products: payload,
           };
+          state.loading = false;
         }
       );
   },
