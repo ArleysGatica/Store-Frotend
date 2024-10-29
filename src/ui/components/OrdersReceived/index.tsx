@@ -34,6 +34,14 @@ export const OrdersReceived = () => {
     fetchData();
   }, [Id]);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredProducts = dataGeneral?.filter((product) =>
+    product.inventarioSucursalId.productoId.nombre
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div>
       <div className="container mx-auto p-4 space-y-6">
@@ -44,7 +52,6 @@ export const OrdersReceived = () => {
           <CardContent>
             <div className="flex justify-between mb-4">
               <div className="flex space-x-2">
-                <Button variant="outline">Filters</Button>
                 <Button variant="outline">Order History</Button>
               </div>
               <div className="flex  space-x-2">
@@ -52,6 +59,8 @@ export const OrdersReceived = () => {
                   type="text"
                   placeholder="Search..."
                   className="max-w-sm"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
@@ -72,8 +81,8 @@ export const OrdersReceived = () => {
                   <div className="loader">
                     <Loader />
                   </div>
-                ) : dataGeneral && dataGeneral.length > 0 ? (
-                  dataGeneral.map((order) => (
+                ) : filteredProducts && filteredProducts.length > 0 ? (
+                  filteredProducts.map((order) => (
                     <AuxiliarMap
                       dataTable={order}
                       dataAuxiliar={dataAuxiliar}

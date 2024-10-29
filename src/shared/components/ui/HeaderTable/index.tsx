@@ -14,19 +14,19 @@ export const HeaderTable = () => {
               className="text-[#ffffff] font-bold border-b-2 border-bg-gray-200 border-opacity-0 bg-black"
               value="send"
             >
-              Enviar herramientas
+              Enviar Productos
             </TabsTrigger>
             <TabsTrigger
               className="bg-black text-[#ffffff] font-bold"
               value="receive"
             >
-              Recibir herramientas
+              Recibir Productos
             </TabsTrigger>
             <TabsTrigger
               className="bg-black text-[#ffffff] font-bold"
               value="branchOrders"
             >
-              Pedidos Sucursal
+              Recibido Sucursal
             </TabsTrigger>
             <TabsTrigger
               className="bg-black text-[#ffffff] font-bold"
