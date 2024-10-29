@@ -12,7 +12,9 @@ import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -27,6 +29,14 @@ import { MapIndex } from './mapIndex';
 import { IDetalleSelected } from '@/interfaces/transferInterfaces';
 import { useParams } from 'react-router-dom';
 import { Loader } from '@/shared/components/ui/Loader';
+
+const orderStatusOptions = [
+  { value: 'Todos', label: 'Ver Todos' },
+  { value: 'En Proceso', label: 'Pendiente' },
+  { value: 'Terminado', label: 'Recibido' },
+  { value: 'Terminado incompleto', label: 'Incompleto' },
+  { value: 'Solicitado', label: 'Solicitado' },
+];
 
 export const ShippedOrders = () => {
   const DataAlls = useAppSelector((state) => state.transfer.data);
@@ -43,6 +53,8 @@ export const ShippedOrders = () => {
   const [items, setItems] = useState<IDetalleSelected | null>(null);
   const [loading, setLoading] = useState(false);
   const { Id } = useParams<{ Id: string }>();
+  const [selectedStatus, setSelectedStatus] = useState<string>('Todos');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchData = async () => {
     if (!Id) return;
@@ -77,9 +89,33 @@ export const ShippedOrders = () => {
     }
   };
 
+  const handleStatusChange = (value: string) => {
+    setSelectedStatus(value);
+  };
+
   useEffect(() => {
     fetchData();
   }, [Id]);
+
+  const filteredProducts = DataAlls?.filter((product) => {
+    const matchesNombre = product.nombre
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesSucursalDestino = product.sucursalDestinoId.nombre
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesSucursalOrigen = product.sucursalOrigenId.nombre
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      selectedStatus === 'Todos' || product.estatusTraslado === selectedStatus;
+
+    return (
+      (matchesNombre || matchesSucursalDestino || matchesSucursalOrigen) &&
+      matchesStatus
+    );
+  });
 
   return (
     <div className="container p-4 mx-auto space-y-6">
@@ -90,11 +126,32 @@ export const ShippedOrders = () => {
         <CardContent>
           <div className="flex justify-between mb-4">
             <div className="flex space-x-2">
-              <Button variant="outline">Filters</Button>
+              <Select onValueChange={handleStatusChange}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Selecciona un estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Estados de Pedido</SelectLabel>
+                    {orderStatusOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+
               <Button variant="outline">Order History</Button>
             </div>
             <div className="flex space-x-2">
-              <Input type="text" placeholder="Search..." className="max-w-sm" />
+              <Input
+                type="text"
+                placeholder="Search..."
+                className="max-w-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
               {userRoles?.role === 'root' && (
                 <div className="mb-4">
                   <Select onValueChange={handleSelectChangeBranch}>
@@ -135,8 +192,8 @@ export const ShippedOrders = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {DataAlls && DataAlls.length > 0 ? (
-                  DataAlls.map((order) => (
+                {filteredProducts && filteredProducts.length > 0 ? (
+                  filteredProducts.map((order) => (
                     <MapIndex order={order} items={items} key={order._id} />
                   ))
                 ) : (
