@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { TableCell, TableRow } from '@/components/ui/table';
@@ -12,7 +13,7 @@ import {
   ListItemDePedido,
 } from '@/interfaces/transferInterfaces';
 import DetallesEnvio from '@/shared/components/ui/Details';
-import { Eye, PenTool } from 'lucide-react';
+import { CornerDownLeft, Eye } from 'lucide-react';
 
 interface IOrder {
   dataTable: ListItemDePedido;
@@ -41,7 +42,19 @@ export const AuxiliarMap = ({ dataTable, dataAuxiliar }: IOrder) => {
         {dataTable.inventarioSucursalId.precio.$numberDecimal}
       </TableCell>
       <TableCell> {dataTable.cantidad}</TableCell>
-      <TableCell> {dataTable.recibido ? 'Si' : 'No'}</TableCell>
+      <TableCell>
+        <Badge
+          variant={
+            dataTable.recibido === true
+              ? 'secondary'
+              : dataTable.recibido === false
+                ? 'default'
+                : 'outline'
+          }
+        >
+          {dataTable.recibido === true ? 'Recibido' : 'Sin Recibir'}
+        </Badge>
+      </TableCell>
       <TableCell>
         <Dialog>
           <DialogTrigger>
@@ -67,10 +80,12 @@ export const AuxiliarMap = ({ dataTable, dataAuxiliar }: IOrder) => {
       </TableCell>
       <TableCell>
         <div className="flex items-center justify-center gap-2">
-          <Button variant="ghost" size="sm">
-            <PenTool className="w-4 h-4 mr-1" />
-            Editar
-          </Button>
+          {dataTable.recibido !== true && (
+            <Button size="sm" className="text-white">
+              Regresar Producto
+              <CornerDownLeft />
+            </Button>
+          )}
         </div>
       </TableCell>
     </TableRow>
