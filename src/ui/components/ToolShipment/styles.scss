@@ -33,3 +33,7 @@
 .card__title {
   @apply mt-0 #{!important};
 }
+
+.tool__skeleton {
+  @apply w-full h-[40px] #{!important};
+}

@@ -20,8 +20,14 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { store } from '@/app/store';
 import { setSelectItemDetail } from '@/app/slices/transferSlice';
-import { ImageGridCard } from '../PendingTools';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
+interface IImageGridCardProps {
+  images: string[];
+  title: string;
+  subtitle: string;
+  description?: string;
+}
 interface IOrder {
   order: IShippedOrder;
   items: IDetalleSelected | null;
@@ -97,5 +103,67 @@ export const MapIndex = ({ order, items }: IOrder) => {
         </div>
       </TableCell>
     </TableRow>
+  );
+};
+
+export const ImageGridCard = ({
+  images,
+  title,
+  subtitle,
+  description,
+}: IImageGridCardProps) => {
+  const imageCount = images.length;
+
+  const getGridClass = () => {
+    if (imageCount === 1) return 'grid-cols-1';
+    if (imageCount <= 3) return 'grid-cols-2';
+    if (imageCount === 4) return 'grid-cols-2';
+    return 'grid-cols-3';
+  };
+
+  return (
+    <Card className="w-full max-w-xl mx-auto">
+      <CardHeader className="flex flex-row items-center space-x-4">
+        <div className="flex items-center justify-center w-12 h-12 bg-green-700 rounded-full cursor-pointer">
+          <span className="text-lg font-semibold text-white">
+            {title.charAt(0) ?? 'A'}
+          </span>
+        </div>
+        <div>
+          <h3 className="font-semibold">{title}</h3>
+          <p className="text-sm text-muted-foreground">{subtitle}</p>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {description && <p className="text-sm">{description}</p>}
+        {imageCount > 0 ? (
+          <div className={`grid ${getGridClass()} gap-1`}>
+            {images.slice(0, 6).map((src, index) => (
+              <div
+                key={index}
+                className={`
+                  ${imageCount === 3 && index === 2 ? 'col-span-2' : ''}
+                  ${imageCount >= 5 && index >= 3 ? 'col-span-1' : ''}
+                  ${imageCount === 1 ? 'col-span-1' : ''}
+                  relative aspect-square overflow-hidden rounded-lg
+                  ${index === 0 ? 'border border-gray-300' : ''}
+                `}
+              >
+                <img
+                  src={src}
+                  alt={index === 0 ? 'Firma' : `Imagen adjunta ${index}`}
+                  className="object-contain w-full h-full"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500">
+            No hay imágenes disponibles
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 };

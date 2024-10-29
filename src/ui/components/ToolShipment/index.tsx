@@ -21,12 +21,12 @@ import { GetBranches } from '@/shared/helpers/Branchs';
 import { store } from '@/app/store';
 import { fetchBranches, updateSelectedBranch } from '@/app/slices/branchSlice';
 import { ITool } from '@/interfaces/transferInterfaces';
+import { Skeleton } from '@/components/ui/skeleton';
+import './styles.scss';
 
 export default function ToolShipment() {
   const user = useAppSelector((state) => state.auth.signIn.user);
-  const selectedBranch = useAppSelector(
-    (state) => state.branches.selectedBranch
-  );
+  const { selectedBranch, loading } = useAppSelector((state) => state.branches);
   const [destinationBranch, setDestinationBranch] = useState<string | null>(
     null
   );
@@ -132,6 +132,7 @@ export default function ToolShipment() {
   useEffect(() => {
     store.dispatch(fetchBranches()).unwrap();
     handleLoadBranch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -161,36 +162,41 @@ export default function ToolShipment() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTools.map((tool) => (
-                    <TableRow key={tool.id}>
-                      <TableCell>{tool.nombre}</TableCell>
-                      <TableCell>{tool.id}</TableCell>
-                      <TableCell>{tool.stock} unidades</TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          value={tool.quantityToSend}
-                          onChange={(e) =>
-                            handleQuantityChange(
-                              tool.id!,
-                              parseInt(e.target.value)
-                            )
-                          }
-                          min={0}
-                          max={tool.stock}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => handleShipmentTool(tool)}
-                        >
-                          Agregar
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {loading &&
+                    [1, 2, 3, 4, 5].map((item) => (
+                      <ShipmentSkeleton key={item} />
+                    ))}
+                  {!loading &&
+                    filteredTools.map((tool) => (
+                      <TableRow key={tool.id}>
+                        <TableCell>{tool.nombre}</TableCell>
+                        <TableCell>{tool.id}</TableCell>
+                        <TableCell>{tool.stock} unidades</TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={tool.quantityToSend}
+                            onChange={(e) =>
+                              handleQuantityChange(
+                                tool.id!,
+                                parseInt(e.target.value)
+                              )
+                            }
+                            min={0}
+                            max={tool.stock}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleShipmentTool(tool)}
+                          >
+                            Agregar
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </CardContent>
@@ -221,3 +227,25 @@ export default function ToolShipment() {
     </div>
   );
 }
+
+const ShipmentSkeleton = () => {
+  return (
+    <TableRow>
+      <TableCell>
+        <Skeleton className="tool__skeleton" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="tool__skeleton" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="tool__skeleton" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="tool__skeleton" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="tool__skeleton" />
+      </TableCell>
+    </TableRow>
+  );
+};

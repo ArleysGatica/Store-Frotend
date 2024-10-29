@@ -12,7 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Pen, Trash2 } from 'lucide-react';
+import { Pen, SignatureIcon, Trash2 } from 'lucide-react';
 
 export interface ISignature {
   handleSignature: (signature: string | null) => void;
@@ -28,7 +28,7 @@ export default function Signature({
   handleSignature,
   canvasWidth = 350,
   canvasHeight = 200,
-  buttonText = 'Gestionar firma',
+  buttonText = 'FIRMA',
   title = 'Dibuje su firma',
 }: ISignature) {
   const [isOpen, setIsOpen] = useState(false);
@@ -100,7 +100,12 @@ export default function Signature({
     <Popover open={isOpen} onOpenChange={handleOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline">
-          <Pen className="w-4 h-4 mr-2" /> {buttonText}
+          {!savedSignature ? (
+            <Pen className="w-4 h-4 mr-1" />
+          ) : (
+            <SignatureIcon className="w-4 h-4" />
+          )}
+          {buttonText}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" side="top">

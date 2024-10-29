@@ -14,7 +14,6 @@ import {
 } from '@/app/slices/transferSlice';
 import { store } from '@/app/store';
 import { Toaster, toast } from 'sonner';
-import { useAppSelector } from '@/app/hooks';
 import { isValidTransfer } from '@/shared/helpers/transferHelper';
 
 export const ToolTransfer = ({
@@ -24,7 +23,6 @@ export const ToolTransfer = ({
   userId,
   setShipmentTools,
 }: IToolTransferProps) => {
-  const transferStatus = useAppSelector((state) => state.transfer.status);
   const [sending, setSending] = useState(false);
   const [toolTransfer, setToolTransfer] = useState<ITransferDetails>({
     comentarioEnvio: null,
@@ -77,15 +75,13 @@ export const ToolTransfer = ({
       error: (err) => `Error al enviar transferencia: ${err}`,
     });
 
-    if (transferStatus === 'succeeded') {
-      setShipmentTools([]);
-      setToolTransfer({
-        ...toolTransfer,
-        comentarioEnvio: null,
-        firmaEnvio: '',
-        archivosAdjuntos: [],
-      });
-    }
+    setShipmentTools([]);
+    setToolTransfer({
+      ...toolTransfer,
+      comentarioEnvio: null,
+      firmaEnvio: '',
+      archivosAdjuntos: [],
+    });
 
     store.dispatch(updateStatus('idle'));
     setSending(false);
@@ -132,8 +128,12 @@ export const ToolTransfer = ({
         savedSignature={toolTransfer.firmaEnvio}
         handleSignature={handleSignature}
       />
-      <Button disabled={sending} onClick={handleSendTransfer}>
-        <Send className="w-4 h-4 mr-2" />
+      <Button
+        disabled={sending}
+        onClick={handleSendTransfer}
+        className="uppercase"
+      >
+        <Send className="w-4 h-4" />
         Enviar
       </Button>
       <Toaster richColors position="bottom-right" />

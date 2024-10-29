@@ -150,6 +150,9 @@ const transferSlice = createSlice({
           ...(payload.payload as unknown as IShippedOrder[]),
         ];
       })
+      .addCase(getPendingTransfers.pending, (state) => {
+        state.status = 'loading';
+      })
       .addCase(
         getPendingTransfers.fulfilled,
         (state, { payload }: PayloadAction<IPendingTransfer[]>) => {
@@ -171,6 +174,9 @@ const transferSlice = createSlice({
           traslado: payload.data?.traslado,
           listItemDePedido: payload.data?.listItemDePedido,
         };
+      })
+      .addCase(getPendingProductsByTransfer.pending, (state) => {
+        state.status = 'loading';
       })
       .addCase(getPendingProductsByTransfer.fulfilled, (state, { payload }) => {
         state.status = 'succeeded';

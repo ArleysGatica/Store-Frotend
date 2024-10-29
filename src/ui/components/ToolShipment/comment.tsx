@@ -6,7 +6,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
-import { MessageSquare, Pencil, Trash2 } from 'lucide-react';
+import { MessageSquare, MessageSquareMore, Pencil, Trash2 } from 'lucide-react';
 
 export interface ICommentProps {
   children?: React.ReactNode;
@@ -26,7 +26,7 @@ const Comment = ({
   handleSaveComment,
   title = 'Comentario',
   placeholder = 'Descripción del comentario',
-  buttonText = 'Agregar comentario',
+  buttonText = 'COMENTARIO',
   readonly,
 }: ICommentProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,8 +61,12 @@ const Comment = ({
           children
         ) : (
           <Button variant="outline">
-            <MessageSquare className="w-4 h-4 mr-1" />
-            {!comment ? buttonText : 'Ver comentario'}
+            {!comment ? (
+              <MessageSquare className="w-4 h-4" />
+            ) : (
+              <MessageSquareMore className="w-4 h-4" />
+            )}
+            {buttonText}
           </Button>
         )}
       </PopoverTrigger>

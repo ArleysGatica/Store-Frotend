@@ -12,33 +12,28 @@ import {
 } from '@/components/ui/table';
 import { Tabs } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   getFormatedDate,
-  getTimeElapsed,
   incomingShipmentTableHeaders,
 } from '@/shared/helpers/transferHelper';
 import { store } from '@/app/store';
 import { getPendingTransfers } from '@/app/slices/transferSlice';
 import { useAppSelector } from '@/app/hooks';
-import {
-  IPendingShipmentDetailsProps,
-  IPendingTransfer,
-} from '@/interfaces/transferInterfaces';
+import { IPendingTransfer } from '@/interfaces/transferInterfaces';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Link } from 'react-router-dom';
-
-interface IImageGridCardProps {
-  images: string[];
-  title: string;
-  subtitle: string;
-  description?: string;
-}
+import DetallesEnvio from '@/shared/components/ui/Details';
+import { Skeleton } from '@/components/ui/skeleton';
+import './styles.scss';
+import { IStatus } from '@/interfaces/branchInterfaces';
 
 export default function PendingTools() {
   const user = useAppSelector((state) => state.auth.signIn.user);
-  const pendingTransfer = useAppSelector((state) => state.transfer.pending);
+  const { pending: pendingTransfer, status } = useAppSelector(
+    (state) => state.transfer
+  );
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredShipments = pendingTransfer.filter(
@@ -74,7 +69,10 @@ export default function PendingTools() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <IncomingShipmentTable shipments={filteredShipments} />
+            <IncomingShipmentTable
+              shipments={filteredShipments}
+              status={status}
+            />
           </CardContent>
         </Card>
       </Tabs>
@@ -84,8 +82,10 @@ export default function PendingTools() {
 
 const IncomingShipmentTable = ({
   shipments,
+  status,
 }: {
   shipments: IPendingTransfer[];
+  status: IStatus;
 }) => {
   return (
     <Table>
@@ -102,138 +102,100 @@ const IncomingShipmentTable = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {shipments.map((shipment) => (
-          <TableRow key={shipment._id}>
-            <TableCell>
-              <Badge
-                variant={
-                  shipment.estatusTraslado === 'En Proceso'
-                    ? 'secondary'
-                    : shipment.estatusTraslado === 'Terminado'
-                      ? 'default'
-                      : 'outline'
-                }
-              >
-                {shipment.estatusTraslado === 'En Proceso'
-                  ? 'Pendiente'
-                  : shipment.estatusTraslado === 'Terminado'
-                    ? 'Recibido'
-                    : shipment.estatusTraslado === 'Terminado incompleto'
-                      ? 'Incompleto'
-                      : 'Solicitado'}
-              </Badge>
-            </TableCell>
-            <TableCell>{shipment.consecutivo}</TableCell>
-            <TableCell>{shipment.sucursalDestinoId.nombre}</TableCell>
-            <TableCell>{getFormatedDate(shipment.fechaEnvio)}</TableCell>
-            <TableCell>{shipment.usuarioIdEnvia.username}</TableCell>
-            <TableCell>
-              <div className="flex items-center justify-center gap-2">
-                <Dialog>
-                  <DialogTrigger>
-                    <Button variant="ghost" size="sm">
-                      <Eye className="w-4 h-4 mr-1" />
-                      Ver detalles
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="p-3">
-                    <PendingShipmentDetails pendingShipment={shipment} />
-                  </DialogContent>
-                </Dialog>
-                <Link
-                  to={`/transfer/pending/${shipment._id}/itemdepedido`}
-                  state={{ id: shipment._id }}
+        {status === 'loading' &&
+          [1, 2, 3, 4, 5].map((item) => <ShipmentSkeleton key={item} />)}
+
+        {status === 'succeeded' &&
+          shipments.map((shipment) => (
+            <TableRow key={shipment._id}>
+              <TableCell>
+                <Badge
+                  variant={
+                    shipment.estatusTraslado === 'En Proceso'
+                      ? 'secondary'
+                      : shipment.estatusTraslado === 'Terminado'
+                        ? 'default'
+                        : 'outline'
+                  }
                 >
-                  <Button size="sm" className="text-white">
-                    Recibir
-                    <ArrowDown />
-                  </Button>
-                </Link>
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
+                  {shipment.estatusTraslado === 'En Proceso'
+                    ? 'Pendiente'
+                    : shipment.estatusTraslado === 'Terminado'
+                      ? 'Recibido'
+                      : shipment.estatusTraslado === 'Terminado incompleto'
+                        ? 'Incompleto'
+                        : 'Solicitado'}
+                </Badge>
+              </TableCell>
+              <TableCell>{shipment.consecutivo}</TableCell>
+              <TableCell>{shipment.sucursalDestinoId.nombre}</TableCell>
+              <TableCell>{getFormatedDate(shipment.fechaEnvio)}</TableCell>
+              <TableCell>{shipment.usuarioIdEnvia.username}</TableCell>
+              <TableCell>
+                <div className="flex items-center justify-center gap-2">
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button variant="ghost" size="sm">
+                        <Eye className="w-4 h-4 mr-1" />
+                        Ver detalles
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="p-3">
+                      <DetallesEnvio
+                        pedidoId={shipment.consecutivo?.toString() ?? ''}
+                        fechaCreacion={shipment.fechaRegistro}
+                        origen={shipment.sucursalOrigenId.nombre}
+                        destino={shipment.sucursalDestinoId.nombre}
+                        fechaEnvio={shipment.fechaEnvio}
+                        fechaRecepcion={null}
+                        productos={[
+                          shipment.firmaEnvio ?? '',
+                          ...(shipment.archivosAdjuntos ?? []),
+                        ]}
+                        firmaRecepcion={null}
+                        comentarioEnvio={shipment.comentarioEnvio ?? ''}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                  <Link
+                    to={`/transfer/pending/${shipment._id}/itemdepedido`}
+                    state={{ id: shipment._id }}
+                  >
+                    <Button size="sm" className="text-white">
+                      Recibir
+                      <ArrowDown />
+                    </Button>
+                  </Link>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
       </TableBody>
     </Table>
   );
 };
 
-export const ImageGridCard = ({
-  images,
-  title,
-  subtitle,
-  description,
-}: IImageGridCardProps) => {
-  const imageCount = images.length;
-
-  const getGridClass = () => {
-    if (imageCount === 1) return 'grid-cols-1';
-    if (imageCount <= 3) return 'grid-cols-2';
-    if (imageCount === 4) return 'grid-cols-2';
-    return 'grid-cols-3';
-  };
-
+const ShipmentSkeleton = () => {
   return (
-    <Card className="w-full max-w-xl mx-auto">
-      <CardHeader className="flex flex-row items-center space-x-4">
-        <div className="flex items-center justify-center w-12 h-12 bg-green-700 rounded-full cursor-pointer">
-          <span className="text-lg font-semibold text-white">
-            {title.charAt(0) ?? 'A'}
-          </span>
-        </div>
-        <div>
-          <h3 className="font-semibold">{title}</h3>
-          <p className="text-sm text-muted-foreground">{subtitle}</p>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {description && <p className="text-sm">{description}</p>}
-        {imageCount > 0 ? (
-          <div className={`grid ${getGridClass()} gap-1`}>
-            {images.slice(0, 6).map((src, index) => (
-              <div
-                key={index}
-                className={`
-                  ${imageCount === 3 && index === 2 ? 'col-span-2' : ''}
-                  ${imageCount >= 5 && index >= 3 ? 'col-span-1' : ''}
-                  ${imageCount === 1 ? 'col-span-1' : ''}
-                  relative aspect-square overflow-hidden rounded-lg
-                  ${index === 0 ? 'border border-gray-300' : ''}
-                `}
-              >
-                <img
-                  src={src}
-                  alt={index === 0 ? 'Firma' : `Imagen adjunta ${index}`}
-                  className="object-contain w-full h-full"
-                  loading="lazy"
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-gray-500">
-            No hay imágenes disponibles
-          </p>
-        )}
-      </CardContent>
-    </Card>
-  );
-};
-
-export const PendingShipmentDetails = ({
-  pendingShipment,
-}: IPendingShipmentDetailsProps) => {
-  const imageSources = [
-    pendingShipment.firmaEnvio ?? '',
-    ...(pendingShipment.archivosAdjuntos ?? []),
-  ];
-
-  return (
-    <ImageGridCard
-      images={imageSources}
-      title={pendingShipment.usuarioIdEnvia.username}
-      subtitle={getTimeElapsed(pendingShipment.fechaEnvio)}
-      description={pendingShipment.comentarioEnvio}
-    />
+    <TableRow>
+      <TableCell>
+        <Skeleton className="skeleton" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="skeleton" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="skeleton" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="skeleton" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="skeleton" />
+      </TableCell>
+      <TableCell className="text-center">
+        <Skeleton className="skeleton" />
+      </TableCell>
+    </TableRow>
   );
 };

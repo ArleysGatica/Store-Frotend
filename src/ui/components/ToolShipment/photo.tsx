@@ -12,7 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Plus, Trash2, Camera } from 'lucide-react';
+import { Plus, Trash2, Camera, Image } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -24,7 +24,6 @@ export interface IImages {
   showTitle?: boolean;
   maxImages?: number;
   title?: string;
-  icon?: React.ReactNode;
   readonly?: boolean;
 }
 
@@ -35,7 +34,6 @@ export default function Images({
   showTitle,
   maxImages = 6,
   title = 'Fotografía',
-  icon,
   readonly,
 }: IImages) {
   const [isOpen, setIsOpen] = useState(false);
@@ -69,11 +67,17 @@ export default function Images({
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className={className}>
-          {icon ?? <Camera className="w-4 h-4 mr-1" />}
-          {showTitle && <span className="px-1">Gestionar imágenes</span>}
-          {fotos.length > 0 && (
+          {savedImages.length > 0 ? (
+            <Image className="w-4 h-4" />
+          ) : (
+            <Camera className="w-4 h-4" />
+          )}
+          {showTitle && (
+            <span className="text-sm font-semibold uppercase">imágenes</span>
+          )}
+          {savedImages.length > 0 && (
             <Badge variant="secondary" className="ml-1">
-              {fotos.length}
+              {savedImages.length}
             </Badge>
           )}
         </Button>
