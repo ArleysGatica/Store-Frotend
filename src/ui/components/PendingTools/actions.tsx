@@ -13,10 +13,7 @@ import {
   ITrasladoRecepcion,
 } from '@/interfaces/transferInterfaces';
 import { store } from '@/app/store';
-import {
-  createProductReceived,
-  updateReceivedStatus,
-} from '@/app/slices/transferSlice';
+import { createProductReceived } from '@/app/slices/transferSlice';
 import { useNavigate } from 'react-router-dom';
 import { isValidReceivedTransfer } from '@/shared/helpers/transferHelper';
 
@@ -97,20 +94,23 @@ export const PendingProductsActions = ({
 
     const request = store
       .dispatch(createProductReceived(formattedReceivingData))
-      .unwrap();
+      .unwrap()
+      .catch((err) => {
+        setSending(false);
+        return Promise.reject(err);
+      })
+      .then(() => {
+        setTimeout(() => {
+          setSending(false);
+          navigate('/orders');
+        }, 1000);
+      });
 
     toast.promise(request, {
       loading: 'Recibiendo...',
       success: '¡Productos recibidos!',
       error: (err) => `Error al recibir productos: ${err}`,
     });
-
-    setTimeout(() => {
-      request.finally(() => {
-        store.dispatch(updateReceivedStatus('idle'));
-        navigate('/orders');
-      });
-    }, 1500);
   };
 
   const handleSignature = (signature: string | null) => {

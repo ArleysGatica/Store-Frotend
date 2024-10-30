@@ -67,24 +67,31 @@ export const ToolTransfer = ({
           listDetalleTraslado: formattedTools,
         })
       )
-      .unwrap();
+      .unwrap()
+      .catch((err) => {
+        store.dispatch(updateStatus('idle'));
+        setSending(false);
+        return Promise.reject(err);
+      })
+      .then(() => {
+        setTimeout(() => {
+          store.dispatch(updateStatus('idle'));
+          setShipmentTools([]);
+          setToolTransfer({
+            ...toolTransfer,
+            comentarioEnvio: null,
+            firmaEnvio: '',
+            archivosAdjuntos: [],
+          });
+          setSending(false);
+        }, 1000);
+      });
 
     toast.promise(request, {
       loading: 'Enviando...',
       success: '¡Transferencia enviada!',
       error: (err) => `Error al enviar transferencia: ${err}`,
     });
-
-    setShipmentTools([]);
-    setToolTransfer({
-      ...toolTransfer,
-      comentarioEnvio: null,
-      firmaEnvio: '',
-      archivosAdjuntos: [],
-    });
-
-    store.dispatch(updateStatus('idle'));
-    setSending(false);
   };
 
   const handleSignature = (signature: string | null) => {
@@ -112,31 +119,33 @@ export const ToolTransfer = ({
   }, [sourceBranchId, destinationBranchId]);
 
   return (
-    <div className="flex justify-between">
-      <Comment
-        comment={toolTransfer.comentarioEnvio}
-        handleSaveComment={handleSaveComment}
-        handleRemoveComment={handleRemoveComment}
-      />
-      <Images
-        savedImages={toolTransfer.archivosAdjuntos}
-        handleSaveImages={(images) => handleSaveImages(images)}
-        className="h-[36px]"
-        showTitle
-      />
-      <Signature
-        savedSignature={toolTransfer.firmaEnvio}
-        handleSignature={handleSignature}
-      />
-      <Button
-        disabled={sending}
-        onClick={handleSendTransfer}
-        className="uppercase"
-      >
-        <Send className="w-4 h-4" />
-        Enviar
-      </Button>
+    <>
+      <div className="flex justify-between">
+        <Comment
+          comment={toolTransfer.comentarioEnvio}
+          handleSaveComment={handleSaveComment}
+          handleRemoveComment={handleRemoveComment}
+        />
+        <Images
+          savedImages={toolTransfer.archivosAdjuntos}
+          handleSaveImages={(images) => handleSaveImages(images)}
+          className="h-[36px]"
+          showTitle
+        />
+        <Signature
+          savedSignature={toolTransfer.firmaEnvio}
+          handleSignature={handleSignature}
+        />
+        <Button
+          disabled={sending}
+          onClick={handleSendTransfer}
+          className="uppercase"
+        >
+          <Send className="w-4 h-4" />
+          Enviar
+        </Button>
+      </div>
       <Toaster richColors position="bottom-right" />
-    </div>
+    </>
   );
 };

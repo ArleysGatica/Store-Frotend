@@ -65,8 +65,6 @@ export default function PendingProductsByTransfer() {
         ? { ...shipment, archivosAdjuntosRecibido: images }
         : shipment
     );
-
-    console.log(updatedShipments);
     setShipments(updatedShipments);
   };
 
