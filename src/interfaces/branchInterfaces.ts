@@ -58,6 +58,7 @@ export interface ITablaBranch {
   updatedAt?: string;
   createdAt?: string;
   inventarioSucursalId?: string;
+  nombreSucursal?: string;
 }
 export interface IProductShortage {
   nombre: string;
