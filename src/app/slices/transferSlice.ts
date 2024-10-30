@@ -69,7 +69,6 @@ export const receiveTransfer = createAsyncThunk(
   async (sucursalId: string, { rejectWithValue }) => {
     try {
       const response = await getAllOrdersReceipts(sucursalId);
-      console.log(response, 'response');
       return response;
     } catch (error) {
       return rejectWithValue(handleThunkError(error));

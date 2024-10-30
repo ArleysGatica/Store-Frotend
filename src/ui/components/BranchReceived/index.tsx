@@ -87,13 +87,13 @@ export const BranchReceived = () => {
   };
 
   const filteredProducts = DataAlls?.filter((product) => {
-    const matchesNombre = product.nombre
+    const matchesNombre = product?.nombre
       ?.toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const matchesSucursalDestino = product.sucursalDestinoId.nombre
+    const matchesSucursalDestino = product?.sucursalDestinoId?.nombre
       ?.toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const matchesSucursalOrigen = product.sucursalOrigenId.nombre
+    const matchesSucursalOrigen = product?.sucursalOrigenId?.nombre
       ?.toLowerCase()
       .includes(searchTerm.toLowerCase());
 

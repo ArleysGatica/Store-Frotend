@@ -12,8 +12,8 @@ import { store } from '@/app/store';
 import Pagination from '../../../../shared/components/ui/Pagination/Pagination';
 import { useAppSelector } from '@/app/hooks';
 import { searchForStockProductsAtBranch } from '@/app/slices/branchSlice';
-import SearchAndFilter from './search';
 import ProductsTable from './Table';
+import { SearchAndFilter } from '@/shared/components/ui/Search';
 
 export function ExistingProductAdd() {
   const user = useAppSelector((state) => state.auth.signIn.user);
@@ -24,7 +24,9 @@ export function ExistingProductAdd() {
 
   const fetchData = async () => {
     if (user?.sucursalId) {
-      const response = await store.dispatch(searchForStockProductsAtBranch(user.sucursalId._id)).unwrap();
+      const response = await store
+        .dispatch(searchForStockProductsAtBranch(user.sucursalId._id))
+        .unwrap();
       setProducts(response);
     } else {
       console.log('admin user debe obtener productos generales');
@@ -47,7 +49,6 @@ export function ExistingProductAdd() {
   );
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
-
   return (
     <div className="flex flex-col w-full min-h-screen bg-muted/40">
       <main className="flex-1 p-4 md:p-6">
@@ -68,7 +69,7 @@ export function ExistingProductAdd() {
                 No hay productos en esta sucursal
               </span>
             ) : (
-              <ProductsTable products={currentItems}/>
+              <ProductsTable products={currentItems} />
             )}
           </CardContent>
           <CardFooter className="flex items-center justify-between">
