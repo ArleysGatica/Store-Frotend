@@ -7,8 +7,10 @@ import {
   ITransferPost,
   ITransferSlice,
   IDetalleSelected,
+  ITrasladoRecepcion,
 } from '@/interfaces/transferInterfaces';
 import {
+  createReceiveTransfer,
   createTransfer,
   fetchPendingTransfers,
   getAllOrdersReceipts,
@@ -25,6 +27,7 @@ const initialState: ITransferSlice = {
   selectedItem: null,
   selectedPending: null,
   status: 'idle',
+  receivedStatus: 'idle',
   error: null,
 };
 
@@ -95,12 +98,27 @@ export const getPendingProductsByTransfer = createAsyncThunk(
   }
 );
 
+export const createProductReceived = createAsyncThunk(
+  'transfer/receiveTransfer',
+  async (transfer: ITrasladoRecepcion, { rejectWithValue }) => {
+    try {
+      const response = await createReceiveTransfer(transfer);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
 const transferSlice = createSlice({
   name: 'transfer',
   initialState,
   reducers: {
     updateStatus: (state, action: PayloadAction<IStatus>) => {
       state.status = action.payload;
+    },
+    updateReceivedStatus: (state, action: PayloadAction<IStatus>) => {
+      state.receivedStatus = action.payload;
     },
     setTransferData(state, action: PayloadAction<IShippedOrder[]>) {
       state.data = action.payload;
@@ -186,6 +204,13 @@ const transferSlice = createSlice({
           traslado: data.traslado,
           listItemDePedido: data.listItemDePedido,
         };
+      })
+      .addCase(createProductReceived.pending, (state) => {
+        state.receivedStatus = 'loading';
+      })
+      .addCase(createProductReceived.fulfilled, (state, { payload }) => {
+        state.received = [...state.received, payload];
+        state.receivedStatus = 'succeeded';
       });
   },
 });
@@ -196,6 +221,7 @@ export const {
   updateStatus,
   setPendingSelected,
   setSelectItemDetail,
+  updateReceivedStatus,
 } = transferSlice.actions;
 
 export const transferReducer = transferSlice.reducer;

@@ -12,6 +12,7 @@ import { useAppSelector } from '@/app/hooks';
 import { SummaryPendingTools } from './summary';
 import { PendingProductsActions } from './actions';
 import { useParams } from 'react-router-dom';
+import { IProductoTraslado } from '@/interfaces/transferInterfaces';
 
 export default function PendingProductsByTransfer() {
   const { id } = useParams<{ id: string }>();
@@ -19,15 +20,71 @@ export default function PendingProductsByTransfer() {
     (state) => state.transfer
   );
   const [searchTerm, setSearchTerm] = useState('');
+  const [shipments, setShipments] = useState<IProductoTraslado[]>([]);
 
-  const ShipmentList = pendingTransfer?.listItemDePedido.filter(
+  const ShipmentList = shipments.filter(
     (shipment) =>
       shipment.inventarioSucursalId &&
-      shipment.inventarioSucursalId.productoId.nombre
+      shipment.nombre
         ?.toString()
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
   );
+
+  const handleChangeQuantityReceived = (id: string, quantity: number) => {
+    const isReceived = quantity > 0;
+
+    const updatedShipments = shipments.map((shipment) =>
+      shipment.id === id
+        ? { ...shipment, cantidad: quantity, recibido: isReceived }
+        : shipment
+    );
+    setShipments(updatedShipments);
+  };
+
+  const handleChangePricing = (id: string, price: number) => {
+    const updatedShipments = shipments.map((shipment) =>
+      shipment.id === id ? { ...shipment, precio: price } : shipment
+    );
+    setShipments(updatedShipments);
+  };
+
+  const handleChangeProductState = (id: string, state: string) => {
+    const updatedShipments = shipments.map((shipment) =>
+      shipment.id === id
+        ? { ...shipment, estadoProducto: state, estadoEquipo: state }
+        : shipment
+    );
+    setShipments(updatedShipments);
+  };
+
+  const handleSaveImages = (id: string, images: string[]) => {
+    console.log(images);
+    const updatedShipments = shipments.map((shipment) =>
+      shipment.id === id
+        ? { ...shipment, archivosAdjuntosRecibido: images }
+        : shipment
+    );
+
+    console.log(updatedShipments);
+    setShipments(updatedShipments);
+  };
+
+  const handleSaveComment = (id: string, comment: string) => {
+    const updatedShipments = shipments.map((shipment) =>
+      shipment.id === id
+        ? { ...shipment, comentarioRecibido: comment }
+        : shipment
+    );
+    setShipments(updatedShipments);
+  };
+
+  const handleRemoveComment = (id: string) => {
+    const updatedShipments = shipments.map((shipment) =>
+      shipment.id === id ? { ...shipment, comentarioRecibido: null } : shipment
+    );
+    setShipments(updatedShipments);
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -38,6 +95,29 @@ export default function PendingProductsByTransfer() {
     };
   }, [id]);
 
+  useEffect(() => {
+    if (!pendingTransfer) return;
+
+    const formattedShipmentData: IProductoTraslado[] =
+      pendingTransfer.listItemDePedido.map((shipment) => ({
+        id: shipment.inventarioSucursalId.productoId._id,
+        nombre: shipment.inventarioSucursalId.productoId.nombre,
+        archivosAdjuntosEnviado: shipment.archivosAdjuntos ?? [],
+        comentarioEnvio: shipment.comentarioEnvio ?? '',
+        cantidadEnviada: shipment.cantidad,
+        inventarioSucursalId: shipment.inventarioSucursalId._id,
+        cantidad: 0,
+        archivosAdjuntosRecibido: [],
+        comentarioRecibido: '',
+        estadoEquipo: '',
+        precio: 0,
+        recibido: false,
+        estadoProducto: '',
+      }));
+
+    setShipments(formattedShipmentData);
+  }, [pendingTransfer]);
+
   return (
     <div className="container mx-auto ">
       <Tabs defaultValue="receive">
@@ -47,17 +127,26 @@ export default function PendingProductsByTransfer() {
             <div className="relative mb-6">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar herramientas..."
+                placeholder="Buscar por nombre..."
                 className="pl-8"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <SummaryPendingTools
-              products={ShipmentList ?? []}
+              shipments={ShipmentList}
               status={status}
+              handleChangeQuantityReceived={handleChangeQuantityReceived}
+              handleChangePricing={handleChangePricing}
+              handleChangeProductState={handleChangeProductState}
+              handleSaveImages={handleSaveImages}
+              handleSaveComment={handleSaveComment}
+              handleRemoveComment={handleRemoveComment}
             />
-            <PendingProductsActions />
+            <PendingProductsActions
+              trasladoId={id ?? ''}
+              shipments={shipments}
+            />
           </CardContent>
         </Card>
       </Tabs>

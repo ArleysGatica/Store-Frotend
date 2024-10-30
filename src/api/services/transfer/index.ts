@@ -1,7 +1,10 @@
 import { AxiosResponse } from 'axios';
 import { createAxiosInstance, PATH_LIST } from '../axios';
 import { Token } from '@/shared/hooks/useJWT';
-import { ITransferPost } from '@/interfaces/transferInterfaces';
+import {
+  ITransferPost,
+  ITrasladoRecepcion,
+} from '@/interfaces/transferInterfaces';
 
 export const createTransfer = async ({
   ...transfer
@@ -42,4 +45,12 @@ export const getAllOrdersReceivedById = async (
   const response = await axiosInstance.get(`/${sucursalId}/itemdepedido`);
 
   return response.data;
+};
+
+export const createReceiveTransfer = async ({
+  ...transfer
+}: ITrasladoRecepcion): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Transfer);
+  const response = await axiosInstance.post('/RecibirPedido', transfer);
+  return response;
 };

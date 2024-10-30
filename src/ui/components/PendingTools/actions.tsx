@@ -1,28 +1,48 @@
 import Images from '../ToolShipment/photo';
 import Comment from '../ToolShipment/comment';
 import Signature from '../ToolShipment/signature';
-import { Toaster } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ArrowDown } from 'lucide-react';
 import { useState } from 'react';
 import { useAppSelector } from '@/app/hooks';
 import { IUser } from '@/app/slices/login';
+import {
+  IProductoTraslado,
+  IDetalleTrasladoRecepcion,
+  ITrasladoRecepcion,
+} from '@/interfaces/transferInterfaces';
+import { store } from '@/app/store';
+import {
+  createProductReceived,
+  updateReceivedStatus,
+} from '@/app/slices/transferSlice';
+import { useNavigate } from 'react-router-dom';
+import { isValidReceivedTransfer } from '@/shared/helpers/transferHelper';
 
 export interface ITransferDetails {
-  fechaRecepcion: Date | null;
   comentarioRecepcion: string | null;
   firmaRecepcion: string | null;
-  archivosAdjuntos: string[];
+  archivosAdjuntosRecibido: string[];
   usuarioIdRecibe: IUser | null;
 }
 
-export const PendingProductsActions = () => {
+export interface IPendingProductsActionsProps {
+  trasladoId: string;
+  shipments: IProductoTraslado[];
+}
+
+export const PendingProductsActions = ({
+  trasladoId,
+  shipments,
+}: IPendingProductsActionsProps) => {
+  const navigate = useNavigate();
+  const [sending, setSending] = useState(false);
   const user = useAppSelector((state) => state.auth.signIn.user);
   const [toolReceiving, setToolReceiving] = useState<ITransferDetails>({
-    fechaRecepcion: null,
     comentarioRecepcion: null,
     firmaRecepcion: '',
-    archivosAdjuntos: [],
+    archivosAdjuntosRecibido: [],
     usuarioIdRecibe: null,
   });
 
@@ -41,12 +61,56 @@ export const PendingProductsActions = () => {
   };
 
   const handleReceiveTransfer = async () => {
-    const formattedReceivingData = {
+    setSending(true);
+    const everyProductHasStatus = shipments.every(
+      (shipment) => shipment.estadoProducto && shipment.estadoProducto !== ''
+    );
+
+    const validTransfer = isValidReceivedTransfer(
+      toolReceiving.firmaRecepcion ?? '',
+      everyProductHasStatus
+    );
+    if (!validTransfer) return setSending(false);
+
+    const formattedShipments: IDetalleTrasladoRecepcion[] = shipments.map(
+      (shipment) => ({
+        archivosAdjuntosRecibido: shipment.archivosAdjuntosRecibido ?? [],
+        comentarioRecibido: shipment.comentarioRecibido ?? '',
+        estadoEquipo: shipment.estadoEquipo,
+        inventarioSucursalId: shipment.inventarioSucursalId,
+        cantidad: shipment.cantidad,
+        precio: shipment.precio,
+        recibido: shipment.recibido,
+        estadoProducto: shipment.estadoProducto,
+      })
+    );
+
+    const formattedReceivingData: ITrasladoRecepcion = {
       ...toolReceiving,
-      fechaRecepcion: new Date(),
-      usuarioIdRecibe: user ?? '',
+      trasladoId,
+      usuarioIdRecibe: user?._id ?? '',
+      estatusTraslado: 'Terminado',
+      listDetalleTraslado: formattedShipments,
+      firmaRecepcion: toolReceiving.firmaRecepcion ?? '',
+      comentarioRecepcion: toolReceiving.comentarioRecepcion ?? '',
     };
-    console.log(formattedReceivingData, 'toolReceiving');
+
+    const request = store
+      .dispatch(createProductReceived(formattedReceivingData))
+      .unwrap();
+
+    toast.promise(request, {
+      loading: 'Recibiendo...',
+      success: '¡Productos recibidos!',
+      error: (err) => `Error al recibir productos: ${err}`,
+    });
+
+    setTimeout(() => {
+      request.finally(() => {
+        store.dispatch(updateReceivedStatus('idle'));
+        navigate('/orders');
+      });
+    }, 1500);
   };
 
   const handleSignature = (signature: string | null) => {
@@ -59,36 +123,38 @@ export const PendingProductsActions = () => {
   const handleSaveImages = (images: string[]) => {
     setToolReceiving({
       ...toolReceiving,
-      archivosAdjuntos: images,
+      archivosAdjuntosRecibido: images,
     });
   };
 
   return (
-    <div className="flex justify-between mt-6">
-      <Comment
-        comment={toolReceiving.comentarioRecepcion}
-        handleSaveComment={handleSaveComment}
-        handleRemoveComment={handleRemoveComment}
-      />
-      <Images
-        savedImages={toolReceiving.archivosAdjuntos}
-        handleSaveImages={(images) => handleSaveImages(images)}
-        className="h-[36px]"
-        showTitle
-      />
-      <Signature
-        savedSignature={toolReceiving.firmaRecepcion}
-        handleSignature={handleSignature}
-      />
-      <Button
-        disabled={false}
-        onClick={handleReceiveTransfer}
-        className="uppercase"
-      >
-        <ArrowDown />
-        Recibir
-      </Button>
+    <>
+      <div className="flex justify-between mt-6">
+        <Comment
+          comment={toolReceiving.comentarioRecepcion}
+          handleSaveComment={handleSaveComment}
+          handleRemoveComment={handleRemoveComment}
+        />
+        <Images
+          savedImages={toolReceiving.archivosAdjuntosRecibido}
+          handleSaveImages={(images) => handleSaveImages(images)}
+          className="h-[36px]"
+          showTitle
+        />
+        <Signature
+          savedSignature={toolReceiving.firmaRecepcion}
+          handleSignature={handleSignature}
+        />
+        <Button
+          disabled={sending}
+          onClick={handleReceiveTransfer}
+          className="uppercase"
+        >
+          <ArrowDown />
+          Recibir
+        </Button>
+      </div>
       <Toaster richColors position="bottom-right" />
-    </div>
+    </>
   );
 };

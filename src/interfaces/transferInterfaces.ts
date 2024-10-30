@@ -66,6 +66,7 @@ export interface ITransferSlice {
   pending: IPendingTransfer[];
   selectedPending: IDetalleSelected | null;
   status: IStatus;
+  receivedStatus: IStatus;
   error: string | null;
   selectedItem: IDetalleSelected | null;
 }
@@ -193,6 +194,37 @@ export interface ListItemDePedido {
 export interface IDetalleSelected {
   traslado?: IPendingTransfer;
   listItemDePedido: ListItemDePedido[];
+}
+
+export interface IDetalleTrasladoRecepcion {
+  inventarioSucursalId: string;
+  cantidad: number;
+  precio: number;
+  comentarioRecibido: string | null;
+  recibido: boolean;
+  estadoEquipo: string;
+  archivosAdjuntosRecibido: string[] | null;
+  estadoProducto?: string;
+}
+
+export interface IProductoTraslado extends IDetalleTrasladoRecepcion {
+  id: string;
+  nombre: string;
+  cantidadEnviada: number;
+  archivosAdjuntosEnviado: string[];
+  comentarioEnvio: string;
+}
+
+export interface ITrasladoRecepcion {
+  trasladoId: string;
+  estatusTraslado?: string;
+  listDetalleTraslado: IDetalleTrasladoRecepcion[];
+  archivosAdjuntosRecibido: string[] | null;
+
+  // Datos para enviar el pedido
+  firmaRecepcion: string;
+  comentarioRecepcion: string;
+  usuarioIdRecibe: string;
 }
 
 export interface ISucursal {
