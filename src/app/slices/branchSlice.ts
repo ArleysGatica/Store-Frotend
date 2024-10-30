@@ -6,13 +6,14 @@ import {
   deleteBranchById,
   getAll,
   getBranchesById,
+  getForStockProductsAtBranch,
   updateBranch,
 } from '../../api/services/branch';
 import {
   handleAsyncThunkError,
   handleThunkError,
 } from '../../shared/utils/errorHandlers';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { IProductShortage, ITablaBranch } from '@/interfaces/branchInterfaces';
 
 export interface Branch {
   _id?: string;
@@ -47,6 +48,18 @@ export const fetchBranchesById = createAsyncThunk<ITablaBranch[], string>(
   async (id: string, { rejectWithValue }) => {
     try {
       const response: ITablaBranch[] = await getBranchesById(id);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Error desconocido');
+    }
+  }
+);
+
+export const searchForStockProductsAtBranch = createAsyncThunk<IProductShortage[], string>(
+  'branches/searchForStockProductsAtBranch',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response: IProductShortage[] = await getForStockProductsAtBranch(id);
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Error desconocido');

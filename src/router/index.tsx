@@ -14,6 +14,7 @@ import { Page } from '@/shared/components/ui/Page';
 import { Products } from '@/ui/components/Table/products';
 import { OrdersReceived } from '@/ui/components/OrdersReceived';
 import PendingProductsByTransfer from '@/ui/components/PendingTools/products';
+import { ViewProucts } from '@/ui/components/products';
 
 export const Router = () => {
   return (
@@ -59,7 +60,7 @@ export const Router = () => {
           path="/products"
           element={
             <Layout>
-              <Products />
+              <ViewProucts />
             </Layout>
           }
         />
