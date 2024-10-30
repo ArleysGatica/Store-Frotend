@@ -3,6 +3,7 @@ import { Products } from '../../../../ui/components/Table/products';
 import { useAppSelector } from '@/app/hooks';
 import { ExistingProductAdd } from '@/ui/components/products/existingProduct/existingProduct';
 import { Allproducts } from '@/ui/components/products/AllProducts';
+import { ProductsTransit } from '@/ui/components/products/TransitProduct';
 
 export const ViewProucts = () => {
   const user = useAppSelector((state) => state.auth.signIn.user);
@@ -47,7 +48,7 @@ export const ViewProucts = () => {
           <ExistingProductAdd />
         </TabsContent>
         <TabsContent value="productsTransit">
-          {/* <Allproducts /> */}
+          <ProductsTransit />
         </TabsContent>
         <TabsContent value="allProduct">
           <Allproducts />

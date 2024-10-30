@@ -3,9 +3,6 @@ import { useAppSelector } from '@/app/hooks';
 import { store } from '@/app/store';
 import {
   clearTransferDataReceived,
-  //   clearTransferData,
-  getAllProductTransfer,
-  OrdersReceivedById,
   receiveTransfer,
 } from '@/app/slices/transferSlice';
 import { Button } from '@/components/ui/button';
@@ -28,8 +25,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { MapIndex } from './table';
-import { IDetalleSelected } from '@/interfaces/transferInterfaces';
-import { useParams } from 'react-router-dom';
 import { Loader } from '@/shared/components/ui/Loader';
 
 const orderStatusOptions = [
