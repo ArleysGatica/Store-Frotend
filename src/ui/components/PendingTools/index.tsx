@@ -128,7 +128,7 @@ const IncomingShipmentTable = ({
                 </Badge>
               </TableCell>
               <TableCell>{shipment.consecutivo}</TableCell>
-              <TableCell>{shipment.sucursalDestinoId.nombre}</TableCell>
+              <TableCell>{shipment.sucursalOrigenId.nombre}</TableCell>
               <TableCell>{getFormatedDate(shipment.fechaEnvio)}</TableCell>
               <TableCell>{shipment.usuarioIdEnvia.username}</TableCell>
               <TableCell>

@@ -28,6 +28,23 @@ export const isValidTransfer = (
   return true;
 };
 
+export const isValidReceivedTransfer = (
+  signature: string,
+  everyProductHasStatus: boolean
+) => {
+  if (signature === '') {
+    toast.warning('Escriba una firma para realizar la transferencia');
+    return false;
+  }
+
+  if (!everyProductHasStatus) {
+    toast.warning('Estableza el estado de cada producto');
+    return false;
+  }
+
+  return true;
+};
+
 export const incomingShipmentTableHeaders = [
   { key: 'estado', label: 'Estado' },
   { key: 'consecutivo', label: 'Consecutivo' },

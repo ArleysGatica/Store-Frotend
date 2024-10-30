@@ -7,7 +7,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ListItemDePedido } from '@/interfaces/transferInterfaces';
+import { IProductoTraslado } from '@/interfaces/transferInterfaces';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -23,7 +23,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, MessageSquareMore } from 'lucide-react';
+import { MessageSquareMore } from 'lucide-react';
 import Images from '../ToolShipment/photo';
 import Comment from '../ToolShipment/comment';
 import { Badge } from '@/components/ui/badge';
@@ -40,24 +40,26 @@ const productStates = [
 ];
 
 export interface ISummaryPendingTools {
-  products: ListItemDePedido[];
   status: IStatus;
+  shipments: IProductoTraslado[];
+  handleChangeQuantityReceived: (id: string, quantity: number) => void;
+  handleChangePricing: (id: string, price: number) => void;
+  handleChangeProductState: (id: string, state: string) => void;
+  handleSaveImages: (id: string, images: string[]) => void;
+  handleSaveComment: (id: string, comment: string) => void;
+  handleRemoveComment: (id: string) => void;
 }
 
 export const SummaryPendingTools = ({
-  products,
   status,
+  shipments,
+  handleChangeQuantityReceived,
+  handleChangePricing,
+  handleChangeProductState,
+  handleSaveImages,
+  handleSaveComment,
+  handleRemoveComment,
 }: ISummaryPendingTools) => {
-  const handleSaveComment = (comment: string) => {
-    console.log(comment);
-  };
-
-  const handleRemoveComment = () => {};
-
-  const handleSaveImages = (images: string[]) => {
-    console.log(images);
-  };
-
   return (
     <Card className="branch__transfer__list">
       <CardHeader>
@@ -82,33 +84,26 @@ export const SummaryPendingTools = ({
               [1, 2, 3].map((item) => <ShipmentSkeleton key={item} />)}
 
             {status === 'succeeded' &&
-              products.map((product) => (
-                <TableRow key={product._id}>
+              shipments.map((product) => (
+                <TableRow key={product.id}>
                   <TableCell>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          {product.inventarioSucursalId.productoId._id.slice(
-                            0,
-                            10
-                          )}
+                          {product.id.slice(0, 10)}
                           ...
                         </TooltipTrigger>
-                        <TooltipContent>
-                          {product.inventarioSucursalId.productoId._id}
-                        </TooltipContent>
+                        <TooltipContent>{product.id}</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
-                  <TableCell>
-                    {product.inventarioSucursalId.productoId.nombre}
-                  </TableCell>
+                  <TableCell>{product.nombre}</TableCell>
                   <TableCell>
                     <Badge
                       variant={'secondary'}
                       className="flex items-center justify-center h-[36px] w-[50%]"
                     >
-                      {product.cantidad}
+                      {product.cantidadEnviada}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -116,7 +111,13 @@ export const SummaryPendingTools = ({
                       type="number"
                       min={0}
                       className="text-center w-[60%]"
-                      value={0}
+                      value={product.cantidad}
+                      onChange={(e) =>
+                        handleChangeQuantityReceived(
+                          product.id,
+                          parseInt(e.target.value)
+                        )
+                      }
                     />
                   </TableCell>
                   <TableCell>
@@ -124,11 +125,22 @@ export const SummaryPendingTools = ({
                       type="number"
                       min={0}
                       className="text-center w-[60%]"
-                      value={0}
+                      value={product.precio}
+                      onChange={(e) =>
+                        handleChangePricing(
+                          product.id,
+                          parseInt(e.target.value)
+                        )
+                      }
                     />
                   </TableCell>
                   <TableCell>
-                    <Select>
+                    <Select
+                      value={product.estadoProducto}
+                      onValueChange={(state) =>
+                        handleChangeProductState(product.id, state)
+                      }
+                    >
                       <SelectTrigger className="w-[150px]">
                         <SelectValue placeholder="Seleccione" />
                       </SelectTrigger>
@@ -144,8 +156,7 @@ export const SummaryPendingTools = ({
                   <TableCell>
                     <div className="flex items-center justify-center gap-2">
                       <Images
-                        savedImages={product.archivosAdjuntos ?? []}
-                        handleSaveImages={() => handleSaveImages([])}
+                        savedImages={product.archivosAdjuntosEnviado ?? []}
                         readonly
                       />
                       <Comment
@@ -162,18 +173,21 @@ export const SummaryPendingTools = ({
                   <TableCell>
                     <div className="flex items-center justify-center gap-2">
                       <Images
-                        savedImages={[]}
-                        handleSaveImages={() => handleSaveImages([])}
+                        savedImages={product.archivosAdjuntosRecibido ?? []}
+                        handleSaveImages={(images) =>
+                          handleSaveImages(product.id, images)
+                        }
                       />
                       <Comment
-                        comment={''}
-                        handleRemoveComment={() => handleRemoveComment()}
-                        handleSaveComment={() => handleSaveComment('')}
-                      >
-                        <Button variant="outline" size="sm">
-                          <MessageSquare className="w-4 h-4 mr-1" />
-                        </Button>
-                      </Comment>
+                        comment={product.comentarioRecibido ?? ''}
+                        handleRemoveComment={() =>
+                          handleRemoveComment(product.id)
+                        }
+                        handleSaveComment={(comment) =>
+                          handleSaveComment(product.id, comment)
+                        }
+                        buttonText=""
+                      />
                     </div>
                   </TableCell>
                 </TableRow>

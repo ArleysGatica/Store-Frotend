@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
 export interface IImages {
-  handleSaveImages: (images: string[]) => void;
+  handleSaveImages?: (images: string[]) => void;
   savedImages: string[];
   className?: string;
   showTitle?: boolean;
@@ -55,7 +55,7 @@ export default function Images({
   const deleteLastImage = () => setFotos((prevFotos) => prevFotos.slice(0, -1));
 
   const saveImages = () => {
-    handleSaveImages(fotos);
+    handleSaveImages && handleSaveImages(fotos);
     setIsOpen(false);
   };
 
