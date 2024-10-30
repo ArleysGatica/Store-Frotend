@@ -8,8 +8,10 @@ import {
   createTablaBranch,
   inventoryAllProduct,
   inventoryGetAll,
+  inventoryGetProdutsTransit,
 } from '@/api/services/products';
 import { IStatus, ITablaBranch } from '@/interfaces/branchInterfaces';
+import { InventarioSucursal } from '@/interfaces/transferInterfaces';
 
 export const createProduct = createAsyncThunk(
   'products/create',
@@ -40,6 +42,18 @@ export const fetchTablaBranches = createAsyncThunk(
   }
 );
 
+export const productsTransit = createAsyncThunk(
+  'products/getAllTransit',
+  async (sucursalId: string, { rejectWithValue }) => {
+    try {
+      const response = await inventoryGetProdutsTransit(sucursalId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
 export const fetchAllProducts = createAsyncThunk<
   ITablaBranch[],
   void,
@@ -56,13 +70,15 @@ export const fetchAllProducts = createAsyncThunk<
 interface ProductState {
   products: ITablaBranch[];
   error: string | null;
+  transitProducts: InventarioSucursal[];
   status: IStatus;
 }
 
 const initialState: ProductState = {
   products: [] as ITablaBranch[],
-  error: null,
+  transitProducts: [],
   status: 'idle',
+  error: null,
 };
 
 const productsSlice = createSlice({
@@ -86,6 +102,14 @@ const productsSlice = createSlice({
       .addCase(fetchAllProducts.rejected, (state, { payload }) => {
         state.status = 'failed';
         state.error = payload || 'Error fetching products';
+      })
+      .addCase(productsTransit.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(productsTransit.fulfilled, (state, { payload }) => {
+        state.status = 'succeeded';
+        console.log(payload, 'data');
+        state.transitProducts = payload as unknown as InventarioSucursal[];
       });
   },
 });

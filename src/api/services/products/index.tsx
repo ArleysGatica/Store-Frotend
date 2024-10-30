@@ -23,3 +23,11 @@ export const inventoryAllProduct = async (): Promise<ITablaBranch[]> => {
     await axiosInstance.get('/allProduct');
   return response.data;
 };
+
+export const inventoryGetProdutsTransit = async (
+  sucursalId: string
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Inventory);
+  const response = await axiosInstance.get(`/${sucursalId}/transit`);
+  return response.data;
+};
