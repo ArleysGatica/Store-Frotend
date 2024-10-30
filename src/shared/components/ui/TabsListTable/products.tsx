@@ -1,7 +1,8 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Products } from '../Table/products';
+import { Products } from '../../../../ui/components/Table/products';
 import { useAppSelector } from '@/app/hooks';
-import { ExistingProductAdd } from './existingProduct/existingProduct';
+import { ExistingProductAdd } from '@/ui/components/products/existingProduct/existingProduct';
+import { Allproducts } from '@/ui/components/products/AllProducts';
 
 export const ViewProucts = () => {
   const user = useAppSelector((state) => state.auth.signIn.user);
@@ -46,10 +47,10 @@ export const ViewProucts = () => {
           <ExistingProductAdd />
         </TabsContent>
         <TabsContent value="productsTransit">
-          <ExistingProductAdd />
+          {/* <Allproducts /> */}
         </TabsContent>
         <TabsContent value="allProduct">
-          <></>
+          <Allproducts />
         </TabsContent>
       </Tabs>
     </div>

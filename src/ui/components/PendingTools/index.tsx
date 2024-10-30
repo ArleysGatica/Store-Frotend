@@ -36,7 +36,7 @@ export default function PendingTools() {
   );
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredShipments = pendingTransfer.filter(
+  const filteredShipments = pendingTransfer?.filter(
     (shipment) =>
       (shipment.consecutivo &&
         shipment.consecutivo?.toString().includes(searchTerm)) ||
@@ -106,7 +106,7 @@ const IncomingShipmentTable = ({
           [1, 2, 3, 4, 5].map((item) => <ShipmentSkeleton key={item} />)}
 
         {status === 'succeeded' &&
-          shipments.map((shipment) => (
+          shipments?.map((shipment) => (
             <TableRow key={shipment._id}>
               <TableCell>
                 <Badge

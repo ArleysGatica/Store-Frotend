@@ -64,6 +64,7 @@ export interface ITransferSlice {
   sent: ITransfer[];
   received: ITransfer[];
   pending: IPendingTransfer[];
+  dataBranchReceived: IPendingTransfer[];
   selectedPending: IDetalleSelected | null;
   status: IStatus;
   receivedStatus: IStatus;
@@ -171,7 +172,7 @@ interface InventarioSucursal {
 export interface InventarioSucursalWithPopulated {
   _id: string;
   productoId: Producto;
-  sucursalId: ISucursal;
+  sucursalId: IBranch;
   stock: number;
   precio: Precio;
   ultimo_movimiento: string;
@@ -225,16 +226,4 @@ export interface ITrasladoRecepcion {
   firmaRecepcion: string;
   comentarioRecepcion: string;
   usuarioIdRecibe: string;
-}
-
-export interface ISucursal {
-  _id: string;
-  nombre: string;
-  direccion: string;
-  ciudad: string;
-  pais: string;
-  telefono: string;
-  deleted_at: string | null;
-  createdAt: string;
-  updatedAt: string;
 }

@@ -23,6 +23,7 @@ const initialState: ITransferSlice = {
   data: [],
   sent: [],
   received: [],
+  dataBranchReceived: [],
   pending: [],
   selectedItem: null,
   selectedPending: null,
@@ -50,6 +51,7 @@ export const getAllProductTransfer = createAsyncThunk(
     return response;
   }
 );
+
 export const getPendingTransfers = createAsyncThunk(
   'transfer/getPending',
   async (sucursalId: string, { rejectWithValue }) => {
@@ -67,7 +69,7 @@ export const receiveTransfer = createAsyncThunk(
   async (sucursalId: string, { rejectWithValue }) => {
     try {
       const response = await getAllOrdersReceipts(sucursalId);
-      return response.data;
+      return response;
     } catch (error) {
       return rejectWithValue(handleThunkError(error));
     }
@@ -126,6 +128,9 @@ const transferSlice = createSlice({
     clearTransferData(state) {
       state.data = [];
     },
+    clearTransferDataReceived(state) {
+      state.dataBranchReceived = [];
+    },
     setPendingSelected(state, action: PayloadAction<IDetalleSelected | null>) {
       state.selectedPending = action.payload;
     },
@@ -178,13 +183,18 @@ const transferSlice = createSlice({
           state.pending = payload;
         }
       )
-      .addCase(
-        receiveTransfer.fulfilled,
-        (state, { payload }: PayloadAction<IPendingTransfer[]>) => {
-          state.status = 'succeeded';
-          state.pending = payload;
-        }
-      )
+
+      .addCase(receiveTransfer.pending, (state) => {
+        state.receivedStatus = 'loading';
+      })
+
+      .addCase(receiveTransfer.fulfilled, (state, payload) => {
+        state.status = 'succeeded';
+        state.dataBranchReceived = [
+          ...state.dataBranchReceived,
+          ...(payload.payload as unknown as IPendingTransfer[]),
+        ];
+      })
       .addCase(OrdersReceivedById.fulfilled, (state, { payload }) => {
         state.status = 'succeeded';
 
@@ -222,6 +232,7 @@ export const {
   setPendingSelected,
   setSelectItemDetail,
   updateReceivedStatus,
+  clearTransferDataReceived,
 } = transferSlice.actions;
 
 export const transferReducer = transferSlice.reducer;

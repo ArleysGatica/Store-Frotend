@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Page404 } from '../pages/404';
 import { Layout } from '../shared/components/ui/Layout';
-import { HeaderTable } from '../shared/components/ui/HeaderTable';
+import { HeaderTable } from '../shared/components/ui/TabsListTable/orders';
 import BranchDashboard from '../ui/components/Branches';
 import { DataTableDemo } from '../ui/components/Table';
 import {
@@ -11,10 +11,9 @@ import {
 import RegisterForm from '@/ui/components/Login/RegisterForm';
 import { PagesCategories } from '@/pages/Categories';
 import { Page } from '@/shared/components/ui/Page';
-import { Products } from '@/ui/components/Table/products';
 import { OrdersReceived } from '@/ui/components/OrdersReceived';
 import PendingProductsByTransfer from '@/ui/components/PendingTools/products';
-import { ViewProucts } from '@/ui/components/products';
+import { ViewProucts } from '@/shared/components/ui/TabsListTable/products';
 
 export const Router = () => {
   return (

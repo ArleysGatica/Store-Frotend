@@ -1,8 +1,8 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import ToolShipment from '../../../../ui/components/ToolShipment';
 import PendingTools from '@/ui/components/PendingTools';
-import { ShippedOrders } from '@/ui/components/shippedOrders';
-import { OrdersReceived } from '@/ui/components/OrdersReceived';
+import { ShippedOrders } from '@/ui/components/BranchShipments';
+import { BranchReceived } from '@/ui/components/BranchReceived';
 
 export const HeaderTable = () => {
   return (
@@ -44,7 +44,7 @@ export const HeaderTable = () => {
           <ToolShipment />
         </TabsContent>
         <TabsContent value="branchOrders">
-          <OrdersReceived />
+          <BranchReceived />
         </TabsContent>
         <TabsContent value="branchShipments">
           <ShippedOrders />

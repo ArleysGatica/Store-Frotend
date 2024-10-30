@@ -1,13 +1,12 @@
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
-
 interface SearchAndFilterProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
 }
 
-const SearchAndFilter = ({
+export const SearchAndFilter = ({
   searchTerm,
   setSearchTerm,
 }: SearchAndFilterProps) => {
@@ -28,5 +27,3 @@ const SearchAndFilter = ({
     </div>
   );
 };
-
-export default SearchAndFilter;

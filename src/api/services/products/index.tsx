@@ -16,3 +16,10 @@ export const inventoryGetAll = async (): Promise<AxiosResponse> => {
   const response = await axiosInstance.get('/');
   return response.data;
 };
+
+export const inventoryAllProduct = async (): Promise<ITablaBranch[]> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Inventory);
+  const response: AxiosResponse<ITablaBranch[]> =
+    await axiosInstance.get('/allProduct');
+  return response.data;
+};
