@@ -10,7 +10,7 @@ import {
 import { toast } from '@/components/hooks/use-toast';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
-import { createProduct } from '@/app/slices/products';
+import { createProduct } from '@/app/slices/productsSlice';
 import SearchAndFilter from './sear';
 import ProductsTable from './ProductTable';
 import Pagination from '../../../shared/components/ui/Pagination/Pagination';
@@ -22,6 +22,7 @@ import { IProductoGroups } from '@/api/services/groups';
 export function Products() {
   const user = useAppSelector((state) => state.auth.signIn.user);
   const [products, setProducts] = useState<ITablaBranch[]>([]);
+  const userRoles = useAppSelector((state) => state.auth.signIn.user);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string[]>([
     'active',
@@ -135,6 +136,7 @@ export function Products() {
                 products={currentItems}
                 selectedGroup={selectedGroup}
                 groups={GroupsAll}
+                userRoles={userRoles}
                 handleSelectChange={handleSelectChange}
               />
             )}

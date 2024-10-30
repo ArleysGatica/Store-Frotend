@@ -11,7 +11,7 @@ import { useParams } from 'react-router-dom';
 import { toast } from '@/components/hooks/use-toast';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
-import { createProduct } from '@/app/slices/products';
+import { createProduct } from '@/app/slices/productsSlice';
 import SearchAndFilter from './sear';
 import ProductsTable from './ProductTable';
 import Pagination from '../../../shared/components/ui/Pagination/Pagination';

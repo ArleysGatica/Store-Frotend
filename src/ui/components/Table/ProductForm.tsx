@@ -60,7 +60,6 @@ const ProductForm = ({
       });
     }
   }, [initialData]);
-  console.log(initialData, formData, 'initialData');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
