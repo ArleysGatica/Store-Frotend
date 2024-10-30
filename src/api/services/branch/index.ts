@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { createAxiosInstance, PATH_LIST } from '../axios';
 import { Token } from '../../../shared/hooks/useJWT';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { IProductShortage, ITablaBranch } from '@/interfaces/branchInterfaces';
 
 interface IBranch {
   nombre: string;
@@ -28,6 +28,12 @@ export const getAll = async (): Promise<AxiosResponse> => {
 export const getBranchesById = async (id: string): Promise<ITablaBranch[]> => {
   const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Branch);
   const response = await axiosInstance.get(`/${id}/products`);
+  return response.data;
+};
+
+export const getForStockProductsAtBranch = async (id: string): Promise<IProductShortage[]> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Branch);
+  const response = await axiosInstance.get(`/${id}/products-shortages`);
   return response.data;
 };
 
