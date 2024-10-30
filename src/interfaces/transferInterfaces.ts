@@ -167,6 +167,18 @@ interface InventarioSucursal {
   update_at: string;
 }
 
+export interface InventarioSucursalWithPopulated {
+  _id: string;
+  productoId: Producto;
+  sucursalId: ISucursal;
+  stock: number;
+  precio: Precio;
+  ultimo_movimiento: string;
+  deleted_at: string | null;
+  created_at: string;
+  update_at: string;
+}
+
 export interface ListItemDePedido {
   _id: string;
   inventarioSucursalId: InventarioSucursal;
@@ -181,4 +193,16 @@ export interface ListItemDePedido {
 export interface IDetalleSelected {
   traslado?: IPendingTransfer;
   listItemDePedido: ListItemDePedido[];
+}
+
+export interface ISucursal {
+  _id: string;
+  nombre: string;
+  direccion: string;
+  ciudad: string;
+  pais: string;
+  telefono: string;
+  deleted_at: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
