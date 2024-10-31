@@ -12,7 +12,7 @@ import {
   inventoryUpdateProduct,
 } from '@/api/services/products';
 import { IStatus, ITablaBranch } from '@/interfaces/branchInterfaces';
-import { InventarioSucursal } from '@/interfaces/transferInterfaces';
+import { InventarioSucursal, IProductInTransit } from '@/interfaces/transferInterfaces';
 
 export const createProduct = createAsyncThunk(
   'products/create',
@@ -83,7 +83,7 @@ export const fetchAllProducts = createAsyncThunk<
 interface ProductState {
   products: ITablaBranch[];
   error: string | null;
-  transitProducts: InventarioSucursal[];
+  transitProducts: IProductInTransit[];
   status: IStatus;
 }
 
@@ -122,7 +122,7 @@ const productsSlice = createSlice({
       .addCase(productsTransit.fulfilled, (state, { payload }) => {
         state.status = 'succeeded';
         console.log(payload, 'data');
-        state.transitProducts = payload as unknown as InventarioSucursal[];
+        state.transitProducts = payload as unknown as IProductInTransit[];
       })
       .addCase(updateProduct.pending, (state) => {
         state.status = 'loading';

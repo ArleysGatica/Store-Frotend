@@ -14,7 +14,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { InventarioSucursal } from '@/interfaces/transferInterfaces';
+import { IProductInTransit } from '@/interfaces/transferInterfaces';
+import { getFormatedDate } from '@/shared/helpers/transferHelper';
 
 interface IUserRole {
   _id: string;
@@ -24,7 +25,7 @@ interface IUserRole {
 }
 
 interface ProductsTableProps {
-  products: InventarioSucursal[];
+  products: IProductInTransit[];
   userRoles?: IUserRole | undefined;
 }
 
@@ -35,7 +36,9 @@ const ProductsTable = ({ products }: ProductsTableProps) => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Consecutivo</TableHead>
             <TableHead>Name</TableHead>
+            <TableHead className="w-fit">Sucursal de Destino</TableHead>
             <TableHead className="w-fit">Description</TableHead>
             <TableHead>Ultimo Movimiento</TableHead>
             <TableHead>Stock</TableHead>
@@ -44,21 +47,27 @@ const ProductsTable = ({ products }: ProductsTableProps) => {
         </TableHeader>
         <TableBody>
           {products?.map((product) => (
-            <TableRow key={product._id}>
+            <TableRow key={product.id}>
               <TableCell className="font-medium">
-                {product?.productoId?.nombre}
+                {product.consucutivoPedido}
+              </TableCell>
+              <TableCell className="font-medium">
+                {product.nombre}
+              </TableCell>
+              <TableCell className="font-medium">
+                {product.sucursalDestino}
               </TableCell>
               <TooltipProvider>
                 <Tooltip>
-                  <TooltipTrigger className="w-64 overflow-hidden whitespace-nowrap text-ellipsis">
-                    {product.productoId?.descripcion}
+                  <TooltipTrigger className="w-64 overflow-hidden whitespace-nowrap text-ellipsis text-center">
+                    {product.descripcion}
                   </TooltipTrigger>
                   <TooltipContent>
-                    {product.productoId?.descripcion}
+                    {product.descripcion}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              <TableCell>{product.ultimo_movimiento}</TableCell>
+              <TableCell>{getFormatedDate(new Date(product.ultimoMovimiento))}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>{`$${product.precio.$numberDecimal}`}</TableCell>
             </TableRow>
