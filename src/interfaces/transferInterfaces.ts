@@ -178,7 +178,7 @@ export interface IProductInTransit {
   monedaId: string;
   consucutivoPedido: string;
   id: string;
-  sucursalDestino:string;
+  sucursalDestino: string;
 }
 
 export interface InventarioSucursalWithPopulated {
@@ -202,6 +202,7 @@ export interface ListItemDePedido {
   comentarioRecepcion: string | null;
   comentarioEnvio: string | null;
   recibido?: boolean;
+  regresado?: boolean;
 }
 
 export interface IDetalleSelected {
