@@ -13,7 +13,8 @@ import {
   handleAsyncThunkError,
   handleThunkError,
 } from '../../shared/utils/errorHandlers';
-import { IProductShortage, ITablaBranch } from '@/interfaces/branchInterfaces';
+import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
 
 export interface Branch {
   _id?: string;
@@ -37,7 +38,7 @@ interface BranchState {
 }
 
 const initialState: BranchState = {
-  data: [], // Inicializar como un arreglo vacío
+  data: [],
   selectedBranch: null,
   loading: false,
   error: null,
@@ -55,11 +56,15 @@ export const fetchBranchesById = createAsyncThunk<ITablaBranch[], string>(
   }
 );
 
-export const searchForStockProductsAtBranch = createAsyncThunk<IProductShortage[], string>(
+export const searchForStockProductsAtBranch = createAsyncThunk<
+  InventarioSucursalWithPopulated[],
+  string
+>(
   'branches/searchForStockProductsAtBranch',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response: IProductShortage[] = await getForStockProductsAtBranch(id);
+      const response: InventarioSucursalWithPopulated[] =
+        await getForStockProductsAtBranch(id);
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Error desconocido');

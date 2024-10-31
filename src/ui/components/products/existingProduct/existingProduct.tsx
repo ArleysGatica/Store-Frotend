@@ -17,10 +17,13 @@ import {
 import { ProductsTable } from './Table';
 import { SearchComponent } from '@/shared/components/ui/Search';
 import { GetBranches } from '@/shared/helpers/Branchs';
+import { InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
 
 export function ExistingProductAdd() {
   const user = useAppSelector((state) => state.auth.signIn.user);
-  const [products, setProducts] = useState<ITablaBranch[]>([]);
+  const [products, setProducts] = useState<InventarioSucursalWithPopulated[]>(
+    []
+  );
   const branches = useAppSelector((state) => state.branches.data);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +66,7 @@ export function ExistingProductAdd() {
   }, []);
 
   const filteredProducts = products.filter((product) =>
-    product.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+    product.productoId.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const indexOfLastItem = currentPage * itemsPerPage;

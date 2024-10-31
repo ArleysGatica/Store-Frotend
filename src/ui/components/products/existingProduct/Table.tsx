@@ -21,6 +21,7 @@ import { useState } from 'react';
 import { Branch } from '@/app/slices/branchSlice';
 import { store } from '@/app/store';
 import { updateProduct } from '@/app/slices/productsSlice';
+import { InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
 
 interface IUserRole {
   _id: string;
@@ -30,7 +31,7 @@ interface IUserRole {
 }
 
 interface ProductsTableProps {
-  products: ITablaBranch[];
+  products: InventarioSucursalWithPopulated[];
   userRoles?: IUserRole | undefined;
   branches: Branch[];
   handleSelectChangeBranch: (value: string) => void;
@@ -48,17 +49,17 @@ export const ProductsTable = ({
   handleSelectChangeBranch,
 }: ProductsTableProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<ITablaBranch | null>(
-    null
-  );
+  const [editingProduct, setEditingProduct] =
+    useState<InventarioSucursalWithPopulated | null>(null);
 
-  const handleAddToBranch = (product: ITablaBranch) => {
+  const handleAddToBranch = (product: InventarioSucursalWithPopulated) => {
     setEditingProduct(product);
     setIsEditing(true);
   };
 
-  const handleSubmit = (data: ITablaBranch) => {
-    store.dispatch(updateProduct(data?.id!)).unwrap();
+  const handleSubmit = (data: InventarioSucursalWithPopulated) => {
+    store.dispatch(updateProduct(data?.productoId._id!)).unwrap();
+    console.log(data, 'data');
   };
   console.log(products, 'data');
 
@@ -68,6 +69,7 @@ export const ProductsTable = ({
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
+            <TableHead>Categoria</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Stock</TableHead>
             <TableHead>Price</TableHead>
@@ -80,10 +82,13 @@ export const ProductsTable = ({
         </TableHeader>
         <TableBody>
           {products?.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell className="font-medium">{product.nombre}</TableCell>
-              <TableCell>{product.descripcion}</TableCell>
-              <TableCell>{product.stock}</TableCell>
+            <TableRow key={product._id}>
+              <TableCell className="font-medium">
+                {product?.productoId.nombre}
+              </TableCell>
+              <TableCell>{product?.sucursalId.nombre}</TableCell>
+              <TableCell>{product?.productoId.descripcion}</TableCell>
+              <TableCell>{product?.stock}</TableCell>
               <TableCell>${product?.precio?.$numberDecimal}</TableCell>
               <TableCell>
                 {userRoles?.role !== 'admin' && (

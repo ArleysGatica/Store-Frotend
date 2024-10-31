@@ -20,6 +20,7 @@ import { IBranch, ITablaBranch } from '@/interfaces/branchInterfaces';
 import ProductForm from './ProductForm';
 import { IProductoGroups } from '@/api/services/groups';
 import { IRoles } from '@/app/slices/login';
+import { getFormatedDate } from '@/shared/helpers/transferHelper';
 
 interface ProductsTableProps {
   products: ITablaBranch[];
@@ -62,11 +63,10 @@ const ProductsTable = ({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>ID</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Description</TableHead>
-            <TableHead>Created at</TableHead>
-            <TableHead>Updated at</TableHead>
             <TableHead>In Stock</TableHead>
             {userRoles?.role !== 'admin' && (
               <TableHead>
@@ -78,11 +78,10 @@ const ProductsTable = ({
         <TableBody>
           {products?.map((product) => (
             <TableRow key={product.id}>
+              <TableCell>{product.id}</TableCell>
               <TableCell className="font-medium">{product.nombre}</TableCell>
               <TableCell>${product.precio.$numberDecimal}</TableCell>
               <TableCell>{product.descripcion}</TableCell>
-              <TableCell>{product.createdAt}</TableCell>
-              <TableCell className="font-medium">{product.updatedAt}</TableCell>
               <TableCell>{product?.stock || '0'}</TableCell>
               <TableCell>
                 {userRoles?.role !== 'admin' && (

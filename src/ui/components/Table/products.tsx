@@ -60,8 +60,6 @@ export function Products() {
   const handleAddProduct = (newProduct: ITablaBranch) => {
     const product: ITablaBranch = {
       ...newProduct,
-      createdAt: new Date().toISOString().split('T')[0],
-      updatedAt: new Date().toISOString().split('T')[0],
     };
     store.dispatch(createProduct(product));
     setProducts((prevProducts) => [...prevProducts, product]);

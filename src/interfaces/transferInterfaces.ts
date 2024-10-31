@@ -186,7 +186,7 @@ export interface InventarioSucursalWithPopulated {
   productoId: Producto;
   sucursalId: IBranch;
   stock: number;
-  precio: Precio;
+  precio: { $numberDecimal: number };
   ultimo_movimiento: string;
   deleted_at: string | null;
   created_at: string;
