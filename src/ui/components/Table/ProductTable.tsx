@@ -20,7 +20,8 @@ import { IBranch, ITablaBranch } from '@/interfaces/branchInterfaces';
 import ProductForm from './ProductForm';
 import { IProductoGroups } from '@/api/services/groups';
 import { IRoles } from '@/app/slices/login';
-import { getFormatedDate } from '@/shared/helpers/transferHelper';
+import { store } from '@/app/store';
+import { removeProduct } from '@/app/slices/transferSlice';
 
 interface ProductsTableProps {
   products: ITablaBranch[];
@@ -56,6 +57,10 @@ const ProductsTable = ({
     console.log('Product updated:', updatedProduct);
     setIsEditing(false);
     setEditingProduct(null);
+  };
+
+  const handleOnDelete = (id: string) => {
+    store.dispatch(removeProduct(id));
   };
 
   return (
@@ -98,7 +103,11 @@ const ProductsTable = ({
                       <span className="sr-only">Edit</span>
                     </Button>
 
-                    <Button variant="ghost" size="sm">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleOnDelete(product?.id!)}
+                    >
                       <Trash className="h-4 w-4" />
                       <span className="sr-only">Delete</span>
                     </Button>

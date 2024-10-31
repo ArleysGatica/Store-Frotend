@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import {
   handleAsyncThunkError,
@@ -13,10 +13,7 @@ import {
   inventoryUpdateProduct,
 } from '@/api/services/products';
 import { IStatus, ITablaBranch } from '@/interfaces/branchInterfaces';
-import {
-  InventarioSucursal,
-  IProductInTransit,
-} from '@/interfaces/transferInterfaces';
+import { IProductInTransit } from '@/interfaces/transferInterfaces';
 
 export const createProduct = createAsyncThunk(
   'products/create',
@@ -114,6 +111,9 @@ const productsSlice = createSlice({
   name: 'products',
   initialState,
   reducers: {
+    updateStatus: (state, action: PayloadAction<IStatus>) => {
+      state.status = action.payload;
+    },
     clearProducts: (state) => {
       state.products = [];
     },

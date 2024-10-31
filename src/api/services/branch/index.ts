@@ -47,7 +47,7 @@ export const updateBranch = async (branch: IBranch, id: string) => {
 };
 
 export const deleteBranchById = async (id: string): Promise<AxiosResponse> => {
-  const axiosInstance = createAxiosInstance(PATH_LIST.Branch, '');
+  const axiosInstance = createAxiosInstance(PATH_LIST.Branch, Token());
   const response = await axiosInstance.delete(`/${id}`);
   return response;
 };
