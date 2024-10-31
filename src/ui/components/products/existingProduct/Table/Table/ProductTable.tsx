@@ -15,16 +15,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Pencil, Trash } from 'lucide-react';
+import { Pencil, PlusCircle, Trash } from 'lucide-react';
 import { IBranch, ITablaBranch } from '@/interfaces/branchInterfaces';
 import ProductForm from './ProductForm';
 import { IProductoGroups } from '@/api/services/groups';
 import { IRoles } from '@/app/slices/login';
+import { getFormatedDate } from '@/shared/helpers/transferHelper';
+import { InventarioSucursal, InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
 import { store } from '@/app/store';
-import { removeProduct } from '@/app/slices/transferSlice';
+import { createProduct, updateProduct } from '@/app/slices/productsSlice';
+import { inventoryUpdateProduct } from '@/api/services/products';
 
 interface ProductsTableProps {
-  products: ITablaBranch[];
+  products: InventarioSucursalWithPopulated[];
   handleSelectChange: (value: string) => void;
   selectedGroup: {
     nombre: string;
@@ -48,20 +51,39 @@ const ProductsTable = ({
   groups,
   userRoles,
 }: ProductsTableProps) => {
-  const [editingProduct, setEditingProduct] = useState<ITablaBranch | null>(
+  const [editingProduct, setEditingProduct] = useState<InventarioSucursal | null>(
     null
   );
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleEditProduct = (updatedProduct: ITablaBranch) => {
-    console.log('Product updated:', updatedProduct);
-    setIsEditing(false);
-    setEditingProduct(null);
+  const data = {
+    productos: products.map((product) => ({
+      nombre: product.productoId.nombre,
+      descripcion: product.productoId.descripcion,
+      precio: product?.precio?.$numberDecimal ?? 0,
+      stock: product.stock,
+    })),
+    sucursalId: userRoles?.sucursalId?._id ?? '',
   };
 
-  const handleOnDelete = (id: string) => {
-    store.dispatch(removeProduct(id));
+  console.log(data, 'data');
+
+  const handleEditProduct = (updatedProduct: ITablaBranch) => {
+    setIsEditing(false);
+    setEditingProduct(null);
+
+    store.dispatch(updateProduct(updatedProduct)).unwrap();
   };
+
+  const handleAddToBranchOnly = (product: InventarioSucursal) => {
+    setEditingProduct(product);
+    setIsEditing(true);
+  };
+
+  console.log(
+    products.map((product) => product.productoId._id),
+    'product'
+  );
 
   return (
     <>
@@ -82,37 +104,25 @@ const ProductsTable = ({
         </TableHeader>
         <TableBody>
           {products?.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell>{product.id}</TableCell>
-              <TableCell className="font-medium">{product.nombre}</TableCell>
+            <TableRow key={product.productoId._id}>
+              <TableCell>{product.productoId._id}</TableCell>
+              <TableCell className="font-medium">
+                {product.productoId.nombre}
+              </TableCell>
               <TableCell>${product.precio.$numberDecimal}</TableCell>
-              <TableCell>{product.descripcion}</TableCell>
+              <TableCell>{product.productoId.descripcion}</TableCell>
               <TableCell>{product?.stock || '0'}</TableCell>
               <TableCell>
-                {userRoles?.role !== 'admin' && (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEditingProduct(product);
-                        setIsEditing(true);
-                      }}
-                    >
-                      <Pencil className="h-4 w-4" />
-                      <span className="sr-only">Edit</span>
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleOnDelete(product?.id!)}
-                    >
-                      <Trash className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </div>
-                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    handleAddToBranchOnly(product as unknown as InventarioSucursal)
+                  }
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  Agregar a sucursal
+                </Button>
               </TableCell>
             </TableRow>
           ))}

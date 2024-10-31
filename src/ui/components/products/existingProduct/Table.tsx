@@ -58,7 +58,7 @@ export const ProductsTable = ({
   };
 
   const handleSubmit = (data: InventarioSucursalWithPopulated) => {
-    store.dispatch(updateProduct(data?.productoId._id!)).unwrap();
+    // store.dispatch(updateProduct(data?.productoId._id!)).unwrap();
     console.log(data, 'data');
   };
   console.log(products, 'data');

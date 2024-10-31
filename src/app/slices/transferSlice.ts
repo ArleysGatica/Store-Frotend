@@ -12,6 +12,7 @@ import {
 import {
   createReceiveTransfer,
   createTransfer,
+  deleteProduct,
   fetchPendingTransfers,
   getAllOrdersReceipts,
   getAllOrdersReceivedById,
@@ -118,6 +119,18 @@ export const returnProducts = createAsyncThunk(
   async (transferId: string, { rejectWithValue }) => {
     try {
       const response = await returnProductsShipping(transferId);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
+export const removeProduct = createAsyncThunk(
+  'transfer/deleteProduct',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await deleteProduct(id);
       return response.data;
     } catch (error) {
       return rejectWithValue(handleThunkError(error));
@@ -234,6 +247,12 @@ const transferSlice = createSlice({
       .addCase(createProductReceived.fulfilled, (state, { payload }) => {
         state.received = [...state.received, payload];
         state.receivedStatus = 'succeeded';
+      })
+      .addCase(removeProduct.fulfilled, (state, { payload }) => {
+        console.log(payload, 'payload');
+        state.dataBranchReceived = state.dataBranchReceived.filter(
+          (item) => item._id !== payload
+        );
       });
   },
 });

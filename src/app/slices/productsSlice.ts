@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import {
   handleAsyncThunkError,
@@ -6,13 +6,14 @@ import {
 } from '../../shared/utils/errorHandlers';
 import {
   createTablaBranch,
+  findProductoGrupoByProductId,
   inventoryAllProduct,
   inventoryGetAll,
   inventoryGetProdutsTransit,
   inventoryUpdateProduct,
 } from '@/api/services/products';
 import { IStatus, ITablaBranch } from '@/interfaces/branchInterfaces';
-import { InventarioSucursal, IProductInTransit } from '@/interfaces/transferInterfaces';
+import { IProductInTransit } from '@/interfaces/transferInterfaces';
 
 export const createProduct = createAsyncThunk(
   'products/create',
@@ -57,9 +58,21 @@ export const productsTransit = createAsyncThunk(
 
 export const updateProduct = createAsyncThunk(
   'products/update',
-  async (product: string, { rejectWithValue }) => {
+  async (product: ITablaBranch, { rejectWithValue }) => {
     try {
       const response = await inventoryUpdateProduct(product);
+      return response;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
+export const findProductoGrupoByProductIdAC = createAsyncThunk(
+  'products/producto-grupo',
+  async (productId: string, { rejectWithValue }) => {
+    try {
+      const response = await findProductoGrupoByProductId(productId);      
       return response;
     } catch (error) {
       return rejectWithValue(handleThunkError(error));
@@ -98,6 +111,9 @@ const productsSlice = createSlice({
   name: 'products',
   initialState,
   reducers: {
+    updateStatus: (state, action: PayloadAction<IStatus>) => {
+      state.status = action.payload;
+    },
     clearProducts: (state) => {
       state.products = [];
     },

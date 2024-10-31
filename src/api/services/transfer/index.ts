@@ -62,3 +62,9 @@ export const returnProductsShipping = async (
   const response = await axiosInstance.get(`/${transferId}/devolver-producto`);
   return response;
 };
+
+export const deleteProduct = async (id: string): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Inventory);
+  const response = await axiosInstance.delete(`/${id}`);
+  return response;
+};
