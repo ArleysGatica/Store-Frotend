@@ -6,6 +6,7 @@ import {
 } from '../../shared/utils/errorHandlers';
 import {
   createTablaBranch,
+  findProductoGrupoByProductId,
   inventoryAllProduct,
   inventoryGetAll,
   inventoryGetProdutsTransit,
@@ -63,6 +64,18 @@ export const updateProduct = createAsyncThunk(
   async (product: ITablaBranch, { rejectWithValue }) => {
     try {
       const response = await inventoryUpdateProduct(product);
+      return response;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
+export const findProductoGrupoByProductIdAC = createAsyncThunk(
+  'products/producto-grupo',
+  async (productId: string, { rejectWithValue }) => {
+    try {
+      const response = await findProductoGrupoByProductId(productId);      
       return response;
     } catch (error) {
       return rejectWithValue(handleThunkError(error));

@@ -60,3 +60,8 @@ export interface ITablaBranch {
   grupoNombre?: string;
   ultimo_movimiento?: string;
 }
+
+export interface IProductosGrupos {
+  productoId: string;
+  grupoId: IProductoGroups;
+}
