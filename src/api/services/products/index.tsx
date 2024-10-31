@@ -31,3 +31,11 @@ export const inventoryGetProdutsTransit = async (
   const response = await axiosInstance.get(`/${sucursalId}/transit`);
   return response.data;
 };
+
+export const inventoryUpdateProduct = async (
+  sucursalId: string
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Inventory);
+  const response = await axiosInstance.put(`/${sucursalId}`);
+  return response.data;
+};

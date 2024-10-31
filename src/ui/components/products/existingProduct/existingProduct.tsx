@@ -4,23 +4,50 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
 } from '@/components/ui/card';
-import { IProductShortage } from '@/interfaces/branchInterfaces';
+import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
 import Pagination from '../../../../shared/components/ui/Pagination/Pagination';
 import { useAppSelector } from '@/app/hooks';
-import { searchForStockProductsAtBranch } from '@/app/slices/branchSlice';
-import ProductsTable from './Table';
-import { SearchAndFilter } from '@/shared/components/ui/Search';
+import {
+  fetchBranches,
+  searchForStockProductsAtBranch,
+} from '@/app/slices/branchSlice';
+import { ProductsTable } from './Table';
+import { SearchComponent } from '@/shared/components/ui/Search';
+import { GetBranches } from '@/shared/helpers/Branchs';
 
 export function ExistingProductAdd() {
   const user = useAppSelector((state) => state.auth.signIn.user);
-  const [products, setProducts] = useState<IProductShortage[]>([]);
+  const [products, setProducts] = useState<ITablaBranch[]>([]);
+  const branches = useAppSelector((state) => state.branches.data);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [selectedBranch, setSelectedBranch] = useState<{
+    nombre: string;
+    _id: string;
+  } | null>(null);
+  const [, setBranchs] = useState<ITablaBranch[]>([]);
+  console.log(selectedBranch, 'selectedBranch');
+  const fetchDataBranch = async () => {
+    if (!selectedBranch) return;
+    const response = await GetBranches(selectedBranch._id);
+    setBranchs(response);
+  };
+  const handleSelectChangeBranch = (value: string) => {
+    const branch = branches.find((b) => b._id === value);
+    if (branch) {
+      setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
+    }
+  };
+  useEffect(() => {
+    store.dispatch(fetchBranches()).unwrap();
+    if (selectedBranch) {
+      fetchDataBranch();
+    }
+  }, [selectedBranch]);
 
   const fetchData = async () => {
     if (user?.sucursalId) {
@@ -28,8 +55,6 @@ export function ExistingProductAdd() {
         .dispatch(searchForStockProductsAtBranch(user.sucursalId._id))
         .unwrap();
       setProducts(response);
-    } else {
-      console.log('admin user debe obtener productos generales');
     }
   };
 
@@ -47,6 +72,7 @@ export function ExistingProductAdd() {
     indexOfFirstItem,
     indexOfLastItem
   );
+
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   return (
@@ -55,12 +81,9 @@ export function ExistingProductAdd() {
         <Card>
           <CardHeader>
             <CardTitle>Products</CardTitle>
-            <CardDescription>
-              Manage your products and view their sales performance.
-            </CardDescription>
           </CardHeader>
           <CardContent>
-            <SearchAndFilter
+            <SearchComponent
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
             />
@@ -69,7 +92,12 @@ export function ExistingProductAdd() {
                 No hay productos en esta sucursal
               </span>
             ) : (
-              <ProductsTable products={currentItems} />
+              <ProductsTable
+                selectedBranch={selectedBranch}
+                branches={branches}
+                products={currentItems}
+                handleSelectChangeBranch={handleSelectChangeBranch}
+              />
             )}
           </CardContent>
           <CardFooter className="flex items-center justify-between">

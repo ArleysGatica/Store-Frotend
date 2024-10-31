@@ -9,6 +9,7 @@ import {
   inventoryAllProduct,
   inventoryGetAll,
   inventoryGetProdutsTransit,
+  inventoryUpdateProduct,
 } from '@/api/services/products';
 import { IStatus, ITablaBranch } from '@/interfaces/branchInterfaces';
 import { InventarioSucursal } from '@/interfaces/transferInterfaces';
@@ -47,6 +48,18 @@ export const productsTransit = createAsyncThunk(
   async (sucursalId: string, { rejectWithValue }) => {
     try {
       const response = await inventoryGetProdutsTransit(sucursalId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
+export const updateProduct = createAsyncThunk(
+  'products/update',
+  async (product: string, { rejectWithValue }) => {
+    try {
+      const response = await inventoryUpdateProduct(product);
       return response;
     } catch (error) {
       return rejectWithValue(handleThunkError(error));
@@ -110,6 +123,9 @@ const productsSlice = createSlice({
         state.status = 'succeeded';
         console.log(payload, 'data');
         state.transitProducts = payload as unknown as InventarioSucursal[];
+      })
+      .addCase(updateProduct.pending, (state) => {
+        state.status = 'loading';
       });
   },
 });
