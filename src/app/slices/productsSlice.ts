@@ -12,7 +12,10 @@ import {
   inventoryUpdateProduct,
 } from '@/api/services/products';
 import { IStatus, ITablaBranch } from '@/interfaces/branchInterfaces';
-import { InventarioSucursal, IProductInTransit } from '@/interfaces/transferInterfaces';
+import {
+  InventarioSucursal,
+  IProductInTransit,
+} from '@/interfaces/transferInterfaces';
 
 export const createProduct = createAsyncThunk(
   'products/create',
@@ -57,7 +60,7 @@ export const productsTransit = createAsyncThunk(
 
 export const updateProduct = createAsyncThunk(
   'products/update',
-  async (product: string, { rejectWithValue }) => {
+  async (product: ITablaBranch, { rejectWithValue }) => {
     try {
       const response = await inventoryUpdateProduct(product);
       return response;

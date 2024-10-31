@@ -33,9 +33,9 @@ export const inventoryGetProdutsTransit = async (
 };
 
 export const inventoryUpdateProduct = async (
-  sucursalId: string
+  branch: ITablaBranch
 ): Promise<AxiosResponse> => {
   const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Inventory);
-  const response = await axiosInstance.put(`/${sucursalId}`);
+  const response = await axiosInstance.post('/', branch);
   return response.data;
 };
