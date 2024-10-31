@@ -169,6 +169,18 @@ export interface InventarioSucursal {
   update_at: string;
 }
 
+export interface IProductInTransit {
+  nombre: string;
+  descripcion: string;
+  ultimoMovimiento: string;
+  stock: number;
+  precio: Precio;
+  monedaId: string;
+  consucutivoPedido: string;
+  id: string;
+  sucursalDestino:string;
+}
+
 export interface InventarioSucursalWithPopulated {
   _id: string;
   productoId: Producto;

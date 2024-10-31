@@ -77,7 +77,7 @@ export const ProductsTransit = () => {
   };
 
   const filteredProducts = dataAllProducts?.filter((product) =>
-    product?.productoId.nombre
+    product.nombre
       ?.toLowerCase()
       ?.includes(searchTerm.toLowerCase())
   );
