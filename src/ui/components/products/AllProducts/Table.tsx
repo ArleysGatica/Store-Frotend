@@ -49,7 +49,7 @@ const ProductsTable = ({ products, userRoles }: ProductsTableProps) => {
         </TableHeader>
         <TableBody>
           {products?.map((product) => (
-            <TableRow key={product.id}>
+            <TableRow key={product.inventarioSucursalId}>
               <TableCell className="font-medium">{product?.nombre}</TableCell>
               <TooltipProvider>
                 <Tooltip>

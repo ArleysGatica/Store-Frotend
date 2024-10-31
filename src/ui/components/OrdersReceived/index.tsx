@@ -72,8 +72,8 @@ export const OrdersReceived = () => {
                   <TableCell>Precio</TableCell>
                   <TableCell>Stock</TableCell>
                   <TableCell>Recibido</TableCell>
-                  <TableCell>Acciones</TableCell>
                   <TableCell>Estatus</TableCell>
+                  {<TableCell>Acciones</TableCell>}
                 </TableRow>
               </TableHeader>
               <TableBody>

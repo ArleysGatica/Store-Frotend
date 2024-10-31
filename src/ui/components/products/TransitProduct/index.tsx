@@ -77,9 +77,7 @@ export const ProductsTransit = () => {
   };
 
   const filteredProducts = dataAllProducts?.filter((product) =>
-    product.nombre
-      ?.toLowerCase()
-      ?.includes(searchTerm.toLowerCase())
+    product.nombre?.toLowerCase()?.includes(searchTerm.toLowerCase())
   );
 
   const indexOfLastItem = currentPage * itemsPerPage;

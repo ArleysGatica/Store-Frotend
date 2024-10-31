@@ -54,3 +54,11 @@ export const createReceiveTransfer = async ({
   const response = await axiosInstance.post('/RecibirPedido', transfer);
   return response;
 };
+
+export const returnProductsShipping = async (
+  transferId: string
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Transfer);
+  const response = await axiosInstance.get(`/${transferId}/devolver-producto`);
+  return response;
+};

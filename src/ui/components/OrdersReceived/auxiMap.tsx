@@ -1,3 +1,5 @@
+import { returnProducts } from '@/app/slices/transferSlice';
+import { store } from '@/app/store';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
@@ -24,6 +26,24 @@ export const AuxiliarMap = ({ dataTable, dataAuxiliar }: IOrder) => {
   const originBranch = dataAuxiliar?.sucursalOrigenId.nombre;
   const destinationBranch = dataAuxiliar?.sucursalDestinoId.nombre;
 
+  const handleReturnProducts = async (id: string) => {
+    await store.dispatch(returnProducts(id));
+    dataTable.regresado = true;
+  };
+
+  const getBadgeVariant = () => {
+    if (dataTable.regresado) return 'secondary';
+    if (dataTable.recibido) return 'secondary';
+    return 'default';
+  };
+
+  const getStatusLabel = () => {
+    if (dataTable.regresado) return 'Regresado';
+    if (dataTable.recibido !== true) return 'Sin recibir';
+    if (dataTable.recibido) return 'Recibido';
+    return 'Pendiente';
+  };
+
   return (
     <TableRow key={dataTable._id}>
       <TableCell>
@@ -36,25 +56,36 @@ export const AuxiliarMap = ({ dataTable, dataAuxiliar }: IOrder) => {
           </Tooltip>
         </TooltipProvider>
       </TableCell>
-
       <TableCell>{dataTable.inventarioSucursalId.productoId.nombre}</TableCell>
       <TableCell>
         {dataTable.inventarioSucursalId.precio.$numberDecimal}
       </TableCell>
-      <TableCell> {dataTable.cantidad}</TableCell>
+      <TableCell>{dataTable.cantidad}</TableCell>
       <TableCell>
-        <Badge
-          variant={
-            dataTable.recibido === true
-              ? 'secondary'
-              : dataTable.recibido === false
-                ? 'default'
-                : 'outline'
-          }
-        >
-          {dataTable.recibido === true ? 'Recibido' : 'Sin Recibir'}
-        </Badge>
+        <Badge variant={getBadgeVariant()}>{getStatusLabel()}</Badge>
       </TableCell>
+      {
+        <TableCell>
+          <div className="flex items-center justify-center gap-2">
+            {!dataTable.regresado ? (
+              <div className="flex items-center justify-center gap-2">
+                {!dataTable.recibido && (
+                  <Button
+                    size="sm"
+                    className="text-white"
+                    onClick={() => handleReturnProducts(dataTable._id)}
+                  >
+                    Regresar Producto
+                    <CornerDownLeft />
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <span>-</span>
+            )}
+          </div>
+        </TableCell>
+      }
       <TableCell>
         <Dialog>
           <DialogTrigger>
@@ -77,16 +108,6 @@ export const AuxiliarMap = ({ dataTable, dataAuxiliar }: IOrder) => {
             />
           </DialogContent>
         </Dialog>
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center justify-center gap-2">
-          {dataTable.recibido !== true && (
-            <Button size="sm" className="text-white">
-              Regresar Producto
-              <CornerDownLeft />
-            </Button>
-          )}
-        </div>
       </TableCell>
     </TableRow>
   );

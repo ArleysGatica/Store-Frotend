@@ -12,10 +12,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Branch } from '@/app/slices/branchSlice';
+import { InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
 
 interface ProductFormProps {
-  initialData?: ITablaBranch;
-  onSubmit: (data: ITablaBranch) => void;
+  initialData?: InventarioSucursalWithPopulated;
+  onSubmit: (data: InventarioSucursalWithPopulated) => void;
   selectedBranch: {
     nombre: string;
     _id: string;
@@ -48,8 +49,8 @@ export const ProductFormExist = ({
 }: ProductFormProps) => {
   const [formData, setFormData] = useState({
     sucursalId: selectedBranch?._id || '',
-    nombre: initialData?.nombre || '',
-    descripcion: initialData?.descripcion || '',
+    nombre: initialData?.productoId.nombre || '',
+    descripcion: initialData?.productoId.descripcion || '',
     precio: initialData?.precio?.$numberDecimal || '',
     stock: initialData?.stock ?? 0,
     grupoId: '',
@@ -63,13 +64,13 @@ export const ProductFormExist = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const productData: ITablaBranch = {
+    const productData: InventarioSucursalWithPopulated = {
       ...initialData,
       grupoId: '',
       monedaId: '671342d4664051db7c1f8792',
-      sucursalId: selectedBranch?._id || '',
-      nombre: formData.nombre,
-      descripcion: formData.descripcion,
+      //   sucursalId: selectedBranch?._id || '',
+      nombre: formData.nombre || '',
+      descripcion: formData.descripcion || '',
       //@ts-ignore
       precio: parseFloat(formData.precio?.toString() ?? '0'),
       stock: parseInt(formData.stock.toString()),

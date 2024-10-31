@@ -16,6 +16,7 @@ import {
   getAllOrdersReceipts,
   getAllOrdersReceivedById,
   getAllTransfer,
+  returnProductsShipping,
 } from '@/api/services/transfer';
 import { IStatus } from '@/interfaces/branchInterfaces';
 
@@ -105,6 +106,18 @@ export const createProductReceived = createAsyncThunk(
   async (transfer: ITrasladoRecepcion, { rejectWithValue }) => {
     try {
       const response = await createReceiveTransfer(transfer);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
+export const returnProducts = createAsyncThunk(
+  'transfer/returnProductsShipping',
+  async (transferId: string, { rejectWithValue }) => {
+    try {
+      const response = await returnProductsShipping(transferId);
       return response.data;
     } catch (error) {
       return rejectWithValue(handleThunkError(error));
