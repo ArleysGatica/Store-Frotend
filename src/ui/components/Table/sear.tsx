@@ -1,10 +1,8 @@
 import { PlusCircle, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -12,6 +10,7 @@ import {
 import ProductForm from './ProductForm';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { IProductoGroups } from '@/api/services/groups';
+import { SearchComponent } from '@/shared/components/ui/Search';
 
 interface SearchAndFilterProps {
   searchTerm: string;
@@ -42,12 +41,9 @@ const SearchAndFilter = ({
       <div className="flex items-center gap-2">
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search products..."
-            className="pl-8 w-[200px] lg:w-[300px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+          <SearchComponent
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
           />
         </div>
       </div>
@@ -61,9 +57,6 @@ const SearchAndFilter = ({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Product</DialogTitle>
-            <DialogDescription>
-              Enter the details of the new product below.
-            </DialogDescription>
           </DialogHeader>
           <ProductForm
             handleSelectChange={handleSelectChange}

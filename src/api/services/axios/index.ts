@@ -4,7 +4,6 @@ export enum PATH_LIST {
   Login = 'users',
   Branch = 'branches',
   Inventory = 'inventory/products',
-  products = 'inventory/products',
   Groups = 'inventory/groups',
   Transfer = 'transfer',
 }

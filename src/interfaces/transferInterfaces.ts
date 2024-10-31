@@ -157,7 +157,7 @@ interface Precio {
   $numberDecimal: string;
 }
 
-interface InventarioSucursal {
+export interface InventarioSucursal {
   _id: string;
   productoId: Producto;
   sucursalId: string;
