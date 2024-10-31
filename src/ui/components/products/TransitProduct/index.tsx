@@ -11,7 +11,7 @@ import Pagination from '../../../../shared/components/ui/Pagination/Pagination';
 import { useAppSelector } from '@/app/hooks';
 import ProductsTable from './Table';
 import { clearProducts, productsTransit } from '@/app/slices/productsSlice';
-import { SearchAndFilter } from '@/shared/components/ui/Search';
+import { SearchComponent } from '@/shared/components/ui/Search';
 import {
   Select,
   SelectContent,
@@ -33,8 +33,6 @@ export const ProductsTransit = () => {
     (branch) => branch._id === userRoles?.sucursalId?._id
   );
   const filteredBranche = userRoles?.role === 'root' ? branches : dataFilterID;
-
-  console.log(dataAllProducts, 'd');
   const [selectedBranch, setSelectedBranch] = useState<{
     nombre: string;
     _id: string;
@@ -42,6 +40,7 @@ export const ProductsTransit = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [, setProducts] = useState<ITablaBranch[]>([]);
 
   useEffect(() => {
     if (filteredBranche.length === 1 && !selectedBranch) {
@@ -49,7 +48,6 @@ export const ProductsTransit = () => {
       setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
     }
   }, [filteredBranche, selectedBranch]);
-  const [, setProducts] = useState<ITablaBranch[]>([]);
 
   const fetchData = async () => {
     if (!selectedBranch) return;
@@ -101,7 +99,7 @@ export const ProductsTransit = () => {
           </CardHeader>
           <CardContent>
             <div className="flex justify-between mb-4">
-              <SearchAndFilter
+              <SearchComponent
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
               />

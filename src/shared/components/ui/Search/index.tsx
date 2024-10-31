@@ -6,7 +6,7 @@ interface SearchAndFilterProps {
   setSearchTerm: (term: string) => void;
 }
 
-export const SearchAndFilter = ({
+export const SearchComponent = ({
   searchTerm,
   setSearchTerm,
 }: SearchAndFilterProps) => {

@@ -11,8 +11,8 @@ import { store } from '@/app/store';
 import Pagination from '../../../../shared/components/ui/Pagination/Pagination';
 import { useAppSelector } from '@/app/hooks';
 import ProductsTable from './Table';
-import { clearProducts, fetchAllProducts } from '@/app/slices/productsSlice';
-import { SearchAndFilter } from '@/shared/components/ui/Search';
+import { fetchAllProducts } from '@/app/slices/productsSlice';
+import { SearchComponent } from '@/shared/components/ui/Search';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 
 export const Allproducts = () => {
@@ -31,7 +31,7 @@ export const Allproducts = () => {
   useEffect(() => {
     const fetchData = async () => {
       const result = await store.dispatch(fetchAllProducts()).unwrap();
-      setLocalProducts(result); // Guarda los productos en el estado local
+      setLocalProducts(result);
     };
 
     fetchData();
@@ -62,7 +62,7 @@ export const Allproducts = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SearchAndFilter
+            <SearchComponent
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
             />
