@@ -57,17 +57,9 @@ export const ToolTransfer = ({
   };
 
   const handleSendTransfer = async () => {
-    const quantityToSendIsZero = shipmentTools.some(
-      (tool) => tool.quantityToSend === 0
-    );
-
     setSending(true);
-
     const validTransfer = isValidTransfer(toolTransfer, shipmentTools.length);
-    if (!validTransfer) {
-      setSending(false);
-      return;
-    }
+    if (!validTransfer) return setSending(false);
 
     const formattedTools = shipmentTools.map((tool) => ({
       inventarioSucursalId: tool.inventarioSucursalId,
@@ -105,21 +97,11 @@ export const ToolTransfer = ({
 
     toast.promise(request, {
       loading: 'Enviando...',
-      success: '¡Transferencia enviada!',
+      success: hasStockIssues
+        ? '¡Transferencia enviada, pero algunos productos no tienen stock suficiente!'
+        : '¡Transferencia enviada!',
       error: (err) => `Error al enviar transferencia: ${err}`,
     });
-    if (hasStockIssues) {
-      toast.error(
-        'No puedes enviar la transferencia: existen problemas de stock!'
-      );
-      return;
-    }
-    if (quantityToSendIsZero) {
-      toast.error(
-        'Error al enviar transferencia: algunos artículos tienen cantidad para enviar de 0!'
-      );
-      return;
-    }
   };
 
   const handleSignature = (signature: string | null) => {
