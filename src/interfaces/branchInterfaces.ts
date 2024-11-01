@@ -59,4 +59,5 @@ export interface ITablaBranch {
   nombreSucursal?: string;
   grupoNombre?: string;
   ultimo_movimiento?: string;
+  puntoReCompra?: number;
 }
