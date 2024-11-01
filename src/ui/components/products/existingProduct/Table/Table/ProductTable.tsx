@@ -21,7 +21,7 @@ import ProductForm from './ProductForm';
 import { IProductoGroups } from '@/api/services/groups';
 import { IRoles } from '@/app/slices/login';
 import { getFormatedDate } from '@/shared/helpers/transferHelper';
-import { InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
+import { InventarioSucursal, InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
 import { store } from '@/app/store';
 import { createProduct, updateProduct } from '@/app/slices/productsSlice';
 import { inventoryUpdateProduct } from '@/api/services/products';
@@ -51,7 +51,7 @@ const ProductsTable = ({
   groups,
   userRoles,
 }: ProductsTableProps) => {
-  const [editingProduct, setEditingProduct] = useState<ITablaBranch | null>(
+  const [editingProduct, setEditingProduct] = useState<InventarioSucursal | null>(
     null
   );
   const [isEditing, setIsEditing] = useState(false);
@@ -75,7 +75,7 @@ const ProductsTable = ({
     store.dispatch(updateProduct(updatedProduct)).unwrap();
   };
 
-  const handleAddToBranchOnly = (product: ITablaBranch) => {
+  const handleAddToBranchOnly = (product: InventarioSucursal) => {
     setEditingProduct(product);
     setIsEditing(true);
   };
@@ -117,7 +117,7 @@ const ProductsTable = ({
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    handleAddToBranchOnly(product as unknown as ITablaBranch)
+                    handleAddToBranchOnly(product as unknown as InventarioSucursal)
                   }
                 >
                   <PlusCircle className="h-3.5 w-3.5" />

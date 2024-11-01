@@ -61,3 +61,8 @@ export interface ITablaBranch {
   ultimo_movimiento?: string;
   puntoReCompra?: number;
 }
+
+export interface IProductosGrupos {
+  productoId: string;
+  grupoId: IProductoGroups;
+}

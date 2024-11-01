@@ -39,3 +39,11 @@ export const inventoryUpdateProduct = async (
   const response = await axiosInstance.post('/', branch);
   return response.data;
 };
+
+export const findProductoGrupoByProductId = async (
+  productoId: string
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Inventory);
+  const response = await axiosInstance.get(`/${productoId}/producto-grupo`);
+  return response.data;
+};
