@@ -46,6 +46,10 @@ export default function ToolShipment() {
   };
 
   const handleShipmentTool = (tool: ITool) => {
+    if (tool.quantityToSend <= 0) {
+      return;
+    }
+
     const updatedTools = tools.map((tl) =>
       tl.id === tool.id
         ? { ...tl, stock: tl.stock - tool.quantityToSend, quantityToSend: 0 }
@@ -190,6 +194,7 @@ export default function ToolShipment() {
                         </TableCell>
                         <TableCell>
                           <Button
+                            disabled={tool.quantityToSend <= 0}
                             variant="default"
                             size="sm"
                             onClick={() => handleShipmentTool(tool)}
