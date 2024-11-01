@@ -25,7 +25,12 @@ interface ProductFormProps {
   groups: IProductoGroups[];
 }
 
-type FormFieldKeys = 'nombre' | 'descripcion' | 'precio' | 'stock';
+type FormFieldKeys =
+  | 'nombre'
+  | 'descripcion'
+  | 'precio'
+  | 'stock'
+  | 'puntoReCompra';
 
 const ProductForm = ({
   initialData,
@@ -41,9 +46,10 @@ const ProductForm = ({
     nombre: initialData?.nombre || '',
     descripcion: initialData?.descripcion || '',
     precio: initialData?.precio?.$numberDecimal || '',
-    stock: initialData?.stock ?? 0,
+    stock: initialData?.stock ?? '',
     grupoId: selectedGroup?._id || '',
     monedaId: '671342d4664051db7c1f8792',
+    puntoReCompra: initialData?.puntoReCompra || '',
   });
 
   useEffect(() => {
@@ -53,10 +59,11 @@ const ProductForm = ({
         nombre: initialData.nombre || '',
         descripcion: initialData.descripcion || '',
         precio: initialData.precio?.$numberDecimal || '',
-        stock: initialData.stock ?? 0,
+        stock: initialData.stock ?? '',
         grupoId: selectedGroup?._id || '',
         sucursalId: initialData.sucursalId || '',
         monedaId: '671342d4664051db7c1f8792',
+        puntoReCompra: initialData.puntoReCompra || '',
       });
     }
   }, [initialData]);
@@ -78,6 +85,7 @@ const ProductForm = ({
       //@ts-ignore
       precio: parseFloat(formData.precio?.toString() ?? '0'),
       stock: parseInt(formData.stock.toString()),
+      puntoReCompra: parseInt(formData.puntoReCompra.toString()),
     };
 
     onSubmit(productData);
@@ -94,6 +102,7 @@ const ProductForm = ({
     { id: 'descripcion', label: 'Descripcion', type: 'text' },
     { id: 'precio', label: 'Precio', type: 'number' },
     { id: 'stock', label: 'Stock', type: 'number', min: '0' },
+    { id: 'puntoReCompra', label: 'Punto de compra', type: 'number' },
   ];
   return (
     <form onSubmit={handleSubmit}>
