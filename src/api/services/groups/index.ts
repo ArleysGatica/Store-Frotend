@@ -5,9 +5,7 @@ import { Token } from '@/shared/hooks/useJWT';
 export interface IProductoGroups {
   _id?: string;
   nombre: string;
-  descripcion: string;
-  createdAt?: string;
-  updatedAt?: string;
+  descripcion?: string;
 }
 
 export const createGroup = async (

@@ -143,7 +143,7 @@ export interface IPendingShipmentDetailsProps {
   pendingShipment: IPendingTransfer;
 }
 
-interface Producto {
+export interface IProducto {
   _id: string;
   nombre: string;
   descripcion: string;
@@ -159,7 +159,7 @@ interface Precio {
 
 export interface InventarioSucursal {
   _id: string;
-  productoId: Producto;
+  productoId: IProducto;
   sucursalId: string;
   stock: number;
   precio: Precio;
@@ -183,7 +183,7 @@ export interface IProductInTransit {
 
 export interface InventarioSucursalWithPopulated {
   _id: string;
-  productoId: Producto;
+  productoId: IProducto;
   sucursalId: IBranch;
   stock: number;
   precio: { $numberDecimal: number };
