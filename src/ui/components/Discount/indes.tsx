@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Trash2, Pencil, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,17 +13,10 @@ import {
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import {
   Dialog,
   DialogContent,
@@ -31,504 +24,429 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { format, isWithinInterval } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import { useAppSelector } from '@/app/hooks';
+import { getAllGroupsSlice } from '@/app/slices/groups';
+import { store } from '@/app/store';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { SelectSearch } from '@/shared/components/ui/SelectSearch';
+import { useFilteredBranches } from '@/shared/hooks/useSelectedBranch';
+import {
+  cleanDataSales,
+  createDiscountSales,
+  getDiscounts,
+} from '@/app/slices/salesSlice';
+import { fetchAllProducts } from '@/app/slices/productsSlice';
 
-interface Discount {
-  id: number;
-  name: string;
-  startDate: Date;
-  endDate: Date;
-  applicationType: 'product' | 'group';
-  applicationTarget: string;
-  discountType: 'percentage' | 'fixed';
-  value: number;
-  code: string;
-  minPurchaseAmount?: number;
-  minQuantity?: number;
+export interface IDescuentoCreate {
+  nombre: string;
+  tipoDescuento: 'porcentaje' | 'valor';
+  valorDescuento: number;
+  fechaInicio: Date;
+  fechaFin: Date;
+  minimoCompra: number;
+  minimoCantidad: number;
+  activo: boolean;
+  moneda_id: string;
+  codigoDescunto: string;
+  deleted_at: Date | null;
+  tipoDescuentoEntidad: 'Product' | 'Group';
+  ProductId: string;
+  grupoId: string;
+  sucursalId: string;
 }
 
-// Dummy data for products and groups
-const products = ['Product A', 'Product B', 'Product C'];
-const groups = ['Group X', 'Group Y', 'Group Z'];
-
 export default function DiscountManager() {
-  const [discounts, setDiscounts] = useState<Discount[]>([]);
-  const [name, setName] = useState('');
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
-  const [endDate, setEndDate] = useState<Date | undefined>(new Date());
-  const [applicationType, setApplicationType] = useState<'product' | 'group'>(
-    'product'
-  );
-  const [applicationTarget, setApplicationTarget] = useState('');
-  const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>(
-    'percentage'
-  );
-  const [value, setValue] = useState('');
-  const [code, setCode] = useState('');
-  const [minPurchaseAmount, setMinPurchaseAmount] = useState('');
-  const [minQuantity, setMinQuantity] = useState('');
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [discounts, setDiscounts] = useState<IDescuentoCreate[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const data = useAppSelector((state) => state.sales.discounts);
+  const { branches, selectedBranch, setSelectedBranch } = useFilteredBranches();
+  const dataAllProducts = useAppSelector((state) => state.products.products);
+  const GroupsAll = useAppSelector((state) => state.categories.groups);
+  const [formState, setFormState] = useState<IDescuentoCreate>({
+    nombre: '',
+    tipoDescuento: 'porcentaje',
+    valorDescuento: 0,
+    fechaInicio: new Date(),
+    fechaFin: new Date(),
+    minimoCompra: 0,
+    minimoCantidad: 0,
+    activo: true,
+    moneda_id: '64b7f1b4b4f1b5f1c7e7f2a9',
+    codigoDescunto: '',
+    deleted_at: null,
+    tipoDescuentoEntidad: 'Product',
+    ProductId: '',
+    grupoId: '',
+    sucursalId: '',
+  });
+  const stateProduct = formState.tipoDescuentoEntidad === 'Product';
 
-  // New state for filters
-  const [filterType, setFilterType] = useState<'all' | 'product' | 'group'>(
-    'all'
-  );
-  const [filterDiscountType, setFilterDiscountType] = useState<
-    'all' | 'percentage' | 'fixed'
-  >('all');
-  const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
-    undefined
-  );
-  const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
-    undefined
-  );
+  const [, setSelectedGroup] = useState<{
+    nombre: string;
+    _id: string;
+  } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!startDate || !endDate) return;
+  const [, setSelectedProduct] = useState<{
+    nombre: string;
+    _id: string;
+  } | null>(null);
 
-    if (editingId !== null) {
-      setDiscounts(
-        discounts.map((discount) =>
-          discount.id === editingId
-            ? {
-                ...discount,
-                name,
-                startDate,
-                endDate,
-                applicationType,
-                applicationTarget,
-                discountType,
-                value: parseFloat(value),
-                code,
-                minPurchaseAmount: minPurchaseAmount
-                  ? parseFloat(minPurchaseAmount)
-                  : undefined,
-                minQuantity: minQuantity
-                  ? parseInt(minQuantity, 10)
-                  : undefined,
-              }
-            : discount
-        )
-      );
-      setEditingId(null);
-    } else {
-      const newDiscount: Discount = {
-        id: Date.now(),
-        name,
-        startDate,
-        endDate,
-        applicationType,
-        applicationTarget,
-        discountType,
-        value: parseFloat(value),
-        code,
-        minPurchaseAmount: minPurchaseAmount
-          ? parseFloat(minPurchaseAmount)
-          : undefined,
-        minQuantity: minQuantity ? parseInt(minQuantity, 10) : undefined,
-      };
-      setDiscounts([...discounts, newDiscount]);
+  const groupsAllOptions = GroupsAll.filter((branch) => branch._id).map(
+    (branch) => ({
+      id: branch._id as string,
+      nombre: branch.nombre,
+    })
+  );
+  const options = branches
+    .filter((branch) => branch._id)
+    .map((branch) => ({
+      id: branch._id as string,
+      nombre: branch.nombre,
+    }));
+
+  const opcionesProductos = dataAllProducts
+    .filter((branch) => branch?.id)
+    .map((branch) => ({
+      id: branch.id as string,
+      nombre: branch.nombre,
+    }));
+
+  const handleSelectChangeBranch = (value: string) => {
+    const branch = branches.find((b) => b._id === value);
+    if (branch) {
+      setSelectedBranch({ nombre: branch.nombre, _id: branch._id ?? '' });
     }
-    resetForm();
-    setIsModalOpen(false);
+
+    setFormState((prevState) => ({
+      ...prevState,
+      sucursalId: branch?._id ?? '',
+    }));
   };
 
-  const resetForm = () => {
-    setName('');
-    setStartDate(new Date());
-    setEndDate(new Date());
-    setApplicationType('product');
-    setApplicationTarget('');
-    setDiscountType('percentage');
-    setValue('');
-    setCode('');
-    setMinPurchaseAmount('');
-    setMinQuantity('');
+  const handleSelectChange = (value: string) => {
+    const selectedGroupId = value;
+    const category = GroupsAll.find((b) => b._id === selectedGroupId);
+
+    if (category) {
+      setSelectedGroup({
+        nombre: category.nombre,
+        _id: category._id ?? '',
+      });
+
+      setFormState((prevState) => ({
+        ...prevState,
+        grupoId: category._id ?? '',
+      }));
+    }
   };
 
-  const handleEdit = (discount: Discount) => {
-    setName(discount.name);
-    setStartDate(discount.startDate);
-    setEndDate(discount.endDate);
-    setApplicationType(discount.applicationType);
-    setApplicationTarget(discount.applicationTarget);
-    setDiscountType(discount.discountType);
-    setValue(discount.value.toString());
-    setCode(discount.code);
-    setMinPurchaseAmount(discount.minPurchaseAmount?.toString() || '');
-    setMinQuantity(discount.minQuantity?.toString() || '');
-    setEditingId(discount.id);
+  const handleProducts = (value: string) => {
+    const selectedProduct = dataAllProducts.find((d) => d.id === value);
+
+    if (selectedProduct) {
+      setSelectedProduct({
+        nombre: selectedProduct.nombre,
+        _id: selectedProduct.id ?? '',
+      });
+
+      setFormState((prevState) => ({
+        ...prevState,
+        ProductId: selectedProduct.id ?? '',
+      }));
+    }
+  };
+
+  useEffect(() => {
+    store.dispatch(getAllGroupsSlice()).unwrap();
+    store.dispatch(getDiscounts()).unwrap();
+    store.dispatch(fetchAllProducts()).unwrap();
+  }, []);
+
+  const updateFormState = (field: keyof IDescuentoCreate, value: string) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
+
+  const openAddModal = () => {
+    cleanDataSales();
+    setEditingId(null);
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    setDiscounts(discounts.filter((discount) => discount.id !== id));
+  const openEditModal = (id: string) => {
+    const discount = discounts.find(
+      (d) => d.ProductId === id || d.grupoId === id
+    );
+    if (discount) {
+      setEditingId(id);
+      setFormState(discount);
+      setIsModalOpen(true);
+    }
   };
 
-  const filteredDiscounts = discounts.filter((discount) => {
-    const typeMatch =
-      filterType === 'all' || discount.applicationType === filterType;
-    const discountTypeMatch =
-      filterDiscountType === 'all' ||
-      discount.discountType === filterDiscountType;
-    const dateMatch =
-      !filterStartDate ||
-      !filterEndDate ||
-      isWithinInterval(discount.startDate, {
-        start: filterStartDate,
-        end: filterEndDate,
-      }) ||
-      isWithinInterval(discount.endDate, {
-        start: filterStartDate,
-        end: filterEndDate,
-      });
-    return typeMatch && discountTypeMatch && dateMatch;
-  });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (editingId) {
+      setDiscounts((prev) =>
+        prev.map((d) =>
+          d.ProductId === editingId || d.grupoId === editingId ? formState : d
+        )
+      );
+    } else {
+      setDiscounts((prev) => [...prev, formState]);
+      store.dispatch(createDiscountSales(formState)).unwrap();
+    }
+
+    setIsModalOpen(false);
+    cleanDataSales();
+  };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Discount Manager</h1>
-
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogTrigger asChild>
-          <Button className="mb-4">
-            <Plus className="mr-2 h-4 w-4" /> Add New Discount
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>
-              {editingId !== null ? 'Edit Discount' : 'Add New Discount'}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="name">Discount Name</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Start Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={'outline'}
-                      className={cn(
-                        'w-full justify-start text-left font-normal',
-                        !startDate && 'text-muted-foreground'
-                      )}
-                    >
-                      {startDate ? (
-                        format(startDate, 'PPP')
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={setStartDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div>
-                <Label>End Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={'outline'}
-                      className={cn(
-                        'w-full justify-start text-left font-normal',
-                        !endDate && 'text-muted-foreground'
-                      )}
-                    >
-                      {endDate ? (
-                        format(endDate, 'PPP')
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={setEndDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="applicationType">Application Type</Label>
-              <Select
-                value={applicationType}
-                onValueChange={(value: 'product' | 'group') =>
-                  setApplicationType(value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="product">Product</SelectItem>
-                  <SelectItem value="group">Group</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="applicationTarget">
-                {applicationType === 'product' ? 'Product' : 'Group'}
-              </Label>
-              <Select
-                value={applicationTarget}
-                onValueChange={setApplicationTarget}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {(applicationType === 'product' ? products : groups).map(
-                    (item) => (
-                      <SelectItem key={item} value={item}>
-                        {item}
-                      </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="discountType">Discount Type</Label>
-              <Select
-                value={discountType}
-                onValueChange={(value: 'percentage' | 'fixed') =>
-                  setDiscountType(value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="percentage">Percentage</SelectItem>
-                  <SelectItem value="fixed">Fixed Amount</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="value">
-                Discount Value {discountType === 'percentage' ? '(%)' : '($)'}
-              </Label>
-              <Input
-                id="value"
-                type="number"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                required
-                min="0"
-                max={discountType === 'percentage' ? '100' : undefined}
-              />
-            </div>
-            <div>
-              <Label htmlFor="code">Discount Code</Label>
-              <Input
-                id="code"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="minPurchaseAmount">
-                Minimum Purchase Amount ($)
-              </Label>
-              <Input
-                id="minPurchaseAmount"
-                type="number"
-                value={minPurchaseAmount}
-                onChange={(e) => setMinPurchaseAmount(e.target.value)}
-                min="0"
-              />
-            </div>
-            <div>
-              <Label htmlFor="minQuantity">Minimum Quantity</Label>
-              <Input
-                id="minQuantity"
-                type="number"
-                value={minQuantity}
-                onChange={(e) => setMinQuantity(e.target.value)}
-                min="0"
-              />
-            </div>
-            <Button type="submit">
-              {editingId !== null ? 'Update Discount' : 'Add Discount'}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <div>
-          <Label htmlFor="filterType">Filter by Type</Label>
-          <Select
-            value={filterType}
-            onValueChange={(value: 'all' | 'product' | 'group') =>
-              setFilterType(value)
-            }
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="product">Product</SelectItem>
-              <SelectItem value="group">Group</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="filterDiscountType">Filter by Discount Type</Label>
-          <Select
-            value={filterDiscountType}
-            onValueChange={(value: 'all' | 'percentage' | 'fixed') =>
-              setFilterDiscountType(value)
-            }
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="percentage">Percentage</SelectItem>
-              <SelectItem value="fixed">Fixed Amount</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label>Filter Start Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={'outline'}
-                className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !filterStartDate && 'text-muted-foreground'
-                )}
-              >
-                {filterStartDate ? (
-                  format(filterStartDate, 'PPP')
-                ) : (
-                  <span>Pick a date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={filterStartDate}
-                onSelect={setFilterStartDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div>
-          <Label>Filter End Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={'outline'}
-                className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !filterEndDate && 'text-muted-foreground'
-                )}
-              >
-                {filterEndDate ? (
-                  format(filterEndDate, 'PPP')
-                ) : (
-                  <span>Pick a date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={filterEndDate}
-                onSelect={setFilterEndDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-
-      <Table>
+    <div>
+      <Button onClick={openAddModal}>Add Discount</Button>
+      <Table className="min-w-full divide-y divide-gray-200">
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Date Range</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Target</TableHead>
-            <TableHead>Discount</TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead>Min. Purchase</TableHead>
-            <TableHead>Min. Quantity</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Nombre</TableHead>
+            <TableHead>Tipo Descuento</TableHead>
+            <TableHead>Valor Descuento</TableHead>
+            <TableHead>Fecha Inicio</TableHead>
+            <TableHead>Fecha Fin</TableHead>
+            <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredDiscounts.map((discount) => (
-            <TableRow key={discount.id}>
-              <TableCell>{discount.name}</TableCell>
-              <TableCell>{`${format(discount.startDate, 'PP')} - ${format(discount.endDate, 'PP')}`}</TableCell>
-              <TableCell>{discount.applicationType}</TableCell>
-              <TableCell>{discount.applicationTarget}</TableCell>
-              <TableCell>
-                {discount.discountType === 'percentage'
-                  ? `${discount.value}%`
-                  : `$${discount.value.toFixed(2)}`}
-              </TableCell>
-              <TableCell>{discount.code}</TableCell>
-              <TableCell>
-                {discount.minPurchaseAmount
-                  ? `$${discount.minPurchaseAmount.toFixed(2)}`
-                  : 'N/A'}
-              </TableCell>
-              <TableCell>{discount.minQuantity || 'N/A'}</TableCell>
-              <TableCell>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleEdit(discount)}
-                  className="mr-2"
-                >
-                  <Pencil className="h-4 w-4" />
+          {data.map((discount) => (
+            <tr key={discount.ProductId || discount.grupoId}>
+              <td className="px-4 py-2">{discount.nombre}</td>
+              <td className="px-4 py-2">{discount.tipoDescuento}</td>
+              <td className="px-4 py-2">{discount.valorDescuento}</td>
+              <td className="px-4 py-2">
+                {format(new Date(discount.fechaInicio), 'dd/MM/yyyy')}
+              </td>
+              <td className="px-4 py-2">
+                {format(new Date(discount.fechaFin), 'dd/MM/yyyy')}
+              </td>
+              <td className="px-4 py-2">
+                <Button onClick={() => openEditModal(discount.ProductId)}>
+                  Edit
                 </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleDelete(discount.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
+              </td>
+            </tr>
           ))}
         </TableBody>
       </Table>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogTrigger asChild></DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingId ? 'Edit Discount' : 'Add Discount'}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4">
+              <div>
+                <Label htmlFor="nombre">Nombre</Label>
+                <Input
+                  className="w-full"
+                  id="nombre"
+                  value={formState.nombre}
+                  onChange={(e) => updateFormState('nombre', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="tipoDescuento">Tipo</Label>
+                <Select
+                  value={formState.tipoDescuentoEntidad || ''}
+                  onValueChange={(value) => {
+                    updateFormState('tipoDescuentoEntidad', value);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Product">Product</SelectItem>
+                    <SelectItem value="Group">Group</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex w-full gap-4">
+                <div>
+                  <Label htmlFor="tipoDescuento">Categorias</Label>
+                  <SelectSearch
+                    key={formState.tipoDescuentoEntidad}
+                    options={
+                      stateProduct ? opcionesProductos : groupsAllOptions
+                    }
+                    placeholder={stateProduct ? 'Product' : 'Categoria'}
+                    initialValue={
+                      stateProduct
+                        ? formState.ProductId || ''
+                        : formState.grupoId || ''
+                    }
+                    onChange={
+                      stateProduct ? handleProducts : handleSelectChange
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="tipoDescuento">Sucursal</Label>
+                  <SelectSearch
+                    options={options}
+                    placeholder="Selecione su categoria"
+                    initialValue={selectedBranch?._id || ''}
+                    onChange={handleSelectChangeBranch}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="tipoDescuento">Tipo Descuento</Label>
+                <Select
+                  value={formState.tipoDescuento}
+                  onValueChange={(value) =>
+                    updateFormState(
+                      'tipoDescuento',
+                      value as 'porcentaje' | 'valor'
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="porcentaje">Porcentaje</SelectItem>
+                    <SelectItem value="valor">Valor</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="valorDescuento">Valor Descuento</Label>
+                <Input
+                  id="valorDescuento"
+                  type="number"
+                  value={formState.valorDescuento}
+                  onChange={(e) =>
+                    updateFormState('valorDescuento', e.target.value)
+                  }
+                />
+              </div>
+              <div className="flex w-full gap-4">
+                <div>
+                  <Label>Fecha Inicio</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={'outline'}
+                        className={cn(
+                          'w-full justify-start text-left font-normal',
+                          formState.fechaInicio && 'text-muted-foreground'
+                        )}
+                      >
+                        {formState.fechaInicio ? (
+                          format(formState.fechaInicio, 'PPP')
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={formState.fechaInicio}
+                        onSelect={(date) => {
+                          if (date) {
+                            updateFormState('fechaInicio', date.toISOString());
+                          }
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div>
+                  <Label>Fecha Fin</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={'outline'}
+                        className={cn(
+                          'w-full justify-start text-left font-normal',
+                          formState.fechaFin && 'text-muted-foreground'
+                        )}
+                      >
+                        {formState.fechaFin ? (
+                          format(formState.fechaFin, 'PPP')
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={formState.fechaFin}
+                        onSelect={(date) => {
+                          if (date) {
+                            updateFormState('fechaFin', date.toISOString());
+                          }
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="minimoCompra">Mínimo Compra</Label>
+                <Input
+                  id="minimoCompra"
+                  type="number"
+                  value={formState.minimoCompra}
+                  onChange={(e) =>
+                    updateFormState('minimoCompra', e.target.value)
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="minimoCantidad">Mínimo Cantidad</Label>
+                <Input
+                  id="minimoCantidad"
+                  type="number"
+                  value={formState.minimoCantidad}
+                  onChange={(e) =>
+                    updateFormState('minimoCantidad', e.target.value)
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="codigoDescunto">Código Descuento</Label>
+                <Input
+                  id="codigoDescunto"
+                  value={formState.codigoDescunto}
+                  onChange={(e) =>
+                    updateFormState('codigoDescunto', e.target.value)
+                  }
+                />
+              </div>
+              <Button type="submit">{editingId ? 'Update' : 'Create'}</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
