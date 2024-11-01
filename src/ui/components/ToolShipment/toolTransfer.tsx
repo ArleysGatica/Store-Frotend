@@ -23,6 +23,15 @@ export const ToolTransfer = ({
   userId,
   setShipmentTools,
 }: IToolTransferProps) => {
+  const [hasStockIssues, setHasStockIssues] = useState(false);
+
+  useEffect(() => {
+    const stockIssues = shipmentTools.some(
+      (tool) => tool.stock < tool?.puntoReCompra!
+    );
+    setHasStockIssues(stockIssues);
+  }, [shipmentTools]);
+
   const [sending, setSending] = useState(false);
   const [toolTransfer, setToolTransfer] = useState<ITransferDetails>({
     comentarioEnvio: null,
@@ -92,6 +101,13 @@ export const ToolTransfer = ({
       success: '¡Transferencia enviada!',
       error: (err) => `Error al enviar transferencia: ${err}`,
     });
+
+    if (hasStockIssues) {
+      toast.error(
+        'No puedes enviar la transferencia: existen problemas de stock!'
+      );
+      return;
+    }
   };
 
   const handleSignature = (signature: string | null) => {

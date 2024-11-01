@@ -156,6 +156,7 @@ export default function ToolShipment() {
                   <TableRow>
                     <TableHead>Herramientas</TableHead>
                     <TableHead>Código</TableHead>
+                    <TableHead>Punto de compra</TableHead>
                     <TableHead>Cantidad disponible</TableHead>
                     <TableHead>Cantidad a enviar</TableHead>
                     <TableHead></TableHead>
@@ -171,6 +172,7 @@ export default function ToolShipment() {
                       <TableRow key={tool.id}>
                         <TableCell>{tool.nombre}</TableCell>
                         <TableCell>{tool.id}</TableCell>
+                        <TableCell>{tool?.puntoReCompra}</TableCell>
                         <TableCell>{tool.stock} unidades</TableCell>
                         <TableCell>
                           <Input
