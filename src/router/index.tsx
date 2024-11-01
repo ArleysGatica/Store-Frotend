@@ -14,6 +14,7 @@ import { Page } from '@/shared/components/ui/Page';
 import { OrdersReceived } from '@/ui/components/OrdersReceived';
 import PendingProductsByTransfer from '@/ui/components/PendingTools/products';
 import { ViewProucts } from '@/shared/components/ui/TabsListTable/products';
+import DiscountManager from '@/ui/components/Discount/indes';
 
 export const Router = () => {
   return (
@@ -36,7 +37,6 @@ export const Router = () => {
           }
         />
       </Route>
-
       <Route
         path="/branches"
         element={<RequireAuth rolesAllowed={['root', 'admin']} />}
@@ -50,7 +50,6 @@ export const Router = () => {
           }
         />
       </Route>
-
       <Route
         path="/products"
         element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}
@@ -77,7 +76,6 @@ export const Router = () => {
           }
         />
       </Route>
-
       <Route
         path="/transfer/recibido/:Id/itemdepedido"
         element={<RequireAuth rolesAllowed={['root', 'admin', 'user']} />}
@@ -104,7 +102,6 @@ export const Router = () => {
           }
         />
       </Route>
-
       <Route
         path="/register"
         element={<RequireAuth rolesAllowed={['root', 'admin']} />}
@@ -141,6 +138,19 @@ export const Router = () => {
           element={
             <Layout>
               <PendingProductsByTransfer />
+            </Layout>
+          }
+        />
+      </Route>
+      <Route
+        path="/DiscountManager"
+        element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}
+      >
+        <Route
+          path="/DiscountManager"
+          element={
+            <Layout>
+              <DiscountManager />
             </Layout>
           }
         />
