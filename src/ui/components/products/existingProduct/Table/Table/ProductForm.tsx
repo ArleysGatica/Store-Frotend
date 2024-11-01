@@ -42,21 +42,6 @@ const ProductForm = ({
   console.log(initialData);
   const user = useAppSelector((state) => state.auth.signIn.user);
   //findProductoGrupoByProductIdAC
-
-  const [grupo, setGrupo] = useState<IProductosGrupos | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      let gruposAxios = (await store.dispatch(findProductoGrupoByProductIdAC(initialData?.productoId._id!)).unwrap() as unknown as IProductosGrupos);
-      console.log(gruposAxios);
-      
-      return gruposAxios;  
-    }
-    
-    fetchData().then((data) => {
-      setGrupo(data);
-    });
-  }, []);
   
   console.log(sucursalId);
   const [formData, setFormData] = useState({
@@ -66,7 +51,7 @@ const ProductForm = ({
     descripcion: initialData?.productoId.descripcion || '',
     precio: initialData?.precio?.$numberDecimal || 0,
     stock: initialData?.stock ?? 0,
-    grupoId: grupo?.grupoId._id || '',
+    grupoId: selectedGroup?._id || '',
     monedaId: '671342d4664051db7c1f8792',
   });
 
@@ -93,7 +78,7 @@ const ProductForm = ({
     e.preventDefault();
     const productData: ITablaBranch = {
       ...formData,
-      grupoId: grupo?.grupoId._id || '',
+      grupoId: selectedGroup?._id || '',
       monedaId: '671342d4664051db7c1f8792',
       sucursalId: user?.sucursalId?._id ?? '',
       //@ts-ignore
@@ -113,16 +98,17 @@ const ProductForm = ({
     step?: string;
     min?: string;
     readOnly?: boolean;
+    disabled?: boolean;
   }[] = [
-    { id: 'nombre', label: 'Nombre', type: 'text', readOnly: true },
-    { id: 'descripcion', label: 'Descripcion', type: 'text', readOnly: true },
+    { id: 'nombre', label: 'Nombre', type: 'text', readOnly: true, disabled: true },
+    { id: 'descripcion', label: 'Descripcion', type: 'text', readOnly: true, disabled: true },
     { id: 'precio', label: 'Precio', type: 'number' },
     { id: 'stock', label: 'Stock', type: 'number', min: '0' },
   ];
   return (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="grid gap-4 py-4">
-        {fields.map(({ id, label, type, step, min, readOnly }) => (
+        {fields.map(({ id, label, type, step, min, readOnly, disabled  }) => (
           <div key={id} className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor={id} className="text-right">
               {label}
@@ -138,24 +124,11 @@ const ProductForm = ({
               className="col-span-3"
               required
               readOnly={readOnly}
+              disabled={disabled}
             />
           </div>
         ))}
-        <div key={grupo?.grupoId._id} className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor={grupo?.grupoId._id} className="text-right">
-              {grupo?.grupoId.nombre}
-            </Label>
-            <Input
-              id={grupo?.grupoId._id}
-              name={grupo?.grupoId._id}
-              type={"text"}
-              value={grupo?.grupoId.nombre}
-              className="col-span-3"
-              required
-              readOnly={true}
-            />
-          </div>
-        {/* <div className="items-center gap-4 flex">
+        <div className="items-center gap-4 flex">
           <Label htmlFor="branch-select" className="text-right">
             Categorias
           </Label>
@@ -171,7 +144,7 @@ const ProductForm = ({
               ))}
             </SelectContent>
           </Select>
-        </div> */}
+        </div>
       </div>
       <DialogFooter>
         <Button type="submit">
