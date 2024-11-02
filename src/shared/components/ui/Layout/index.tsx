@@ -22,6 +22,7 @@ export const Layout = ({ children }: LayoutProps) => {
       : []),
     { name: 'PRODUCTOS', path: '/products', icon: '📱' },
     { name: 'CATEGORÍAS', path: '/categories', icon: '🧮' },
+    { name: 'Descuentos', path: '/DiscountManager', icon: '〽️' },
     { name: 'PEDIDOS', path: '/orders', icon: '📃' },
     ...(roleUsers === 'root' || roleUsers === 'admin'
       ? [{ name: 'USUARIOS', path: '/register', icon: '👤' }]
