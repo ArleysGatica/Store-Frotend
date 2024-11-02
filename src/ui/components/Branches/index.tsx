@@ -14,15 +14,14 @@ import { Input } from '@/components/ui/input';
 import { BranchCard } from './BranchCard';
 import { store } from '@/app/store';
 import {
-  Branch,
   createBranchs,
   fetchBranches,
   setSelectedBranch,
 } from '@/app/slices/branchSlice';
 import { useAppSelector } from '@/app/hooks';
 import { Label } from '@radix-ui/react-label';
-import { Link } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
+import { Branch } from '@/interfaces/branchInterfaces';
 
 export default function BranchDashboard() {
   const branches = useAppSelector((state) => state.branches.data);
@@ -67,7 +66,7 @@ export default function BranchDashboard() {
         direccion: '',
         description: '',
       });
-      toast.success('Sucursal creada exitosamente');
+      toast.success(`Sucursal ${newBranch.nombre} creada exitosamente`);
     } catch (error) {
       toast.error('Error al crear sucursal: ' + error);
     }
@@ -194,17 +193,12 @@ export default function BranchDashboard() {
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredBranches.length > 0 &&
             filteredBranches.map((branch) => (
-              <Link
+              <BranchCard
                 key={branch._id}
-                to={`/branches/${branch._id}/products`}
-                onClick={() => handleSelectBranch(branch)}
-              >
-                <BranchCard
-                  key={branch._id}
-                  branch={branch}
-                  onEdit={() => openDialog(true)}
-                />
-              </Link>
+                branch={branch}
+                handleSelectBranch={handleSelectBranch}
+                onEdit={() => openDialog(true)}
+              />
             ))}
         </div>
       </div>
