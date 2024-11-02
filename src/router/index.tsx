@@ -15,6 +15,7 @@ import { OrdersReceived } from '@/ui/components/OrdersReceived';
 import PendingProductsByTransfer from '@/ui/components/PendingTools/products';
 import { ViewProucts } from '@/shared/components/ui/TabsListTable/products';
 import DiscountManager from '@/ui/components/Discount/indes';
+import SalesInventorySystem from '@/ui/components/Sales';
 
 export const Router = () => {
   return (
@@ -151,6 +152,20 @@ export const Router = () => {
           element={
             <Layout>
               <DiscountManager />
+            </Layout>
+          }
+        />
+      </Route>
+
+      <Route
+        path="/sales"
+        element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}
+      >
+        <Route
+          path="/sales"
+          element={
+            <Layout>
+              <SalesInventorySystem />
             </Layout>
           }
         />

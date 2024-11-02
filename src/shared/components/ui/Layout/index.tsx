@@ -20,6 +20,7 @@ export const Layout = ({ children }: LayoutProps) => {
     ...(roleUsers === 'root'
       ? [{ name: 'SUCURSALES', path: '/branches', icon: '🏭' }]
       : []),
+    { name: 'VENTAS', path: '/sales', icon: '💰' },
     { name: 'PRODUCTOS', path: '/products', icon: '📱' },
     { name: 'CATEGORÍAS', path: '/categories', icon: '🧮' },
     { name: 'PEDIDOS', path: '/orders', icon: '📃' },
