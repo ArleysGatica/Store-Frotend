@@ -131,7 +131,7 @@ const ProductsTable = ({
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Product</DialogTitle>
+            <DialogTitle>Agregar producto a sucursal</DialogTitle>
             <DialogDescription>
               Make changes to the product details below.
             </DialogDescription>

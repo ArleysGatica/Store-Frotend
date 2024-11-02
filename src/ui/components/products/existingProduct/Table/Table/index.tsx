@@ -7,19 +7,18 @@ import {
   CardDescription,
   CardContent,
 } from '@/components/ui/card';
-import { useParams } from 'react-router-dom';
 import { toast } from '@/components/hooks/use-toast';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { IProductoGroups, ITablaBranch } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
-import { createProduct } from '@/app/slices/productsSlice';
-import SearchAndFilter from './sear';
 import ProductsTable from './ProductTable';
 // import Pagination from '../../../shared/components/ui/Pagination/Pagination';
 import { useAppSelector } from '@/app/hooks';
 import { getAllGroupsSlice } from '@/app/slices/groups';
-import { IProductoGroups } from '@/api/services/groups';
 import { GetBranches } from '@/shared/helpers/Branchs';
-import { searchForStockProductsAtBranch } from '@/app/slices/branchSlice';
+import {
+  createProduct,
+  searchForStockProductsAtBranch,
+} from '@/app/slices/branchSlice';
 import { InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
 
 export function ProductFormExist() {
@@ -73,7 +72,7 @@ export function ProductFormExist() {
     if (!selectedGroup) return;
 
     try {
-      const response = await GetBranches(selectedGroup._id); // Ensure this function returns branch data
+      const response = await GetBranches(selectedGroup._id);
       setGroups(response);
     } catch (error) {
       console.error('Error fetching groups:', error);
@@ -126,7 +125,7 @@ export function ProductFormExist() {
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-muted/40">
+    <div className="flex flex-col w-full  bg-muted/40">
       <main className="flex-1 p-4 md:p-6">
         <Card>
           <CardHeader>
@@ -136,7 +135,7 @@ export function ProductFormExist() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SearchAndFilter
+            {/* <SearchAndFilter
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               filterStatus={filterStatus}
@@ -146,7 +145,7 @@ export function ProductFormExist() {
               handleSelectChange={handleSelectChange}
               selectedGroup={selectedGroup}
               groups={GroupsAll}
-            />
+            /> */}
             {filteredProducts.length === 0 ? (
               <span className="flex justify-center w-full text-sm text-center text-muted-foreground">
                 No hay productos en esta sucursal

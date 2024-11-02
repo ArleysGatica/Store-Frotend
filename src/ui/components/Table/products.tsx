@@ -8,16 +8,15 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { toast } from '@/components/hooks/use-toast';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { IProductoGroups, ITablaBranch } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
-import { createProduct } from '@/app/slices/productsSlice';
 import SearchAndFilter from './sear';
 import ProductsTable from './ProductTable';
 import Pagination from '../../../shared/components/ui/Pagination/Pagination';
 import { GetBranches } from '@/shared/helpers/Branchs';
 import { useAppSelector } from '@/app/hooks';
 import { getAllGroupsSlice } from '@/app/slices/groups';
-import { IProductoGroups } from '@/api/services/groups';
+import { createProduct } from '@/app/slices/branchSlice';
 
 export function Products() {
   const user = useAppSelector((state) => state.auth.signIn.user);
@@ -104,7 +103,7 @@ export function Products() {
   }, [selectedGroup]);
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-muted/40">
+    <div className="flex flex-col w-full bg-muted/40">
       <main className="flex-1 p-4 md:p-6">
         <Card>
           <CardHeader>
