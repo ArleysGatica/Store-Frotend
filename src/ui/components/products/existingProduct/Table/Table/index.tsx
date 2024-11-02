@@ -7,19 +7,18 @@ import {
   CardDescription,
   CardContent,
 } from '@/components/ui/card';
-import { useParams } from 'react-router-dom';
 import { toast } from '@/components/hooks/use-toast';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { IProductoGroups, ITablaBranch } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
-import { createProduct } from '@/app/slices/productsSlice';
-import SearchAndFilter from './sear';
 import ProductsTable from './ProductTable';
 // import Pagination from '../../../shared/components/ui/Pagination/Pagination';
 import { useAppSelector } from '@/app/hooks';
 import { getAllGroupsSlice } from '@/app/slices/groups';
-import { IProductoGroups } from '@/api/services/groups';
 import { GetBranches } from '@/shared/helpers/Branchs';
-import { searchForStockProductsAtBranch } from '@/app/slices/branchSlice';
+import {
+  createProduct,
+  searchForStockProductsAtBranch,
+} from '@/app/slices/branchSlice';
 import { InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
 
 export function ProductFormExist() {
@@ -73,7 +72,7 @@ export function ProductFormExist() {
     if (!selectedGroup) return;
 
     try {
-      const response = await GetBranches(selectedGroup._id); // Ensure this function returns branch data
+      const response = await GetBranches(selectedGroup._id);
       setGroups(response);
     } catch (error) {
       console.error('Error fetching groups:', error);

@@ -1,12 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { createAxiosInstance, PATH_LIST } from '../axios';
 import { Token } from '@/shared/hooks/useJWT';
-
-export interface IProductoGroups {
-  _id?: string;
-  nombre: string;
-  descripcion?: string;
-}
+import { IProductoGroups } from '@/interfaces/branchInterfaces';
 
 export const createGroup = async (
   group: IProductoGroups
