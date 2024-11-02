@@ -101,7 +101,7 @@ export function DataTableDemo() {
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-muted/40">
+    <div className="flex flex-col w-full bg-muted/40">
       <main className="flex-1 p-4 md:p-6">
         <Card>
           <CardHeader>
