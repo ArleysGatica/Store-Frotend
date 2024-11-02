@@ -16,15 +16,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Pencil, Trash } from 'lucide-react';
-import { IBranch, ITablaBranch } from '@/interfaces/branchInterfaces';
+import {
+  Branch,
+  IProductoGroups,
+  ITablaBranch,
+} from '@/interfaces/branchInterfaces';
 import ProductForm from './ProductForm';
-import { IProductoGroups } from '@/api/services/groups';
 import { IRoles } from '@/app/slices/login';
 import { store } from '@/app/store';
-import { removeProduct } from '@/app/slices/transferSlice';
+import { removeProduct } from '@/app/slices/branchSlice';
 
 interface ProductsTableProps {
-  products: ITablaBranch[];
+  products: ITablaBranch[] | undefined;
   handleSelectChange: (value: string) => void;
   selectedGroup: {
     nombre: string;
@@ -36,7 +39,7 @@ interface ProductsTableProps {
         _id: string;
         username: string;
         role: IRoles;
-        sucursalId?: IBranch;
+        sucursalId?: Branch;
       }
     | undefined;
 }

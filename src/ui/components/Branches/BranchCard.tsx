@@ -17,16 +17,39 @@ import { MoreVertical, Pencil, Trash } from 'lucide-react';
 import { IBranchProps } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
 import { deleteBranch } from '@/app/slices/branchSlice';
+import { useNavigate } from 'react-router-dom';
 
-export const BranchCard = ({ branch, onEdit }: IBranchProps) => {
+export const BranchCard = ({
+  branch,
+  onEdit,
+  handleSelectBranch,
+}: IBranchProps) => {
+  const navigate = useNavigate();
+
   const handleOnDelete = (id: string) => {
     store.dispatch(deleteBranch(id));
   };
 
+  const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      navigate(`/branches/${branch._id}/products`);
+    }
+  };
+
   return (
-    <Card key={branch._id} className="flex flex-col justify-between">
+    <Card
+      onClick={handleCardClick}
+      key={branch._id}
+      className="flex flex-col justify-between "
+    >
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <div className="flex items-center space-x-2">
+        <div
+          onClick={() => {
+            navigate(`/branches/${branch._id}/products`);
+            handleSelectBranch(branch);
+          }}
+          className="flex items-center space-x-2 cursor-pointer"
+        >
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
             {branch.nombre[0]}
           </div>
@@ -44,11 +67,21 @@ export const BranchCard = ({ branch, onEdit }: IBranchProps) => {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => onEdit(true)}>
+            <DropdownMenuItem
+              onSelect={(event) => {
+                event.stopPropagation();
+                onEdit(true);
+              }}
+            >
               <Pencil className="mr-2 h-4 w-4" />
               Editar
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => handleOnDelete(branch?._id!)}>
+            <DropdownMenuItem
+              onSelect={(event) => {
+                event.stopPropagation();
+                handleOnDelete(branch._id!);
+              }}
+            >
               <Trash className="mr-2 h-4 w-4" />
               Eliminar
             </DropdownMenuItem>
