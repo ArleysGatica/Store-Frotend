@@ -13,36 +13,15 @@ import {
   handleAsyncThunkError,
   handleThunkError,
 } from '../../shared/utils/errorHandlers';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import {
+  Branch,
+  BranchState,
+  IBranchWithProducts,
+  ITablaBranch,
+} from '@/interfaces/branchInterfaces';
 import { InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
-
-export interface Branch {
-  _id?: string;
-  pais: string;
-  ciudad: string;
-  nombre: string;
-  telefono: string;
-  direccion: string;
-  description: string;
-}
-
-export interface IBranchWithProducts extends Branch {
-  products: ITablaBranch[];
-}
-
-interface BranchState {
-  data: Branch[];
-  selectedBranch: IBranchWithProducts | null;
-  loading: boolean;
-  error: string | null;
-}
-
-const initialState: BranchState = {
-  data: [],
-  selectedBranch: null,
-  loading: false,
-  error: null,
-};
+import { deleteProduct } from '@/api/services/transfer';
+import { createTablaBranch } from '@/api/services/products';
 
 export const fetchBranchesById = createAsyncThunk<ITablaBranch[], string>(
   'branches/fetchById',
@@ -50,8 +29,8 @@ export const fetchBranchesById = createAsyncThunk<ITablaBranch[], string>(
     try {
       const response: ITablaBranch[] = await getBranchesById(id);
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Error desconocido');
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
     }
   }
 );
@@ -66,8 +45,8 @@ export const searchForStockProductsAtBranch = createAsyncThunk<
       const response: InventarioSucursalWithPopulated[] =
         await getForStockProductsAtBranch(id);
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Error desconocido');
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
     }
   }
 );
@@ -117,6 +96,37 @@ export const createBranchs = createAsyncThunk(
   }
 );
 
+export const createProduct = createAsyncThunk(
+  'branches/createProduct',
+  async (product: ITablaBranch, { rejectWithValue }) => {
+    try {
+      const response = await createTablaBranch(product);
+      return response.data as ITablaBranch;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
+export const removeProduct = createAsyncThunk(
+  'branches/deleteProduct',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await deleteProduct(id);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
+const initialState: BranchState = {
+  data: [],
+  selectedBranch: null,
+  status: 'idle',
+  error: null,
+};
+
 const branchesSlice = createSlice({
   name: 'branches',
   initialState,
@@ -141,37 +151,37 @@ const branchesSlice = createSlice({
     builder
       .addCase(fetchBranches.pending, (state) => {
         state.data = [];
-        state.loading = 'loading' === 'loading';
+        state.status = 'loading';
       })
       .addCase(
         fetchBranches.fulfilled,
         (state, { payload }: PayloadAction<Array<Branch>>) => {
-          state.loading = 'succeeded' === 'succeeded';
+          state.status = 'succeeded';
           state.data = payload;
         }
       )
       .addCase(fetchBranches.rejected, (state, action) => {
-        state.loading;
+        state.status = 'failed';
         state.error = action.error.message || 'unknown error';
       })
 
       .addCase(createBranchs.pending, (state) => {
-        state.loading = true;
+        state.status = 'loading';
         state.error = null;
       })
       .addCase(
         createBranchs.fulfilled,
         (state, action: PayloadAction<Branch>) => {
-          state.loading = false;
+          state.status = 'succeeded';
           state.data.push(action.payload);
         }
       )
       .addCase(createBranchs.rejected, (state, action) => {
-        state.loading = false;
+        state.status = 'failed';
         state.error = action.error.message || 'unknown error';
       })
       .addCase(fetchBranchesById.pending, (state) => {
-        state.loading = true;
+        state.status = 'loading';
       })
       .addCase(
         fetchBranchesById.fulfilled,
@@ -180,9 +190,50 @@ const branchesSlice = createSlice({
             ...state.selectedBranch!,
             products: payload,
           };
-          state.loading = false;
+          state.status = 'succeeded';
         }
-      );
+      )
+      .addCase(deleteBranch.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(deleteBranch.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.data = state.data.filter(
+          (branch) => branch._id !== action.meta.arg
+        );
+      })
+      .addCase(deleteBranch.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Error desconocido';
+      })
+      .addCase(removeProduct.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(removeProduct.fulfilled, (state, { payload }) => {
+        state.status = 'succeeded';
+
+        if (state.selectedBranch) {
+          state.selectedBranch = {
+            ...state.selectedBranch,
+            products: state.selectedBranch.products.filter(
+              (product) => product?.id !== payload._id
+            ),
+          };
+        }
+      })
+      .addCase(createProduct.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(createProduct.fulfilled, (state, { payload }) => {
+        state.status = 'succeeded';
+        state.selectedBranch = {
+          ...state.selectedBranch!,
+          products: [...state.selectedBranch!.products, payload],
+        };
+      });
   },
 });
 

@@ -15,31 +15,14 @@ import {
 import { IStatus, ITablaBranch } from '@/interfaces/branchInterfaces';
 import { IProductInTransit } from '@/interfaces/transferInterfaces';
 
-export const createProduct = createAsyncThunk(
-  'products/create',
-  async (product: ITablaBranch, { rejectWithValue }) => {
-    try {
-      const response = await createTablaBranch(product);
-      return response.data as ITablaBranch;
-    } catch (error) {
-      if ((error as AxiosError).response?.status === 404) {
-        return rejectWithValue('El recurso no fue encontrado');
-      }
-      return rejectWithValue(handleAsyncThunkError(error as Error));
-    }
-  }
-);
-
 export const fetchTablaBranches = createAsyncThunk(
   'tablaBranches/getAll',
-  async () => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await inventoryGetAll();
       return response as unknown as ITablaBranch[];
     } catch (error) {
-      return (error as AxiosError).response?.status === 404
-        ? []
-        : handleAsyncThunkError(error as Error);
+      return rejectWithValue(handleThunkError(error));
     }
   }
 );
@@ -72,7 +55,7 @@ export const findProductoGrupoByProductIdAC = createAsyncThunk(
   'products/producto-grupo',
   async (productId: string, { rejectWithValue }) => {
     try {
-      const response = await findProductoGrupoByProductId(productId);      
+      const response = await findProductoGrupoByProductId(productId);
       return response;
     } catch (error) {
       return rejectWithValue(handleThunkError(error));
