@@ -136,7 +136,7 @@ export function ProductFormExist() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SearchAndFilter
+            {/* <SearchAndFilter
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               filterStatus={filterStatus}
@@ -146,7 +146,7 @@ export function ProductFormExist() {
               handleSelectChange={handleSelectChange}
               selectedGroup={selectedGroup}
               groups={GroupsAll}
-            />
+            /> */}
             {filteredProducts.length === 0 ? (
               <span className="flex justify-center w-full text-sm text-center text-muted-foreground">
                 No hay productos en esta sucursal
