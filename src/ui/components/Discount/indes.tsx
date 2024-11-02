@@ -69,6 +69,9 @@ export default function DiscountManager() {
   const { branches, selectedBranch, setSelectedBranch } = useFilteredBranches();
   const dataAllProducts = useAppSelector((state) => state.products.products);
   const GroupsAll = useAppSelector((state) => state.categories.groups);
+  const isRoot = useAppSelector((state) => state.auth.signIn.user?.role) === 'root';
+  
+
   const [formState, setFormState] = useState<IDescuentoCreate>({
     nombre: '',
     tipoDescuento: 'porcentaje',
@@ -266,7 +269,7 @@ export default function DiscountManager() {
                 />
               </div>
               <div>
-                <Label htmlFor="tipoDescuento">Tipo</Label>
+                <Label htmlFor="tipoDescuento">Objetivo descuento</Label>
                 <Select
                   value={formState.tipoDescuentoEntidad || ''}
                   onValueChange={(value) => {
@@ -277,20 +280,20 @@ export default function DiscountManager() {
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Product">Product</SelectItem>
-                    <SelectItem value="Group">Group</SelectItem>
+                    <SelectItem value="Product">Producto</SelectItem>
+                    <SelectItem value="Group">Categoría</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex w-full gap-4">
-                <div>
-                  <Label htmlFor="tipoDescuento">Categorias</Label>
+                <div className={ isRoot ? "" :'w-full'}>
+                  <Label htmlFor="tipoDescuento">Objetivo descuento</Label>
                   <SelectSearch
                     key={formState.tipoDescuentoEntidad}
                     options={
                       stateProduct ? opcionesProductos : groupsAllOptions
                     }
-                    placeholder={stateProduct ? 'Product' : 'Categoria'}
+                    placeholder={stateProduct ? 'Seleccione un producto' : 'Seleccione una categoría'}
                     initialValue={
                       stateProduct
                         ? formState.ProductId || ''
@@ -301,11 +304,11 @@ export default function DiscountManager() {
                     }
                   />
                 </div>
-                <div>
+                <div className={ isRoot ? "" :'hidden'}>
                   <Label htmlFor="tipoDescuento">Sucursal</Label>
                   <SelectSearch
                     options={options}
-                    placeholder="Selecione su categoria"
+                    placeholder="Selecione su sucursal"
                     initialValue={selectedBranch?._id || ''}
                     onChange={handleSelectChangeBranch}
                   />

@@ -25,7 +25,7 @@ export const ProfileUser = () => {
     <div className="flex items-center justify-center gap-2 p-2">
       <div className="flex flex-col items-center justify-center ">
         <h1 className="text-xl font-bold capitalize">{user?.username}</h1>
-        <p className="text-sm text-muted-foreground">{user?.role}</p>
+        <p className="text-sm text-muted-foreground">{user?.role} - {user?.sucursalId?.nombre}</p>
       </div>
       <Popover>
         <PopoverTrigger asChild>

@@ -27,10 +27,25 @@ export const useFilteredBranches = () => {
 
   useEffect(() => {
     store.dispatch(fetchBranches()).unwrap();
+  }, []);
+
+  useEffect(() => {
     if (selectedBranch) {
       fetchData();
     }
   }, [selectedBranch]);
+
+  useEffect(() => {
+    if (branches.length === 0) return;
+    setSelectedBranch(
+      userRoles?.role === 'root'
+        ? null
+        : {
+            nombre: filteredBranches[0].nombre,
+            _id: filteredBranches[0]._id as string,
+          }
+    );
+  }, [branches]);
 
   return {
     branches: filteredBranches,
