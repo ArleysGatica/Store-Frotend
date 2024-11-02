@@ -1,31 +1,5 @@
 'use client';
 
-// import { useState, useEffect } from 'react';
-// import { Button } from '@/components/ui/button';
-// import {
-//   Card,
-//   CardContent,
-//   CardDescription,
-//   CardHeader,
-//   CardTitle,
-// } from '@/components/ui/card';
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from '@/components/ui/table';
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from '@/components/ui/dialog';
-// import { Eye } from 'lucide-react';
 import { Sale } from './Sale';
 import { Inventory } from './Inventory';
 import { SaleHistory } from './SaleHistory';
@@ -36,13 +10,7 @@ import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { GetBranches } from '@/shared/helpers/Branchs';
 import { store } from '@/app/store';
 import { updateSelectedBranch } from '@/app/slices/branchSlice';
-
-// Simulated discount rules
-// const discountRules = [
-//   { id: 1, productId: 1, minQuantity: 5, discountPercentage: 10 },
-//   { id: 2, productId: 2, minQuantity: 3, discountPercentage: 15 },
-//   { id: 3, productIds: [1, 2], minQuantity: 2, discountPercentage: 20 },
-// ];
+import { getDiscountsByBranch } from '@/app/slices/salesSlice';
 
 export default function SalesInventorySystem() {
   const user = useAppSelector((state) => state.auth.signIn.user);
@@ -59,6 +27,7 @@ export default function SalesInventorySystem() {
         })
       );
       setProducts(response);
+      await store.dispatch(getDiscountsByBranch(user.sucursalId._id));
     } else {
       store.dispatch(updateSelectedBranch(null));
       setProducts([]);
@@ -70,61 +39,20 @@ export default function SalesInventorySystem() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //   const [currentSale, setCurrentSale] = useState([]);
-  //   const [salesHistory, setSalesHistory] = useState([]);
-  //   const [selectedProduct, setSelectedProduct] = useState('');
-  //   const [saleQuantity, setSaleQuantity] = useState(1);
-  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   const [selectedSale, setSelectedSale] = useState(null);
-  //   const [isSupplier, setIsSupplier] = useState(false);
-
   //   useEffect(() => {
-  //     updateCurrentSalePrices();
+  //     checkLowInventory();
   //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   }, [isSupplier]);
+  //   }, [products]);
 
-  //   const updateCurrentSalePrices = () => {
-  //     setCurrentSale(
-  //       currentSale.map((item) => ({
-  //         ...item,
-  //         price: isSupplier
-  //           ? products.find((p) => p.id === item.id).supplierPrice
-  //           : products.find((p) => p.id === item.id).price,
-  //       }))
-  //     );
-  //   };
+  //   const checkLowInventory = () => {
+  //     const lowInventoryAlerts = products
+  //       .filter((product) => product.inventory <= product.reorderPoint)
+  //       .map((product) => ({
+  //         type: 'warning',
+  //         message: `Low inventory alert for ${product.name}. Current stock: ${product.inventory}`,
+  //       }));
 
-  //   const addToSale = () => {
-  //     const product = products.find((p) => p.id === parseInt(selectedProduct));
-  //     if (product && product.inventory >= saleQuantity) {
-  //       const price = isSupplier ? product.supplierPrice : product.price;
-  //       const existingItem = currentSale.find((item) => item.id === product.id);
-  //       if (existingItem) {
-  //         setCurrentSale(
-  //           currentSale.map((item) =>
-  //             item.id === product.id
-  //               ? { ...item, quantity: item.quantity + saleQuantity, price }
-  //               : item
-  //           )
-  //         );
-  //       } else {
-  //         setCurrentSale([
-  //           ...currentSale,
-  //           { ...product, quantity: saleQuantity, price },
-  //         ]);
-  //       }
-  //       setSelectedProduct('');
-  //       setSaleQuantity(1);
-  //     } else {
-  //       setAlerts([
-  //         ...alerts,
-  //         { type: 'error', message: 'Insufficient inventory for this sale' },
-  //       ]);
-  //     }
-  //   };
-
-  //   const removeFromSale = (productId) => {
-  //     setCurrentSale(currentSale.filter((item) => item.id !== productId));
+  //     console.log(lowInventoryAlerts);
   //   };
 
   //   const applyDiscounts = (saleItems) => {

@@ -1,17 +1,24 @@
-import { createDiscount, getAllDiscounts } from '@/api/services/sales';
+import {
+  createDiscount,
+  getAllDiscounts,
+  getDiscountByBranchId,
+} from '@/api/services/sales';
 import { IStatus } from '@/interfaces/branchInterfaces';
+import { IListDescuentoResponse } from '@/interfaces/salesInterfaces';
 import { handleThunkError } from '@/shared/utils/errorHandlers';
 import { IDescuentoCreate } from '@/ui/components/Discount/indes';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface SalesState {
   discounts: IDescuentoCreate[];
+  branchDiscounts: IListDescuentoResponse[];
   status: IStatus;
   error: string | null;
 }
 
 const initialState: SalesState = {
   discounts: [],
+  branchDiscounts: [],
   status: 'idle',
   error: null,
 };
@@ -37,6 +44,18 @@ export const getDiscounts = createAsyncThunk('sales/get', async () => {
     return handleThunkError(error);
   }
 });
+
+export const getDiscountsByBranch = createAsyncThunk(
+  'sales/getByBranchId',
+  async (id: string) => {
+    try {
+      const response = await getDiscountByBranchId(id);
+      return response.data;
+    } catch (error) {
+      return handleThunkError(error);
+    }
+  }
+);
 
 const salesSlice = createSlice({
   name: 'sales',
@@ -68,6 +87,10 @@ const salesSlice = createSlice({
       .addCase(getDiscounts.fulfilled, (state, { payload }) => {
         state.status = 'succeeded';
         state.discounts = payload as IDescuentoCreate[];
+      })
+      .addCase(getDiscountsByBranch.fulfilled, (state, { payload }) => {
+        state.status = 'succeeded';
+        state.branchDiscounts = payload;
       });
   },
 });

@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import './style.scss';
+import { useAppSelector } from '@/app/hooks';
 
 export interface IProductSale {
   productId: string;
@@ -44,6 +45,9 @@ export interface ISaleProps {
 }
 
 export const Sale = ({ products, setProducts }: ISaleProps) => {
+  const discounts = useAppSelector((state) => state.sales.branchDiscounts);
+  console.log(discounts, 'discounts by branch');
+
   const [open, setOpen] = useState(false);
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
@@ -129,22 +133,6 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
     );
     setProducts(updatedProducts);
   };
-
-  //   useEffect(() => {
-  //     checkLowInventory();
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   }, [products]);
-
-  //   const checkLowInventory = () => {
-  //     const lowInventoryAlerts = products
-  //       .filter((product) => product.inventory <= product.reorderPoint)
-  //       .map((product) => ({
-  //         type: 'warning',
-  //         message: `Low inventory alert for ${product.name}. Current stock: ${product.inventory}`,
-  //       }));
-
-  //     console.log(lowInventoryAlerts);
-  //   };
 
   const subTotal = productSale.reduce(
     (sum, item) => sum + item.price * item.quantity,
