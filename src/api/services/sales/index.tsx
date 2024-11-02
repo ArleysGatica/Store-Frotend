@@ -16,3 +16,11 @@ export const getAllDiscounts = async (): Promise<AxiosResponse> => {
   const response = await axiosInstance.get('/');
   return response;
 };
+
+export const getDiscountByBranchId = async (
+  id: string
+): Promise<AxiosResponse> => {
+  const axiosInstance = createAxiosInstance(Token(), PATH_LIST.Sales);
+  const response = await axiosInstance.get(`/${id}/branch`);
+  return response;
+};

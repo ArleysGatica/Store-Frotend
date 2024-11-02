@@ -1,0 +1,13 @@
+.inventory__card {
+  @apply h-[36rem] max-h-[36rem] overflow-y-auto;
+
+  &::-webkit-scrollbar {
+    @apply hidden #{!important};
+  }
+}
+
+.product__list {
+  &::-webkit-scrollbar {
+    @apply hidden #{!important};
+  }
+}
