@@ -1,22 +1,28 @@
-import { IProductoGroups } from '@/api/services/groups';
-import { Branch } from '@/app/slices/branchSlice';
-
-export interface IBranchSlice {
-  status: IStatus;
-  error: string | null;
-
-  branches: IBranch | null;
-  loading: boolean;
+export interface IProductoGroups {
+  _id?: string;
+  nombre: string;
+  descripcion?: string;
 }
 
-export interface IBranch {
-  _id: string;
+export interface Branch {
+  _id?: string;
   pais: string;
   ciudad: string;
   nombre: string;
   telefono: string;
   direccion: string;
   description: string;
+}
+
+export interface IBranchWithProducts extends Branch {
+  products: ITablaBranch[];
+}
+
+export interface BranchState {
+  data: Branch[];
+  selectedBranch: IBranchWithProducts | null;
+  status: IStatus;
+  error: string | null;
 }
 
 export interface ICategoriesProps {
@@ -27,6 +33,7 @@ export interface ICategoriesProps {
 export interface IBranchProps {
   onEdit: (isEdit: boolean) => void;
   branch: Branch;
+  handleSelectBranch: (branch: Branch) => void;
 }
 
 export type IStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
