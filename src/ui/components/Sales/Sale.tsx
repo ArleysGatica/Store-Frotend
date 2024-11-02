@@ -9,7 +9,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Check, ChevronsUpDown, DollarSign, Truck } from 'lucide-react';
+import {
+  Check,
+  ChevronsUpDown,
+  ShoppingBag,
+  ShoppingCart,
+  Truck,
+} from 'lucide-react';
 import { ProductSale } from './ProductSale';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import React, { useState } from 'react';
@@ -29,14 +35,25 @@ import {
 import { cn } from '@/lib/utils';
 import './style.scss';
 import { useAppSelector } from '@/app/hooks';
+import {
+  applyDiscounts,
+  handleProductSaleAlerts,
+} from '@/shared/helpers/salesHelper';
+import { toast, Toaster } from 'sonner';
 
 export interface IProductSale {
   productId: string;
+  groupId: string;
+  sucursalId: string;
   productName: string;
   quantity: number;
   price: number;
-  discount: number;
-  discountPercentage: number;
+  discount: null | {
+    id: string;
+    name: string;
+    amount: number;
+    percentage: number;
+  };
 }
 
 export interface ISaleProps {
@@ -46,7 +63,7 @@ export interface ISaleProps {
 
 export const Sale = ({ products, setProducts }: ISaleProps) => {
   const discounts = useAppSelector((state) => state.sales.branchDiscounts);
-  console.log(discounts, 'discounts by branch');
+  const [procesingSale, setProcesingSale] = useState(false);
 
   const [open, setOpen] = useState(false);
   const [quantity, setQuantity] = useState(0);
@@ -84,8 +101,9 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
       productName: selectedProduct?.nombre ?? '',
       quantity: quantity,
       price: price,
-      discount: 0,
-      discountPercentage: 0,
+      discount: null,
+      groupId: selectedProduct?.grupoId ?? '',
+      sucursalId: selectedProduct?.sucursalId ?? '',
     };
 
     const isExistentProduct = productSale.find(
@@ -95,26 +113,40 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
     );
 
     if (isExistentProduct) {
+      newProductSale.quantity =
+        newProductSale.quantity + isExistentProduct.quantity;
+    }
+
+    const productWithDiscount = applyDiscounts(newProductSale, discounts);
+
+    if (isExistentProduct) {
       const updatedProductSale = productSale.map((item) =>
-        item.productId === newProductSale.productId &&
-        item.price === newProductSale.price
-          ? { ...item, quantity: item.quantity + newProductSale.quantity }
+        item.productId === productWithDiscount.productId &&
+        item.price === productWithDiscount.price
+          ? productWithDiscount
           : item
       );
       setProductSale(updatedProductSale);
     } else {
-      setProductSale([...productSale, newProductSale]);
+      setProductSale([...productSale, productWithDiscount]);
     }
 
-    const updatedProducts = products.map((item) =>
-      item.id === newProductSale.productId
-        ? { ...item, stock: item.stock - newProductSale.quantity }
-        : item
-    );
+    const updatedProducts = products.map((item) => {
+      const newStock = item.stock - productWithDiscount.quantity;
+
+      handleProductSaleAlerts(
+        item.nombre,
+        newStock,
+        selectedProduct?.puntoReCompra ?? 0
+      );
+
+      return item.id === productWithDiscount.productId
+        ? { ...item, stock: newStock }
+        : item;
+    });
 
     setProducts(updatedProducts);
     setQuantity(0);
-    setPrice(0);
   };
 
   const handleRemoveProductSale = (productId: string) => {
@@ -139,16 +171,32 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
     0
   );
   const totalDiscount = productSale.reduce(
-    (sum, item) => sum + (item.discount || 0),
+    (sum, item) => sum + (item.discount?.amount || 0),
     0
   );
   const total = subTotal - totalDiscount;
+
+  const handleProccessSale = () => {
+    setProcesingSale(true);
+    const examplePromiseSale = new Promise((resolve) => {
+      setTimeout(() => {
+        setProcesingSale(false);
+        resolve('Venta procesada exitosamente');
+      }, 2500);
+    });
+
+    toast.promise(examplePromiseSale, {
+      loading: 'Procesando...',
+      success: 'Venta procesada exitosamente',
+      error: 'Error al procesar la venta',
+    });
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <DollarSign />
+          <ShoppingBag />
           Gestionar venta
         </CardTitle>
       </CardHeader>
@@ -156,6 +204,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
         <div className="flex items-center mb-4 space-x-2">
           <Switch
             className="p-0"
+            disabled={procesingSale}
             checked={supplierMode}
             onCheckedChange={setSupplierMode}
           />
@@ -170,6 +219,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
+                  disabled={procesingSale}
                   variant="outline"
                   role="combobox"
                   aria-expanded={open}
@@ -225,7 +275,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
               type="number"
               id="branch-select"
               value={selectedProduct ? quantity : 0}
-              disabled={!selectedProduct}
+              disabled={!selectedProduct || procesingSale}
               onChange={(e) =>
                 handleQuantityChange(
                   selectedProduct?.id!,
@@ -244,7 +294,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
                 type="number"
                 id="branch-select"
                 value={selectedProduct ? price : 0}
-                disabled={!selectedProduct}
+                disabled={!selectedProduct || procesingSale}
                 onChange={(e) =>
                   handlePriceChange(
                     selectedProduct?.id!,
@@ -259,7 +309,9 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
           <div className="flex flex-col justify-end gap-1">
             <Button
               className="w-[7rem]"
-              disabled={!selectedProduct || quantity <= 0 || price <= 0}
+              disabled={
+                !selectedProduct || quantity <= 0 || price <= 0 || procesingSale
+              }
               onClick={handleAddProductSale}
             >
               Agregar
@@ -267,6 +319,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
           </div>
         </div>
         <ProductSale
+          procesingSale={procesingSale}
           products={productSale}
           handleRemoveProductSale={handleRemoveProductSale}
         />
@@ -275,8 +328,15 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
         <p>Subtotal: ${subTotal.toFixed(2)}</p>
         <p className="text-green-600">Descuento: ${totalDiscount.toFixed(2)}</p>
         <p className="font-bold">Total: ${total.toFixed(2)}</p>
-        <Button disabled={productSale.length === 0}>Procesar Venta</Button>
+        <Button
+          disabled={productSale.length === 0 || procesingSale}
+          onClick={handleProccessSale}
+        >
+          Procesar
+          <ShoppingCart />
+        </Button>
       </CardFooter>
+      <Toaster richColors />
     </Card>
   );
 };

@@ -1,9 +1,3 @@
-import {
-  IProduct,
-  Branch as IBranch,
-  IProductoGroups,
-} from './branchInterfaces';
-
 export interface IListDescuentoResponse {
   descuentosPorProductosGenerales: IDescuentosProductos[];
   descuentosPorProductosEnSucursal: IDescuentosProductos[];
@@ -13,25 +7,26 @@ export interface IListDescuentoResponse {
 
 export interface IDescuentosProductos {
   descuentoId: IDescuento;
-  productId: IProduct;
-  sucursalId?: IBranch;
+  productId: string;
+  sucursalId?: string;
   deleted_at: Date | null;
 }
 
 export interface IDescuentoGrupo {
   descuentoId: IDescuento;
-  grupoId: IProductoGroups;
-  sucursalId?: IBranch;
+  grupoId: string;
+  sucursalId?: string;
   deleted_at: Date | null;
 }
 
 export interface IDescuento {
+  _id: string;
   nombre: string;
   tipoDescuento: IDisccountType;
   valorDescuento: number;
   fechaInicio: Date;
   fechaFin: Date;
-  minimoCompra: number;
+  minimoCompra: { $numberDecimal: number };
   minimoCantidad: number;
   activo: boolean;
   moneda_id: string;

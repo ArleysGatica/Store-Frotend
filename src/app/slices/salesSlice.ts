@@ -11,14 +11,14 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface SalesState {
   discounts: IDescuentoCreate[];
-  branchDiscounts: IListDescuentoResponse[];
+  branchDiscounts: IListDescuentoResponse;
   status: IStatus;
   error: string | null;
 }
 
 const initialState: SalesState = {
   discounts: [],
-  branchDiscounts: [],
+  branchDiscounts: {} as IListDescuentoResponse,
   status: 'idle',
   error: null,
 };
