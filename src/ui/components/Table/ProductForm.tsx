@@ -11,11 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useAppSelector } from '@/app/hooks';
 
 interface ProductFormProps {
   initialData?: ITablaBranch;
   onSubmit: (data: ITablaBranch) => void;
-  sucursalId: string;
+  sucursalId?: string;
   handleSelectChange: (value: string) => void;
   selectedGroup: {
     nombre: string;
@@ -39,6 +40,11 @@ const ProductForm = ({
   selectedGroup,
   groups,
 }: ProductFormProps) => {
+  const branches = useAppSelector((state) => state.branches.data);
+  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
+    sucursalId
+  );
+
   const [formData, setFormData] = useState({
     _id: initialData?.id || '',
     sucursalId: sucursalId,
@@ -65,6 +71,7 @@ const ProductForm = ({
         puntoReCompra: initialData.puntoReCompra || '',
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,7 +85,7 @@ const ProductForm = ({
       ...initialData,
       grupoId: selectedGroup?._id || '',
       monedaId: '671342d4664051db7c1f8792',
-      sucursalId: sucursalId,
+      sucursalId: selectedBranch ?? '',
       nombre: formData.nombre,
       descripcion: formData.descripcion,
       //@ts-ignore
@@ -103,11 +110,12 @@ const ProductForm = ({
     { id: 'stock', label: 'Stock', type: 'number', min: '0' },
     { id: 'puntoReCompra', label: 'Punto de compra', type: 'number' },
   ];
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid gap-4 py-4">
         {fields.map(({ id, label, type, step, min }) => (
-          <div key={id} className="grid grid-cols-4 items-center gap-4">
+          <div key={id} className="grid items-center grid-cols-4 gap-4">
             <Label htmlFor={id} className="text-right">
               {label}
             </Label>
@@ -124,12 +132,34 @@ const ProductForm = ({
             />
           </div>
         ))}
-        <div className="items-center gap-4 flex">
+        {!sucursalId && (
+          <div className="flex items-center justify-end gap-4">
+            <Label htmlFor="branch-select" className="text-right">
+              Sucursal
+            </Label>
+            <Select
+              value={selectedBranch}
+              onValueChange={(value) => setSelectedBranch(value)}
+            >
+              <SelectTrigger className="w-[75%]">
+                <SelectValue placeholder="Selecciona" />
+              </SelectTrigger>
+              <SelectContent className="flex flex-col gap-2">
+                {branches.map((branch) => (
+                  <SelectItem key={branch._id} value={branch._id as string}>
+                    {branch.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        <div className="flex items-center justify-end gap-4">
           <Label htmlFor="branch-select" className="text-right">
             Categorias
           </Label>
-          <Select onValueChange={handleSelectChange}>
-            <SelectTrigger>
+          <Select disabled={!selectedBranch} onValueChange={handleSelectChange}>
+            <SelectTrigger className="w-[75%]">
               <SelectValue placeholder="Selecciona" />
             </SelectTrigger>
             <SelectContent className="flex flex-col gap-2">
