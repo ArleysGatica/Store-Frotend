@@ -4,9 +4,17 @@ import { useAppSelector } from '@/app/hooks';
 import { Allproducts } from '@/ui/components/products/AllProducts';
 import { ProductsTransit } from '@/ui/components/products/TransitProduct';
 import { ProductFormExist } from '@/ui/components/products/ExistingProduct';
+import { useEffect } from 'react';
+import { store } from '@/app/store';
+import { fetchBranches } from '@/app/slices/branchSlice';
 
 export const ViewProucts = () => {
   const user = useAppSelector((state) => state.auth.signIn.user);
+
+  useEffect(() => {
+    store.dispatch(fetchBranches()).unwrap();
+  }, []);
+
   return (
     <div className="container mx-auto">
       <Tabs defaultValue="listProduct">

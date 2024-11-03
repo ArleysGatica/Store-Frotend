@@ -62,7 +62,7 @@ const SearchAndFilter = ({
             selectedGroup={selectedGroup}
             groups={groups}
             onSubmit={onAddProduct}
-            sucursalId={sucursalId!}
+            sucursalId={sucursalId}
           />
         </DialogContent>
       </Dialog>
