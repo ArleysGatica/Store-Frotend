@@ -48,6 +48,14 @@ export default function PendingProductsByTransfer() {
     );
     setShipments(updatedShipments);
   };
+  const handleChangeBuyback = (id: string, priceBuyback: number) => {
+    const updatedShipments = shipments.map((shipment) =>
+      shipment.id === id
+        ? { ...shipment, puntoReCompra: priceBuyback }
+        : shipment
+    );
+    setShipments(updatedShipments);
+  };
 
   const handleChangeProductState = (id: string, state: string) => {
     const updatedShipments = shipments.map((shipment) =>
@@ -111,6 +119,7 @@ export default function PendingProductsByTransfer() {
         precio: 0,
         recibido: false,
         estadoProducto: '',
+        puntoReCompra: 0,
       }));
 
     setShipments(formattedShipmentData);
@@ -136,6 +145,7 @@ export default function PendingProductsByTransfer() {
               status={status}
               handleChangeQuantityReceived={handleChangeQuantityReceived}
               handleChangePricing={handleChangePricing}
+              handleChangeBuyback={handleChangeBuyback}
               handleChangeProductState={handleChangeProductState}
               handleSaveImages={handleSaveImages}
               handleSaveComment={handleSaveComment}

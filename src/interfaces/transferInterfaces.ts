@@ -1,5 +1,5 @@
 import React from 'react';
-import { IBranch, IStatus, ITablaBranch } from './branchInterfaces';
+import { Branch, IStatus, ITablaBranch } from './branchInterfaces';
 import { IUser } from '@/app/slices/login';
 
 export interface IShippedOrder {
@@ -118,8 +118,8 @@ export interface IPendingTransfer {
   fechaRegistro: Date;
   fechaEnvio: Date;
   fechaRecepcion: Date | null;
-  sucursalOrigenId: IBranch;
-  sucursalDestinoId: IBranch;
+  sucursalOrigenId: Branch;
+  sucursalDestinoId: Branch;
   usuarioIdEnvia: IUser;
   usuarioIdRecibe: IUser | null;
   estado: string;
@@ -167,6 +167,7 @@ export interface InventarioSucursal {
   deleted_at: string | null;
   created_at: string;
   update_at: string;
+  puntoReCompra?: number;
 }
 
 export interface IProductInTransit {
@@ -184,8 +185,9 @@ export interface IProductInTransit {
 export interface InventarioSucursalWithPopulated {
   _id: string;
   productoId: IProducto;
-  sucursalId: IBranch;
+  sucursalId: Branch;
   stock: number;
+  puntoReCompra?: number;
   precio: { $numberDecimal: number };
   ultimo_movimiento: string;
   deleted_at: string | null;
@@ -219,6 +221,7 @@ export interface IDetalleTrasladoRecepcion {
   estadoEquipo: string;
   archivosAdjuntosRecibido: string[] | null;
   estadoProducto?: string;
+  puntoReCompra: number;
 }
 
 export interface IProductoTraslado extends IDetalleTrasladoRecepcion {
