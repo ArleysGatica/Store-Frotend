@@ -11,3 +11,11 @@
     @apply hidden #{!important};
   }
 }
+
+.product__sale__list {
+  @apply max-h-[20rem] overflow-auto;
+
+  &::-webkit-scrollbar {
+    @apply hidden #{!important};
+  }
+}

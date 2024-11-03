@@ -12,13 +12,14 @@ import { Switch } from '@/components/ui/switch';
 import {
   Check,
   ChevronsUpDown,
+  CirclePlus,
   ShoppingBag,
   ShoppingCart,
   Truck,
 } from 'lucide-react';
 import { ProductSale } from './ProductSale';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Popover,
   PopoverContent,
@@ -40,28 +41,17 @@ import {
   handleProductSaleAlerts,
 } from '@/shared/helpers/salesHelper';
 import { toast, Toaster } from 'sonner';
-
-export interface IProductSale {
-  productId: string;
-  groupId: string;
-  sucursalId: string;
-  productName: string;
-  quantity: number;
-  price: number;
-  discount: null | {
-    id: string;
-    name: string;
-    amount: number;
-    percentage: number;
-  };
-}
+import { IProductSale, ISale } from '@/interfaces/salesInterfaces';
+import { createSale } from '@/app/slices/salesSlice';
+import { store } from '@/app/store';
 
 export interface ISaleProps {
+  userId: string;
   products: ITablaBranch[];
   setProducts: React.Dispatch<React.SetStateAction<ITablaBranch[]>>;
 }
 
-export const Sale = ({ products, setProducts }: ISaleProps) => {
+export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
   const discounts = useAppSelector((state) => state.sales.branchDiscounts);
   const [procesingSale, setProcesingSale] = useState(false);
 
@@ -103,7 +93,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
       price: price,
       discount: null,
       groupId: selectedProduct?.grupoId ?? '',
-      sucursalId: selectedProduct?.sucursalId ?? '',
+      clientType: supplierMode ? 'Proveedor' : 'Regular',
     };
 
     const isExistentProduct = productSale.find(
@@ -117,7 +107,11 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
         newProductSale.quantity + isExistentProduct.quantity;
     }
 
-    const productWithDiscount = applyDiscounts(newProductSale, discounts);
+    const productWithDiscount = applyDiscounts(
+      selectedProduct?.sucursalId ?? '',
+      newProductSale,
+      discounts
+    );
 
     if (isExistentProduct) {
       const updatedProductSale = productSale.map((item) =>
@@ -166,26 +160,53 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
     setProducts(updatedProducts);
   };
 
-  const subTotal = productSale.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const totalDiscount = productSale.reduce(
-    (sum, item) => sum + (item.discount?.amount || 0),
-    0
-  );
-  const total = subTotal - totalDiscount;
+  const saleSummary = useMemo(() => {
+    if (productSale.length === 0)
+      return { subTotal: 0, totalDiscount: 0, total: 0 };
+
+    const subTotal = productSale.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    const totalDiscount = productSale.reduce(
+      (sum, item) => sum + (item.discount?.amount || 0),
+      0
+    );
+    const total = subTotal - totalDiscount;
+
+    return {
+      subTotal,
+      totalDiscount,
+      total,
+    };
+  }, [productSale]);
 
   const handleProccessSale = () => {
     setProcesingSale(true);
-    const examplePromiseSale = new Promise((resolve) => {
-      setTimeout(() => {
-        setProcesingSale(false);
-        resolve('Venta procesada exitosamente');
-      }, 2500);
-    });
+    const newSale: ISale = {
+      userId: userId,
+      sucursalId: selectedProduct?.sucursalId ?? '',
+      products: productSale,
+      subtotal: saleSummary.subTotal,
+      total: saleSummary.total,
+      discount: saleSummary.totalDiscount,
+    };
 
-    toast.promise(examplePromiseSale, {
+    const request = store
+      .dispatch(createSale(newSale))
+      .unwrap()
+      .catch(() => {
+        setProcesingSale(false);
+        return Promise.reject();
+      })
+      .then(() => {
+        setTimeout(() => {
+          setProductSale([]);
+          setProcesingSale(false);
+        }, 1000);
+      });
+
+    toast.promise(request, {
       loading: 'Procesando...',
       success: 'Venta procesada exitosamente',
       error: 'Error al procesar la venta',
@@ -214,7 +235,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
           </Label>
         </div>
         <div className="flex gap-4 mb-4">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col w-full gap-1">
             <Label className="text-xs">Producto</Label>
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
@@ -223,7 +244,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
                   variant="outline"
                   role="combobox"
                   aria-expanded={open}
-                  className="w-[250px] justify-between"
+                  className="justify-between w-full"
                 >
                   {selectedProduct
                     ? products.find(
@@ -233,7 +254,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
                   <ChevronsUpDown className="w-4 h-4 ml-2 opacity-50 shrink-0" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[250px] p-0">
+              <PopoverContent className="p-0">
                 <Command>
                   <CommandInput placeholder="Buscar producto" />
                   <CommandList className="product__list">
@@ -269,7 +290,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
               </PopoverContent>
             </Popover>
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 w-[20%]">
             <Label className="text-xs">Cantidad</Label>
             <Input
               type="number"
@@ -284,11 +305,11 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
               }
               min={0}
               max={selectedProduct?.stock ?? 0}
-              className="w-[6rem]"
+              className="w-full"
             />
           </div>
           {supplierMode && (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 w-[20%]">
               <Label className="text-xs">Precio</Label>
               <Input
                 type="number"
@@ -302,35 +323,42 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
                   )
                 }
                 min={0}
-                className="w-[6rem]"
+                className="w-full"
               />
             </div>
           )}
-          <div className="flex flex-col justify-end gap-1">
+          <div className="flex flex-col justify-end gap-1 w-[10%]">
             <Button
-              className="w-[7rem]"
+              className="w-full text-xs"
               disabled={
                 !selectedProduct || quantity <= 0 || price <= 0 || procesingSale
               }
               onClick={handleAddProductSale}
             >
-              Agregar
+              <CirclePlus />
             </Button>
           </div>
         </div>
-        <ProductSale
-          procesingSale={procesingSale}
-          products={productSale}
-          handleRemoveProductSale={handleRemoveProductSale}
-        />
+        <div className="product__sale__list">
+          <ProductSale
+            procesingSale={procesingSale}
+            products={productSale}
+            handleRemoveProductSale={handleRemoveProductSale}
+          />
+        </div>
       </CardContent>
-      <CardFooter className="flex items-center justify-between">
-        <p>Subtotal: ${subTotal.toFixed(2)}</p>
-        <p className="text-green-600">Descuento: ${totalDiscount.toFixed(2)}</p>
-        <p className="font-bold">Total: ${total.toFixed(2)}</p>
+      <CardFooter className="flex items-center justify-between py-0 px-[1.5rem]">
+        <span>Subtotal: ${saleSummary.subTotal.toFixed(2)}</span>
+        <span className="text-green-600">
+          Descuento: ${saleSummary.totalDiscount.toFixed(2)}
+        </span>
+        <span className="font-bold">
+          Total: ${saleSummary.total.toFixed(2)}
+        </span>
         <Button
           disabled={productSale.length === 0 || procesingSale}
           onClick={handleProccessSale}
+          className="h-[2rem]"
         >
           Procesar
           <ShoppingCart />

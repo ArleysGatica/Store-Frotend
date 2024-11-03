@@ -1,3 +1,7 @@
+import { useAppSelector } from '@/app/hooks';
+import { getSalesByBranch } from '@/app/slices/salesSlice';
+import { store } from '@/app/store';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -6,123 +10,138 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { getFormatedDate } from '@/shared/helpers/transferHelper';
+import { Eye, History, ShoppingBasket } from 'lucide-react';
+import { useEffect } from 'react';
 
 export const SaleHistory = () => {
+  const user = useAppSelector((state) => state.auth.signIn.user);
+  const salesHistory = useAppSelector((state) => state.sales.branchSales);
+
+  useEffect(() => {
+    store.dispatch(getSalesByBranch(user?.sucursalId?._id ?? '')).unwrap();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <Card className="mt-4 h-[40rem]">
+    <Card className="mt-4 h-[36rem]">
       <CardHeader>
-        <CardTitle>Sales History</CardTitle>
-        <CardDescription>Recent sales transactions</CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          <History />
+          Historial de ventas
+        </CardTitle>
+        <CardDescription>
+          Ver los detalles de las ventas realizadas
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Sale ID</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Customer Type</TableHead>
+              <TableHead>Usuario</TableHead>
+              <TableHead>Fecha</TableHead>
               <TableHead>Subtotal</TableHead>
-              <TableHead>Discount</TableHead>
+              <TableHead>Descuento</TableHead>
               <TableHead>Total</TableHead>
-              <TableHead>Details</TableHead>
+              <TableHead>Productos</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {/* {salesHistory
-              .slice()
-              .reverse()
-              .map((sale) => (
-                <TableRow key={sale.id}>
-                  <TableCell>{sale.id}</TableCell>
-                  <TableCell>{new Date(sale.date).toLocaleString()}</TableCell>
-                  <TableCell>
-                    {sale.isSupplier ? 'Supplier' : 'Regular'}
-                  </TableCell>
-                  <TableCell>${sale.subtotal.toFixed(2)}</TableCell>
-                  <TableCell>${sale.totalDiscount.toFixed(2)}</TableCell>
-                  <TableCell>${sale.total.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedSale(sale)}
-                        >
-                          <Eye className="w-4 h-4 mr-2" />
-                          View
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-3xl">
-                        <DialogHeader>
-                          <DialogTitle>
-                            Sale Details - Sale #{sale.id}
-                          </DialogTitle>
-                          <DialogDescription>
-                            Date: {new Date(sale.date).toLocaleString()}
-                            <br />
-                            Customer Type:{' '}
-                            {sale.isSupplier ? 'Supplier' : 'Regular'}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Product</TableHead>
-                              <TableHead>Quantity</TableHead>
-                              <TableHead>Price</TableHead>
-                              <TableHead>Discount</TableHead>
-                              <TableHead>Total</TableHead>
-                            </TableRow>
-                          </TableHeader>
+            {salesHistory.map((sale, index) => (
+              <TableRow key={index} className="h-[50px]">
+                <TableCell>{sale.userId}</TableCell>
+                <TableCell>{getFormatedDate(new Date())}</TableCell>
+                <TableCell>${sale.subtotal.toFixed(2)}</TableCell>
+                <TableCell>${sale.discount.toFixed(2)}</TableCell>
+                <TableCell>${sale.total.toFixed(2)}</TableCell>
+                <TableCell>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Eye className="w-4 h-4" />
+                        View
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-3xl rounded-[4px] min-h-[12.5rem]">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 uppercase">
+                          <ShoppingBasket />
+                          Productos
+                        </DialogTitle>
+                      </DialogHeader>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Producto</TableHead>
+                            <TableHead className="text-center">
+                              Tipo de cliente
+                            </TableHead>
+                            <TableHead className="text-center">
+                              Cantidad
+                            </TableHead>
+                            <TableHead className="text-center">
+                              Precio
+                            </TableHead>
+                            <TableHead className="text-center">
+                              Descuento
+                            </TableHead>
+                            <TableHead className="text-center">Total</TableHead>
+                          </TableRow>
+                        </TableHeader>
 
-                          <TableBody>
-                            {sale.items.map((item) => (
-                              <TableRow key={item.id}>
-                                <TableCell>{item.name}</TableCell>
-                                <TableCell>{item.quantity}</TableCell>
-                                <TableCell>${item.price.toFixed(2)}</TableCell>
-                                <TableCell>
-                                  {item.discount ? (
-                                    <span className="text-green-600">
-                                      ${item.discount.toFixed(2)} (
-                                      {item.discountPercentage}%)
-                                    </span>
-                                  ) : (
-                                    '-'
-                                  )}
-                                </TableCell>
-                                <TableCell>
-                                  $
-                                  {(
-                                    item.price * item.quantity -
-                                    (item.discount || 0)
-                                  ).toFixed(2)}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                        <div className="mt-4 text-right">
-                          <p>Subtotal: ${sale.subtotal.toFixed(2)}</p>
-                          <p className="text-green-600">
-                            Total Discount: ${sale.totalDiscount.toFixed(2)}
-                          </p>
-                          <p className="font-bold">
-                            Total: ${sale.total.toFixed(2)}
-                          </p>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </TableCell>
-                </TableRow>
-              ))} */}
+                        <TableBody>
+                          {sale.products.map((item) => (
+                            <TableRow key={item.productId}>
+                              <TableCell>{item.productName}</TableCell>
+                              <TableCell className="text-center">
+                                {item.clientType}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {item.quantity}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                ${item.price.toFixed(2)}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {item.discount && item.discount?.amount > 0 ? (
+                                  <span className="text-green-600">
+                                    ${item.discount.amount.toFixed(2)} (
+                                    {item.discount.percentage}%)
+                                  </span>
+                                ) : (
+                                  '-'
+                                )}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                $
+                                {(
+                                  item.price * item.quantity -
+                                  (item.discount?.amount || 0)
+                                ).toFixed(2)}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </DialogContent>
+                  </Dialog>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </CardContent>
