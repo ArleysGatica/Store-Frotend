@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { ProductSale } from './ProductSale';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Popover,
   PopoverContent,
@@ -46,15 +46,18 @@ import { createSale } from '@/app/slices/salesSlice';
 import { store } from '@/app/store';
 
 export interface ISaleProps {
-  userId: string;
   products: ITablaBranch[];
   setProducts: React.Dispatch<React.SetStateAction<ITablaBranch[]>>;
 }
 
-export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
+export const Sale = ({ products, setProducts }: ISaleProps) => {
+  const user = useAppSelector((state) => state.auth.signIn.user);
+  const selectedBranch = useAppSelector(
+    (state) => state.branches.selectedBranch
+  );
   const discounts = useAppSelector((state) => state.sales.branchDiscounts);
-  const [procesingSale, setProcesingSale] = useState(false);
 
+  const [procesingSale, setProcesingSale] = useState(false);
   const [open, setOpen] = useState(false);
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
@@ -184,8 +187,8 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
   const handleProccessSale = () => {
     setProcesingSale(true);
     const newSale: ISale = {
-      userId: userId,
-      sucursalId: selectedProduct?.sucursalId ?? '',
+      userId: user?._id ?? '',
+      sucursalId: user?.sucursalId?._id ?? selectedBranch?._id,
       products: productSale,
       subtotal: saleSummary.subTotal,
       total: saleSummary.total,
@@ -212,6 +215,18 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
       error: 'Error al procesar la venta',
     });
   };
+
+  const cleanFieldsByBranchChange = () => {
+    setProductSale([]);
+    setQuantity(0);
+    setPrice(0);
+    setSupplierMode(false);
+    setSelectedProduct(null);
+  };
+
+  useEffect(() => {
+    cleanFieldsByBranchChange();
+  }, [selectedBranch]);
 
   return (
     <Card>
@@ -240,7 +255,7 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
-                  disabled={procesingSale}
+                  disabled={procesingSale || products.length === 0}
                   variant="outline"
                   role="combobox"
                   aria-expanded={open}

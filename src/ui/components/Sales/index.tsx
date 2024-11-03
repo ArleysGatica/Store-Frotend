@@ -6,7 +6,7 @@ import { SaleHistory } from './SaleHistory';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/app/hooks';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { Branch, ITablaBranch } from '@/interfaces/branchInterfaces';
 import { GetBranches } from '@/shared/helpers/Branchs';
 import { store } from '@/app/store';
 import { updateSelectedBranch } from '@/app/slices/branchSlice';
@@ -16,18 +16,22 @@ export default function SalesInventorySystem() {
   const user = useAppSelector((state) => state.auth.signIn.user);
   const [products, setProducts] = useState<ITablaBranch[]>([]);
 
-  const handleLoadBranch = async () => {
-    if (user?.sucursalId) {
-      const response = await GetBranches(user.sucursalId._id);
+  const loadProductsByBranch = async (branch: Branch) => {
+    const response = await GetBranches(branch._id ?? '');
 
-      store.dispatch(
-        updateSelectedBranch({
-          ...user.sucursalId,
-          products: response,
-        })
-      );
-      setProducts(response);
-      await store.dispatch(getDiscountsByBranch(user.sucursalId._id));
+    store.dispatch(
+      updateSelectedBranch({
+        ...branch,
+        products: response,
+      })
+    );
+    setProducts(response);
+    await store.dispatch(getDiscountsByBranch(branch._id ?? ''));
+  };
+
+  const handleLoadBranch = (branch: Branch | undefined) => {
+    if (branch) {
+      loadProductsByBranch(branch);
     } else {
       store.dispatch(updateSelectedBranch(null));
       setProducts([]);
@@ -35,7 +39,7 @@ export default function SalesInventorySystem() {
   };
 
   useEffect(() => {
-    handleLoadBranch();
+    handleLoadBranch(user?.sucursalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -61,12 +65,11 @@ export default function SalesInventorySystem() {
 
         <TabsContent value="sale">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 h-[36rem] max-h-[36rem]">
-            <Inventory products={products} />
-            <Sale
-              userId={user?._id ?? ''}
+            <Inventory
               products={products}
-              setProducts={setProducts}
+              handleLoadBranch={handleLoadBranch}
             />
+            <Sale products={products} setProducts={setProducts} />
           </div>
         </TabsContent>
         <TabsContent value="history">

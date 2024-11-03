@@ -141,7 +141,7 @@ const ProductForm = ({
               value={selectedBranch}
               onValueChange={(value) => setSelectedBranch(value)}
             >
-              <SelectTrigger className="w-[75%]">
+              <SelectTrigger className="w-[74.3%]">
                 <SelectValue placeholder="Selecciona" />
               </SelectTrigger>
               <SelectContent className="flex flex-col gap-2">
@@ -159,7 +159,7 @@ const ProductForm = ({
             Categorias
           </Label>
           <Select disabled={!selectedBranch} onValueChange={handleSelectChange}>
-            <SelectTrigger className="w-[75%]">
+            <SelectTrigger className="w-[74.3%]">
               <SelectValue placeholder="Selecciona" />
             </SelectTrigger>
             <SelectContent className="flex flex-col gap-2">
