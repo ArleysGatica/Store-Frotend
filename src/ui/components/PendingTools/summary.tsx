@@ -44,6 +44,7 @@ export interface ISummaryPendingTools {
   shipments: IProductoTraslado[];
   handleChangeQuantityReceived: (id: string, quantity: number) => void;
   handleChangePricing: (id: string, price: number) => void;
+  handleChangeBuyback: (id: string, priceBuyback: number) => void;
   handleChangeProductState: (id: string, state: string) => void;
   handleSaveImages: (id: string, images: string[]) => void;
   handleSaveComment: (id: string, comment: string) => void;
@@ -59,6 +60,7 @@ export const SummaryPendingTools = ({
   handleSaveImages,
   handleSaveComment,
   handleRemoveComment,
+  handleChangeBuyback,
 }: ISummaryPendingTools) => {
   return (
     <Card className="branch__transfer__list">
@@ -74,6 +76,7 @@ export const SummaryPendingTools = ({
               <TableHead className="w-[10%]">Enviado</TableHead>
               <TableHead className="w-[10%]">Recibido</TableHead>
               <TableHead className="w-[10%]">Precio ud.</TableHead>
+              <TableHead className="w-[10%]">Punto de Recompra</TableHead>
               <TableHead className="w-[13%]">Estado</TableHead>
               <TableHead className=" text-center w-[15%]">Detalles</TableHead>
               <TableHead className="text-center w-[15%]">Acciones</TableHead>
@@ -128,6 +131,20 @@ export const SummaryPendingTools = ({
                       value={product.precio}
                       onChange={(e) =>
                         handleChangePricing(
+                          product.id,
+                          parseInt(e.target.value)
+                        )
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      min={0}
+                      className="text-center w-[60%]"
+                      value={product?.puntoReCompra}
+                      onChange={(e) =>
+                        handleChangeBuyback(
                           product.id,
                           parseInt(e.target.value)
                         )

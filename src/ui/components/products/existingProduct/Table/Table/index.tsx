@@ -30,6 +30,7 @@ export function ProductFormExist() {
     'active',
     'draft',
   ]);
+  console.log(products, 'products');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
   const userRoles = useAppSelector((state) => state.auth.signIn.user);
@@ -40,11 +41,9 @@ export function ProductFormExist() {
   } | null>(null);
 
   const [, setGroups] = useState<IProductoGroups[]>([]);
-
   const [findData, setFindData] = useState<InventarioSucursalWithPopulated[]>(
     []
   );
-  console.log(findData, 'findData');
 
   const fetchData2 = async () => {
     if (user?.sucursalId) {
@@ -75,7 +74,7 @@ export function ProductFormExist() {
       const response = await GetBranches(selectedGroup._id);
       setGroups(response);
     } catch (error) {
-      console.error('Error fetching groups:', error);
+      console.error('', error);
     }
   };
 

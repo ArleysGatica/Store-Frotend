@@ -1,11 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AxiosError } from 'axios';
+import { handleThunkError } from '../../shared/utils/errorHandlers';
 import {
-  handleAsyncThunkError,
-  handleThunkError,
-} from '../../shared/utils/errorHandlers';
-import {
-  createTablaBranch,
   findProductoGrupoByProductId,
   inventoryAllProduct,
   inventoryGetAll,
@@ -78,6 +73,7 @@ export const fetchAllProducts = createAsyncThunk<
 
 interface ProductState {
   products: ITablaBranch[];
+
   error: string | null;
   transitProducts: IProductInTransit[];
   status: IStatus;
@@ -103,6 +99,14 @@ const productsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
+      .addCase(fetchTablaBranches.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchTablaBranches.fulfilled, (state, { payload }) => {
+        state.status = 'succeeded';
+        state.products = payload;
+      })
 
       .addCase(fetchAllProducts.pending, (state) => {
         state.status = 'loading';

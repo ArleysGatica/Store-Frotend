@@ -2,9 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { IProductoGroups, ITablaBranch } from '@/interfaces/branchInterfaces';
 import React, { useState, useEffect } from 'react';
-import { IProductoGroups } from '@/api/services/groups';
 import {
   Select,
   SelectContent,

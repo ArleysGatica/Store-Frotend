@@ -79,6 +79,7 @@ export const PendingProductsActions = ({
         precio: shipment.precio,
         recibido: shipment.recibido,
         estadoProducto: shipment.estadoProducto,
+        puntoReCompra: shipment.puntoReCompra,
       })
     );
 
