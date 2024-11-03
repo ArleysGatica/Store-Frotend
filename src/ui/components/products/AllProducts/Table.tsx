@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -8,7 +7,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Pencil, Trash } from 'lucide-react';
-import { IBranch, ITablaBranch } from '@/interfaces/branchInterfaces';
+import { Branch, ITablaBranch } from '@/interfaces/branchInterfaces';
 import { IRoles } from '@/app/slices/login';
 import {
   Tooltip,
@@ -21,7 +20,7 @@ interface IUserRole {
   _id: string;
   username: string;
   role: IRoles;
-  sucursalId?: IBranch;
+  sucursalId?: Branch;
 }
 
 interface ProductsTableProps {

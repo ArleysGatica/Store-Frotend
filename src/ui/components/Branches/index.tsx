@@ -26,11 +26,6 @@ import { Branch } from '@/interfaces/branchInterfaces';
 export default function BranchDashboard() {
   const branches = useAppSelector((state) => state.branches.data);
   const userRoles = useAppSelector((state) => state.auth.signIn.user);
-  const dataFilterID = branches.filter(
-    (branch) => branch._id === userRoles?.sucursalId?._id
-  );
-  const filteredBranche = userRoles?.role === 'root' ? branches : dataFilterID;
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSucursal, setEditingSucursal] = useState(false);
   const [newBranch, setNewBranch] = useState<Branch>({

@@ -34,4 +34,22 @@ export interface IDescuento {
   deleted_at: Date | null;
 }
 
+export interface IDescuentoCreate {
+  nombre: string;
+  tipoDescuento: 'porcentaje' | 'valor';
+  valorDescuento: number;
+  fechaInicio: Date;
+  fechaFin: Date;
+  minimoCompra: number;
+  minimoCantidad: number;
+  activo: boolean;
+  moneda_id: string;
+  codigoDescunto: string;
+  deleted_at: Date | null;
+  tipoDescuentoEntidad: 'Product' | 'Group';
+  productId: string;
+  groupId: string;
+  sucursalId: string;
+}
+
 export type IDisccountType = 'porcentaje' | 'valor';
