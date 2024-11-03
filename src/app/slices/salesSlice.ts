@@ -4,9 +4,11 @@ import {
   getDiscountByBranchId,
 } from '@/api/services/sales';
 import { IStatus } from '@/interfaces/branchInterfaces';
-import { IListDescuentoResponse } from '@/interfaces/salesInterfaces';
+import {
+  IDescuentoCreate,
+  IListDescuentoResponse,
+} from '@/interfaces/salesInterfaces';
 import { handleThunkError } from '@/shared/utils/errorHandlers';
-import { IDescuentoCreate } from '@/ui/components/Discount/indes';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface SalesState {

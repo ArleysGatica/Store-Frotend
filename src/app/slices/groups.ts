@@ -1,13 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import { handleAsyncThunkError } from '../../shared/utils/errorHandlers';
-import {
-  createGroup,
-  deleteGroup,
-  getAllGroups,
-  IProductoGroups,
-} from '@/api/services/groups';
+import { createGroup, deleteGroup, getAllGroups } from '@/api/services/groups';
 import { statusProgressLogin } from './login';
+import { IProductoGroups } from '@/interfaces/branchInterfaces';
 
 export const createGroupSlice = createAsyncThunk(
   'groups/create',
