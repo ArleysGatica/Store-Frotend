@@ -10,12 +10,12 @@ import {
 } from '../shared/helpers/login.Helper';
 import RegisterForm from '@/ui/components/Login/RegisterForm';
 import { PagesCategories } from '@/pages/Categories';
-import { Page } from '@/shared/components/ui/Page';
 import { OrdersReceived } from '@/ui/components/OrdersReceived';
 import PendingProductsByTransfer from '@/ui/components/PendingTools/products';
 import { ViewProucts } from '@/shared/components/ui/TabsListTable/products';
 import DiscountManager from '@/ui/components/Discount';
 import SalesInventorySystem from '@/ui/components/Sales';
+import Dashboard from '@/ui/components/Dashboard';
 
 export const Router = () => {
   return (
@@ -29,11 +29,7 @@ export const Router = () => {
           path="/"
           element={
             <Layout>
-              <Page center>
-                <h1 className="font-mono font-semibold capitalize">
-                  Welcome to Store 🎁
-                </h1>
-              </Page>
+              <Dashboard />
             </Layout>
           }
         />

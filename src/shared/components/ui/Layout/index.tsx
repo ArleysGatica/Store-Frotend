@@ -4,6 +4,16 @@ import { Header } from '../../../../ui/components/header';
 import { Sidebar } from '../Sidebar/index';
 import { useAppSelector } from '@/app/hooks';
 import { Toaster } from '@/components/ui/toaster';
+import {
+  BadgeDollarSign,
+  Group,
+  House,
+  Repeat,
+  ShoppingBag,
+  ShoppingCart,
+  Store,
+  UserPlus,
+} from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,18 +25,18 @@ export const Layout = ({ children }: LayoutProps) => {
     {
       name: 'INICIO',
       path: '/',
-      icon: '🏠',
+      icon: <House />,
     },
     ...(roleUsers === 'root' || roleUsers === 'admin'
-      ? [{ name: 'SUCURSALES', path: '/branches', icon: '🏭' }]
+      ? [{ name: 'SUCURSALES', path: '/branches', icon: <Store /> }]
       : []),
-    { name: 'VENTAS', path: '/sales', icon: '💰' },
-    { name: 'PRODUCTOS', path: '/products', icon: '📱' },
-    { name: 'CATEGORÍAS', path: '/categories', icon: '🧮' },
-    { name: 'DESCUENTOS', path: '/DiscountManager', icon: '〽️' },
-    { name: 'PEDIDOS', path: '/orders', icon: '📃' },
+    { name: 'VENTAS', path: '/sales', icon: <ShoppingBag /> },
+    { name: 'PRODUCTOS', path: '/products', icon: <ShoppingCart /> },
+    { name: 'CATEGORÍAS', path: '/categories', icon: <Group /> },
+    { name: 'DESCUENTOS', path: '/DiscountManager', icon: <BadgeDollarSign /> },
+    { name: 'TRASLADOS', path: '/orders', icon: <Repeat /> },
     ...(roleUsers === 'root' || roleUsers === 'admin'
-      ? [{ name: 'USUARIOS', path: '/register', icon: '👤' }]
+      ? [{ name: 'USUARIOS', path: '/register', icon: <UserPlus /> }]
       : []),
   ];
 
