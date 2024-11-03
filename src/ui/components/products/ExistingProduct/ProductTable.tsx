@@ -29,6 +29,12 @@ import {
 } from '@/interfaces/transferInterfaces';
 import { store } from '@/app/store';
 import { updateProduct } from '@/app/slices/productsSlice';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ProductsTableProps {
   products: InventarioSucursalWithPopulated[];
@@ -58,19 +64,6 @@ const ProductsTable = ({
   const [editingProduct, setEditingProduct] =
     useState<InventarioSucursal | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-
-  const data = {
-    productos: products.map((product) => ({
-      nombre: product.productoId.nombre,
-      descripcion: product.productoId.descripcion,
-      precio: product?.precio?.$numberDecimal ?? 0,
-      stock: product.stock,
-      puntoReCompra: product.puntoReCompra,
-    })),
-    sucursalId: userRoles?.sucursalId?._id ?? '',
-  };
-
-  console.log(data, 'data');
 
   const handleEditProduct = (updatedProduct: ITablaBranch) => {
     setIsEditing(false);
@@ -109,7 +102,18 @@ const ProductsTable = ({
                 {product.productoId.nombre}
               </TableCell>
               <TableCell>${product.precio.$numberDecimal}</TableCell>
-              <TableCell>{product.productoId.descripcion}</TableCell>
+              <TableCell>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger className="w-64 overflow-hidden whitespace-nowrap text-ellipsis">
+                      {product.productoId.descripcion}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {product.productoId.descripcion}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </TableCell>
               <TableCell>{product?.stock || '0'}</TableCell>
               <TableCell>
                 <Button

@@ -25,6 +25,12 @@ import ProductForm from './ProductForm';
 import { IRoles } from '@/app/slices/login';
 import { store } from '@/app/store';
 import { removeProduct } from '@/app/slices/branchSlice';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ProductsTableProps {
   products: ITablaBranch[] | undefined;
@@ -90,7 +96,16 @@ const ProductsTable = ({
               <TableCell>{product.id}</TableCell>
               <TableCell className="font-medium">{product.nombre}</TableCell>
               <TableCell>${product.precio.$numberDecimal}</TableCell>
-              <TableCell>{product.descripcion}</TableCell>
+              <TableCell>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger className="w-64 overflow-hidden whitespace-nowrap text-ellipsis">
+                      {product.descripcion}
+                    </TooltipTrigger>
+                    <TooltipContent>{product.descripcion}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </TableCell>
               <TableCell>{product?.stock || '0'}</TableCell>
               <TableCell>{product?.puntoReCompra || '0'}</TableCell>
               <TableCell>
