@@ -39,131 +39,6 @@ export default function SalesInventorySystem() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //   useEffect(() => {
-  //     checkLowInventory();
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   }, [products]);
-
-  //   const checkLowInventory = () => {
-  //     const lowInventoryAlerts = products
-  //       .filter((product) => product.inventory <= product.reorderPoint)
-  //       .map((product) => ({
-  //         type: 'warning',
-  //         message: `Low inventory alert for ${product.name}. Current stock: ${product.inventory}`,
-  //       }));
-
-  //     console.log(lowInventoryAlerts);
-  //   };
-
-  //   const applyDiscounts = (saleItems) => {
-  //     let discountedItems = [...saleItems];
-
-  //     // Apply individual product discounts
-  //     discountedItems = discountedItems.map((item) => {
-  //       const rule = discountRules.find(
-  //         (r) => r.productId === item.id && item.quantity >= r.minQuantity
-  //       );
-  //       if (rule) {
-  //         const discountAmount =
-  //           (item.price * item.quantity * rule.discountPercentage) / 100;
-  //         return {
-  //           ...item,
-  //           discount: discountAmount,
-  //           discountPercentage: rule.discountPercentage,
-  //         };
-  //       }
-  //       return item;
-  //     });
-
-  //     // Apply group discounts
-  //     discountRules
-  //       .filter((rule) => rule.productIds)
-  //       .forEach((rule) => {
-  //         const groupItems = discountedItems.filter((item) =>
-  //           rule?.productIds?.includes(item.id)
-  //         );
-  //         const groupQuantity = groupItems.reduce(
-  //           (sum, item) => sum + item.quantity,
-  //           0
-  //         );
-  //         if (groupQuantity >= rule.minQuantity) {
-  //           groupItems.forEach((item) => {
-  //             const index = discountedItems.findIndex((i) => i.id === item.id);
-  //             const discountAmount =
-  //               (item.price * item.quantity * rule.discountPercentage) / 100;
-  //             discountedItems[index] = {
-  //               ...item,
-  //               discount: Math.max(discountAmount, item.discount || 0),
-  //               discountPercentage: Math.max(
-  //                 rule.discountPercentage,
-  //                 item.discountPercentage || 0
-  //               ),
-  //             };
-  //           });
-  //         }
-  //       });
-
-  //     return discountedItems;
-  //   };
-
-  //   const processSale = () => {
-  //     const discountedSale = applyDiscounts(currentSale);
-
-  //     // Update inventory
-  //     const updatedProducts = products.map((product) => {
-  //       const saleItem = discountedSale.find((item) => item.id === product.id);
-  //       if (saleItem) {
-  //         return { ...product, inventory: product.inventory - saleItem.quantity };
-  //       }
-  //       return product;
-  //     });
-
-  //     // Calculate subtotal and total
-  //     const subtotal = discountedSale.reduce(
-  //       (sum, item) => sum + item.price * item.quantity,
-  //       0
-  //     );
-  //     const totalDiscount = discountedSale.reduce(
-  //       (sum, item) => sum + (item.discount || 0),
-  //       0
-  //     );
-  //     const total = subtotal - totalDiscount;
-
-  //     // Record sale
-  //     const newSale = {
-  //       id: salesHistory.length + 1,
-  //       items: discountedSale,
-  //       subtotal: subtotal,
-  //       totalDiscount: totalDiscount,
-  //       total: total,
-  //       date: new Date().toISOString(),
-  //       isSupplier: isSupplier,
-  //     };
-
-  //     setProducts(updatedProducts);
-  //     setSalesHistory([...salesHistory, newSale]);
-  //     setCurrentSale([]);
-  //     setAlerts([
-  //       ...alerts,
-  //       {
-  //         type: 'success',
-  //         message: `Sale #${newSale.id} processed successfully!`,
-  //       },
-  //     ]);
-  //     setIsSupplier(false);
-  //   };
-
-  //   const discountedSale = applyDiscounts(currentSale);
-  //   const subtotal = discountedSale.reduce(
-  //     (sum, item) => sum + item.price * item.quantity,
-  //     0
-  //   );
-  //   const totalDiscount = discountedSale.reduce(
-  //     (sum, item) => sum + (item.discount || 0),
-  //     0
-  //   );
-  //   const total = subtotal - totalDiscount;
-
   return (
     <div className="container p-4 mx-auto">
       <Tabs defaultValue="sale">
@@ -187,7 +62,11 @@ export default function SalesInventorySystem() {
         <TabsContent value="sale">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 h-[36rem] max-h-[36rem]">
             <Inventory products={products} />
-            <Sale products={products} setProducts={setProducts} />
+            <Sale
+              userId={user?._id ?? ''}
+              products={products}
+              setProducts={setProducts}
+            />
           </div>
         </TabsContent>
         <TabsContent value="history">

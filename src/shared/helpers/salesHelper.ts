@@ -1,12 +1,15 @@
-import { IListDescuentoResponse } from '@/interfaces/salesInterfaces';
-import { IProductSale } from '@/ui/components/Sales/Sale';
+import {
+  IListDescuentoResponse,
+  IProductSale,
+} from '@/interfaces/salesInterfaces';
 import { toast } from 'sonner';
 
 export const applyDiscounts = (
+  sucursalId: string,
   producto: IProductSale,
   descuentos: IListDescuentoResponse
 ): IProductSale => {
-  const { productId, groupId, sucursalId, price, quantity } = producto;
+  const { productId, groupId, price, quantity } = producto;
 
   let precioFinal = price;
   let descuentoAplicado = 0;
@@ -41,28 +44,36 @@ export const applyDiscounts = (
         ? descuentosGrupo[0].descuentoId
         : null;
 
+  const discountType =
+    descuentosProducto.length > 0
+      ? 'producto'
+      : descuentosGrupo.length > 0
+        ? 'grupo'
+        : null;
+
   if (descuentoAplicable) {
     if (descuentoAplicable.tipoDescuento === 'porcentaje') {
       porcentajeAplicado = descuentoAplicable.valorDescuento;
-      descuentoAplicado = precioFinal * (porcentajeAplicado / 100);
-      precioFinal -= descuentoAplicado;
+      descuentoAplicado = precioFinal * quantity * (porcentajeAplicado / 100);
     } else if (descuentoAplicable.tipoDescuento === 'valor') {
       descuentoAplicado = descuentoAplicable.valorDescuento;
-      porcentajeAplicado = (descuentoAplicado / precioFinal) * 100;
-      precioFinal -= descuentoAplicado;
+      porcentajeAplicado = (descuentoAplicado / (precioFinal * quantity)) * 100;
     }
 
-    precioFinal = Math.max(precioFinal, 0);
+    // precioFinal = Math.max(precioFinal, 0);
   }
 
   return {
     ...producto,
-    discount: {
-      id: descuentoAplicable?._id ?? '',
-      name: descuentoAplicable?.nombre ?? '',
-      amount: descuentoAplicado,
-      percentage: porcentajeAplicado,
-    },
+    discount: discountType
+      ? {
+          id: descuentoAplicable?._id ?? '',
+          name: descuentoAplicable?.nombre ?? '',
+          type: discountType,
+          amount: descuentoAplicado,
+          percentage: porcentajeAplicado,
+        }
+      : null,
   };
 };
 

@@ -6,7 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { IProductSale } from './Sale';
 import { Button } from '@/components/ui/button';
 import { BadgeInfo, CircleDollarSign, Trash2 } from 'lucide-react';
 import {
@@ -14,6 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { IProductSale } from '@/interfaces/salesInterfaces';
 
 export interface IProductSaleProps {
   procesingSale: boolean;
@@ -30,10 +30,10 @@ export const ProductSale = ({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Product</TableHead>
-          <TableHead className="text-center">Quantity</TableHead>
-          <TableHead className="text-center">Price</TableHead>
-          <TableHead className="text-center">Discount</TableHead>
+          <TableHead>Producto</TableHead>
+          <TableHead className="text-center">Cantidad</TableHead>
+          <TableHead className="text-center">Precio ud.</TableHead>
+          <TableHead className="text-center">Descuento</TableHead>
           <TableHead className="text-center">Total</TableHead>
           <TableHead className="text-center"></TableHead>
         </TableRow>

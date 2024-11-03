@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SendHorizonal } from 'lucide-react';
+import { SendHorizonal, SendToBack } from 'lucide-react';
 import CustomSelect from './customSelect';
 import { updateSelectedBranch } from '@/app/slices/branchSlice';
 import { Branch, ITablaBranch } from '@/interfaces/branchInterfaces';
@@ -54,7 +54,10 @@ export const ConsolidatedShipment = ({
   return (
     <Card className="h-[25%]">
       <CardHeader>
-        <CardTitle>Consolidado de envío</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <SendToBack />
+          Consolidado de envío
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between mb-4">
