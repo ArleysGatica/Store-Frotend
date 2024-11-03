@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -35,6 +34,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { toast, Toaster } from 'sonner';
 
 interface ProductsTableProps {
   products: InventarioSucursalWithPopulated[];
@@ -66,10 +66,13 @@ const ProductsTable = ({
   const [isEditing, setIsEditing] = useState(false);
 
   const handleEditProduct = (updatedProduct: ITablaBranch) => {
-    setIsEditing(false);
-    setEditingProduct(null);
-
-    store.dispatch(updateProduct(updatedProduct)).unwrap();
+    try {
+      store.dispatch(updateProduct(updatedProduct)).unwrap();
+      toast.success('Product updated successfully');
+    } catch (error) {
+      console.log(error);
+      toast.error('Error updating product: ');
+    }
   };
 
   const handleAddToBranchOnly = (product: InventarioSucursal) => {
@@ -79,6 +82,7 @@ const ProductsTable = ({
 
   return (
     <>
+      <Toaster richColors position="bottom-right" />
       <Table>
         <TableHeader>
           <TableRow>
@@ -126,7 +130,7 @@ const ProductsTable = ({
                   }
                 >
                   <PlusCircle className="h-3.5 w-3.5" />
-                  Agregar a sucursal
+                  Agregar
                 </Button>
               </TableCell>
             </TableRow>
@@ -137,9 +141,6 @@ const ProductsTable = ({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Agregar producto a sucursal</DialogTitle>
-            <DialogDescription>
-              Make changes to the product details below.
-            </DialogDescription>
           </DialogHeader>
           {editingProduct && (
             <ProductForm

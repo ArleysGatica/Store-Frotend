@@ -142,9 +142,6 @@ const ProductsTable = ({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
-            <DialogDescription>
-              Make changes to the product details below.
-            </DialogDescription>
           </DialogHeader>
           {editingProduct && (
             <ProductForm

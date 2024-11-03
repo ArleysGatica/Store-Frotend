@@ -85,7 +85,7 @@ export function DataTableDemo() {
   return (
     <>
       <Toaster richColors position="bottom-right" />
-      <div className="flex flex-col w-full bg-muted/40">
+      <div className="flex flex-col w-full">
         <main className="flex-1 p-4 md:p-6">
           <Card>
             <CardHeader>
