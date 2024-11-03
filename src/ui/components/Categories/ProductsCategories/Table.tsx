@@ -29,7 +29,7 @@ interface ProductsTableProps {
   userRoles?: IUserRole | undefined;
 }
 
-const ProductsTable = ({ products }: ProductsTableProps) => {
+export const ProductsCategoriesTable = ({ products }: ProductsTableProps) => {
   return (
     <>
       <Table>
@@ -74,5 +74,3 @@ const ProductsTable = ({ products }: ProductsTableProps) => {
     </>
   );
 };
-
-export default ProductsTable;

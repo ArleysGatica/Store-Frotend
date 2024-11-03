@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { ChangeEvent, useEffect, useState } from 'react';
-import { GitBranch, Store } from 'lucide-react';
+import { Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -192,7 +192,6 @@ export default function BranchDashboard() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredBranches.length > 0 &&
             filteredBranches.map((branch) => (

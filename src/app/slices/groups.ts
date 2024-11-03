@@ -1,7 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AxiosError } from 'axios';
-import { handleAsyncThunkError } from '../../shared/utils/errorHandlers';
-import { createGroup, deleteGroup, getAllGroups } from '@/api/services/groups';
+import { handleThunkError } from '../../shared/utils/errorHandlers';
+import {
+  createGroup,
+  deleteGroup,
+  getAllGroups,
+  getProductsByGroup,
+} from '@/api/services/groups';
 import { statusProgressLogin } from './login';
 import { IProductoGroups } from '@/interfaces/branchInterfaces';
 
@@ -12,30 +16,22 @@ export const createGroupSlice = createAsyncThunk(
       const response = await createGroup(group);
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError;
-
-      if (axiosError.response) {
-        const errorMessage = //@ts-ignore
-          axiosError.response.data?.errors?.[0]?.message ||
-          'Ocurrió un error en la solicitud';
-        return rejectWithValue(errorMessage);
-      }
-
-      return rejectWithValue(handleAsyncThunkError(error as Error));
+      return rejectWithValue(handleThunkError(error));
     }
   }
 );
 
-export const getAllGroupsSlice = createAsyncThunk('groups/getAll', async () => {
-  try {
-    const response = await getAllGroups();
-    return response as unknown as IProductoGroups[];
-  } catch (error) {
-    return (error as AxiosError).response?.status === 404
-      ? []
-      : handleAsyncThunkError(error as Error);
+export const getAllGroupsSlice = createAsyncThunk(
+  'groups/getAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAllGroups();
+      return response as unknown as IProductoGroups[];
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
   }
-});
+);
 
 export const deleteGroupSlice = createAsyncThunk(
   'groups/delete',
@@ -45,13 +41,21 @@ export const deleteGroupSlice = createAsyncThunk(
   }
 );
 
-export interface ICategoriesWithProducts extends IProductoGroups {
-  products: IProductoGroups[];
-}
+export const productsCatetories = createAsyncThunk<IProductoGroups[], string>(
+  'groups/products',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await getProductsByGroup(id);
+      return response;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
 
 interface GroupState {
   groups: IProductoGroups[];
-  selectedGroup: ICategoriesWithProducts | null;
+  selectedGroup: IProductoGroups | null;
   error: string | null;
   status: statusProgressLogin;
 }
@@ -71,10 +75,7 @@ const groupsSlice = createSlice({
       state.groups.push(action.payload);
     },
     setSelectCategory: (state, action: PayloadAction<IProductoGroups>) => {
-      state.selectedGroup = {
-        ...action.payload,
-        products: state.selectedGroup?.products ?? [],
-      };
+      state.selectedGroup = action.payload;
     },
   },
   extraReducers: (builder) => {
