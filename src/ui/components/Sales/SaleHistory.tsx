@@ -119,8 +119,10 @@ export const SaleHistory = () => {
                               <TableCell className="text-center">
                                 {item.discount && item.discount?.amount > 0 ? (
                                   <span className="text-green-600">
-                                    ${item.discount.amount.toFixed(2)} (
-                                    {item.discount.percentage}%)
+                                    $
+                                    {(
+                                      item.quantity * item.discount.amount
+                                    ).toFixed(2)}{' '}
                                   </span>
                                 ) : (
                                   '-'
@@ -130,7 +132,7 @@ export const SaleHistory = () => {
                                 $
                                 {(
                                   item.price * item.quantity -
-                                  (item.discount?.amount || 0)
+                                  (item.discount?.amount || 0) * item.quantity
                                 ).toFixed(2)}
                               </TableCell>
                             </TableRow>
