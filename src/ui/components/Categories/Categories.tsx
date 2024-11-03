@@ -18,22 +18,40 @@ import { ICategoriesProps } from '@/interfaces/branchInterfaces';
 import { deleteGroupSlice } from '@/app/slices/groups';
 import { store } from '@/app/store';
 import { toast, Toaster } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 export const CategoriesCard = ({
   categoriesData,
   onEdit,
+  handleSelectCategory,
 }: ICategoriesProps) => {
+  const navigate = useNavigate();
   const handleOnDelete = () => {
     store.dispatch(deleteGroupSlice(categoriesData._id as string));
     toast.success('Categoria eliminada exitosamente');
   };
 
-  // /api/inventory/groups/:id/products
+  const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      navigate(`/groups/${categoriesData._id}/products`);
+    }
+  };
+
   return (
     <>
       <Toaster richColors position="bottom-right" />
-      <Card key={categoriesData._id} className="flex flex-col justify-between">
+      <Card
+        onClick={handleCardClick}
+        key={categoriesData._id}
+        className="flex flex-col justify-between"
+      >
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <div className="flex items-center space-x-2">
+          <div
+            onClick={() => {
+              navigate(`/groups/${categoriesData._id}/products`);
+              handleSelectCategory(categoriesData);
+            }}
+            className="flex items-center space-x-2"
+          >
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
               {categoriesData.nombre[0]}
             </div>

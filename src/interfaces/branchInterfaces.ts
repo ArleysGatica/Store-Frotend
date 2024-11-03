@@ -1,7 +1,10 @@
+import { IProducto } from './transferInterfaces';
+
 export interface IProductoGroups {
   _id?: string;
   nombre: string;
   descripcion?: string;
+  products?: IProducto[];
 }
 
 export interface Branch {
@@ -29,6 +32,7 @@ export interface BranchState {
 export interface ICategoriesProps {
   onEdit: (isEdit: boolean) => void;
   categoriesData: IProductoGroups;
+  handleSelectCategory: (cat: IProductoGroups) => void;
 }
 
 export interface IBranchProps {

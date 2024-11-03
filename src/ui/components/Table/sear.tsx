@@ -50,12 +50,12 @@ const SearchAndFilter = ({
         <DialogTrigger asChild>
           <Button size="sm" className="h-8 gap-1">
             <PlusCircle className="h-3.5 w-3.5" />
-            <span>Add Product</span>
+            <span>Agregar</span>
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Product</DialogTitle>
+            <DialogTitle>Agregar Producto</DialogTitle>
           </DialogHeader>
           <ProductForm
             handleSelectChange={handleSelectChange}

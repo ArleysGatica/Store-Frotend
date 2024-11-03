@@ -16,6 +16,7 @@ import { ViewProucts } from '@/shared/components/ui/TabsListTable/products';
 import DiscountManager from '@/ui/components/Discount';
 import SalesInventorySystem from '@/ui/components/Sales';
 import Dashboard from '@/ui/components/Dashboard';
+import { ProductsCategories } from '@/ui/components/Categories/ProductsCategories';
 
 export const Router = () => {
   return (
@@ -112,6 +113,19 @@ export const Router = () => {
           }
         />
       </Route>
+      {/* <Route
+        path="/groups/:id/products"
+        element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}
+      >
+        <Route
+          path="/groups/:id/products"
+          element={
+            <Layout>
+              <ProductsCategories />
+            </Layout>
+          }
+        />
+      </Route> */}
       <Route
         path="/categories"
         element={<RequireAuth rolesAllowed={['root', 'user', 'admin']} />}

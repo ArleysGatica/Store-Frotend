@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react';
-import {
-  ChartBarStacked,
-  ChartColumnStacked,
-  Group,
-  MapPin,
-} from 'lucide-react';
+import { ChartColumnStacked, Group } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
 import {
   Dialog,
   DialogContent,
@@ -20,7 +14,6 @@ import { CategoriesCard } from './Categories';
 import { store } from '@/app/store';
 import { useAppSelector } from '@/app/hooks';
 import { Label } from '@radix-ui/react-label';
-import { Link } from 'react-router-dom';
 import {
   AddingGroups,
   createGroupSlice,
@@ -74,13 +67,7 @@ export default function Categories() {
     setIsDialogOpen(true);
   };
 
-  const handleSelectBranch = (
-    cat: IProductoGroups,
-    e: React.MouseEvent<HTMLAnchorElement>
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('aa');
+  const handleSelectCategory = (cat: IProductoGroups) => {
     store.dispatch(setSelectCategory(cat));
   };
 
@@ -175,20 +162,15 @@ export default function Categories() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
+      <div className="flex flex-row flex-wrap gap-4">
         {filteredCategories.length > 0 &&
           filteredCategories.map((branch) => (
-            <Link
+            <CategoriesCard
               key={branch._id}
-              to={`/branches/${branch._id}/products`}
-              onClick={(e) => handleSelectBranch(branch, e)}
-            >
-              <CategoriesCard
-                key={branch._id}
-                categoriesData={branch}
-                onEdit={() => openDialog(true)}
-              />
-            </Link>
+              categoriesData={branch}
+              handleSelectCategory={handleSelectCategory}
+              onEdit={() => openDialog(true)}
+            />
           ))}
       </div>
     </div>
