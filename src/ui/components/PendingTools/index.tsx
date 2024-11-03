@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Eye, ArrowDown, Search } from 'lucide-react';
+import { Eye, ArrowDown, Search, FolderSync } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Tabs } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   getFormatedDate,
@@ -58,7 +58,12 @@ export default function PendingTools() {
     <div className="container mx-auto ">
       <Tabs defaultValue="receive">
         <Card className="product__list">
-          <br />
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <FolderSync size={20} />
+              <CardTitle>Products</CardTitle>
+            </div>
+          </CardHeader>
           <CardContent>
             <div className="relative mb-4">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />

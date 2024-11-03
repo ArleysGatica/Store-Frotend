@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { ChartColumnStacked, MapPin } from 'lucide-react';
+import {
+  ChartBarStacked,
+  ChartColumnStacked,
+  Group,
+  MapPin,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import {
@@ -85,18 +90,21 @@ export default function Categories() {
 
   return (
     <div className="container mx-auto ">
-      <Typography component="h1" className="mb-4 font-medium text-black">
-        Categorias
-      </Typography>
-      <nav className="flex flex-col mb-6 space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+      <div className="flex items-center w-full gap-3">
+        <Group size={40} />
+        <Typography component="h2" className="mb-4 font-medium text-black">
+          Categorías
+        </Typography>
+      </div>
+      <br />
+      <nav className="flex flex-col mb-6 space-y-4 sm:flex-row sm:items-center gap-5 sm:space-y-0">
         <div className="flex items-center space-x-4">
           <Input
             placeholder="Buscar por nombre de la categorias"
-            className="w-full sm:w-64"
+            className="w-full sm:w-[34.5rem]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <MapPin className="w-5 h-5" />
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
           <Button

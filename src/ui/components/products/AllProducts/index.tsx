@@ -14,6 +14,7 @@ import ProductsTable from './Table';
 import { fetchAllProducts } from '@/app/slices/productsSlice';
 import { SearchComponent } from '@/shared/components/ui/Search';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { Boxes } from 'lucide-react';
 
 export const Allproducts = () => {
   const dataAllProducts = useAppSelector((state) => state.products.products);
@@ -56,10 +57,13 @@ export const Allproducts = () => {
       <main className="flex-1 p-4 md:p-6">
         <Card>
           <CardHeader>
-            <CardTitle>Products</CardTitle>
-            <CardDescription>
-              Manage your products and view their sales performance.
-            </CardDescription>
+            <div className="flex items-center gap-3">
+              <Boxes size={20} />
+
+              <CardTitle>Products</CardTitle>
+            </div>
+
+            <CardDescription>Gestione sus productos</CardDescription>
           </CardHeader>
           <CardContent>
             <SearchComponent

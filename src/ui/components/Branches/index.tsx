@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { ChangeEvent, useEffect, useState } from 'react';
-import { MapPin, Store } from 'lucide-react';
+import { GitBranch, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -85,12 +85,16 @@ export default function BranchDashboard() {
     <>
       <Toaster richColors position="bottom-right" />
       <div className="container mx-auto ">
-        <Typography component="h1" className="mb-4 font-medium text-black">
-          Sucursales
-        </Typography>
+        <div className="flex items-center w-full gap-3">
+          <Store size={40} />
+          <Typography component="h2" className="mb-4 font-medium text-black">
+            Sucursales
+          </Typography>
+        </div>
+
+        <br />
         <nav className="flex flex-col mb-6 space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div className="flex items-center space-x-4">
-            <MapPin className="w-5 h-5" />
             <Input
               placeholder="Buscar por nombre de la sucursal"
               className="w-full sm:w-64"
