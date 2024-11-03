@@ -1,8 +1,8 @@
 import { AxiosResponse } from 'axios';
 import { createAxiosInstance, PATH_LIST } from '../axios';
 import { Token } from '@/shared/hooks/useJWT';
-import { IDescuentoCreate } from '@/ui/components/Discount/indes';
 import { ISale } from '@/interfaces/salesInterfaces';
+import { IDescuentoCreate } from '@/interfaces/salesInterfaces';
 
 export const createDiscount = async ({
   ...data

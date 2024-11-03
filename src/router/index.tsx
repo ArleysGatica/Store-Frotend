@@ -14,7 +14,7 @@ import { Page } from '@/shared/components/ui/Page';
 import { OrdersReceived } from '@/ui/components/OrdersReceived';
 import PendingProductsByTransfer from '@/ui/components/PendingTools/products';
 import { ViewProucts } from '@/shared/components/ui/TabsListTable/products';
-import DiscountManager from '@/ui/components/Discount/indes';
+import DiscountManager from '@/ui/components/Discount';
 import SalesInventorySystem from '@/ui/components/Sales';
 
 export const Router = () => {

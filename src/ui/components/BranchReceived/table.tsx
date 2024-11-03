@@ -13,13 +13,8 @@ import {
 } from '@/shared/helpers/transferHelper';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { Eye } from 'lucide-react';
-import {
-  IDetalleSelected,
-  IPendingTransfer,
-} from '@/interfaces/transferInterfaces';
+import { IPendingTransfer } from '@/interfaces/transferInterfaces';
 import { useNavigate } from 'react-router-dom';
-import { store } from '@/app/store';
-import { setSelectItemDetail } from '@/app/slices/transferSlice';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 interface IImageGridCardProps {
@@ -38,11 +33,6 @@ export const MapIndex = ({ order }: IOrder) => {
   ];
 
   const navigate = useNavigate();
-
-  const handleSelectItem = (items: IDetalleSelected) => {
-    console.log(items, 'items');
-    store.dispatch(setSelectItemDetail(items));
-  };
 
   return (
     <TableRow key={order._id} className="cursor-pointer">

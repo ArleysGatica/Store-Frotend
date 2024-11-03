@@ -3,14 +3,14 @@ import { Products } from '../../../../ui/components/Table/products';
 import { useAppSelector } from '@/app/hooks';
 import { Allproducts } from '@/ui/components/products/AllProducts';
 import { ProductsTransit } from '@/ui/components/products/TransitProduct';
-import { ProductFormExist } from '@/ui/components/products/existingProduct/Table/Table';
+import { ProductFormExist } from '@/ui/components/products/ExistingProduct';
 
 export const ViewProucts = () => {
   const user = useAppSelector((state) => state.auth.signIn.user);
   return (
     <div className="container mx-auto">
       <Tabs defaultValue="listProduct">
-        <div className="flex flex-col items-start justify-between gap-4 mb-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col items-start justify-center gap-4 mb-4 sm:flex-row sm:items-center">
           <TabsList className="gap-4 font-bold text-white bg-black">
             <TabsTrigger
               className="text-[#ffffff] font-bold border-b-2 border-bg-gray-200 border-opacity-0 bg-black"

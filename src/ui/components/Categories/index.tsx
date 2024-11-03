@@ -25,6 +25,7 @@ import {
 import { unwrapResult } from '@reduxjs/toolkit';
 import { toast } from 'sonner';
 import { IProductoGroups } from '@/interfaces/branchInterfaces';
+import { Typography } from '@/shared/components/ui/Typography';
 
 export default function Categories() {
   const categories = useAppSelector((state) => state.categories.groups);
@@ -84,6 +85,9 @@ export default function Categories() {
 
   return (
     <div className="container mx-auto ">
+      <Typography component="h1" className="mb-4 font-medium text-black">
+        Categorias
+      </Typography>
       <nav className="flex flex-col mb-6 space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div className="flex items-center space-x-4">
           <Input
@@ -104,7 +108,6 @@ export default function Categories() {
           </Button>
         </div>
       </nav>
-
       <Dialog
         open={isDialogOpen}
         onOpenChange={(open) => {
@@ -164,7 +167,6 @@ export default function Categories() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
         {filteredCategories.length > 0 &&
           filteredCategories.map((branch) => (

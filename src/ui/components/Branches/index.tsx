@@ -22,15 +22,11 @@ import { useAppSelector } from '@/app/hooks';
 import { Label } from '@radix-ui/react-label';
 import { toast, Toaster } from 'sonner';
 import { Branch } from '@/interfaces/branchInterfaces';
+import { Typography } from '@/shared/components/ui/Typography';
 
 export default function BranchDashboard() {
   const branches = useAppSelector((state) => state.branches.data);
   const userRoles = useAppSelector((state) => state.auth.signIn.user);
-  const dataFilterID = branches.filter(
-    (branch) => branch._id === userRoles?.sucursalId?._id
-  );
-  const filteredBranche = userRoles?.role === 'root' ? branches : dataFilterID;
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSucursal, setEditingSucursal] = useState(false);
   const [newBranch, setNewBranch] = useState<Branch>({
@@ -89,6 +85,9 @@ export default function BranchDashboard() {
     <>
       <Toaster richColors position="bottom-right" />
       <div className="container mx-auto ">
+        <Typography component="h1" className="mb-4 font-medium text-black">
+          Sucursales
+        </Typography>
         <nav className="flex flex-col mb-6 space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div className="flex items-center space-x-4">
             <MapPin className="w-5 h-5" />

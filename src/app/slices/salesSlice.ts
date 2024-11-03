@@ -6,9 +6,12 @@ import {
   postSale,
 } from '@/api/services/sales';
 import { IStatus } from '@/interfaces/branchInterfaces';
-import { IListDescuentoResponse, ISale } from '@/interfaces/salesInterfaces';
+import {
+  ISale,
+  IDescuentoCreate,
+  IListDescuentoResponse,
+} from '@/interfaces/salesInterfaces';
 import { handleThunkError } from '@/shared/utils/errorHandlers';
-import { IDescuentoCreate } from '@/ui/components/Discount/indes';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface SalesState {
