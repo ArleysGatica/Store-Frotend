@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/table';
 import './style.scss';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
+import { PackageSearch } from 'lucide-react';
 
 export interface InventoryProps {
   products: ITablaBranch[];
@@ -24,7 +25,10 @@ export const Inventory = ({ products }: InventoryProps) => {
   return (
     <Card className="inventory__card">
       <CardHeader>
-        <CardTitle>Inventario</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <PackageSearch />
+          Inventario
+        </CardTitle>
         <CardDescription>Estado actual del inventario</CardDescription>
       </CardHeader>
       <CardContent>

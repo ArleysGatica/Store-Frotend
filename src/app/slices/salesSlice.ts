@@ -2,22 +2,28 @@ import {
   createDiscount,
   getAllDiscounts,
   getDiscountByBranchId,
+  getSaleByBranchId,
+  postSale,
 } from '@/api/services/sales';
 import { IStatus } from '@/interfaces/branchInterfaces';
-import { IListDescuentoResponse } from '@/interfaces/salesInterfaces';
+import { IListDescuentoResponse, ISale } from '@/interfaces/salesInterfaces';
 import { handleThunkError } from '@/shared/utils/errorHandlers';
 import { IDescuentoCreate } from '@/ui/components/Discount/indes';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface SalesState {
+  sales: ISale[];
   discounts: IDescuentoCreate[];
   branchDiscounts: IListDescuentoResponse;
+  branchSales: ISale[];
   status: IStatus;
   error: string | null;
 }
 
 const initialState: SalesState = {
+  sales: [],
   discounts: [],
+  branchSales: [],
   branchDiscounts: {} as IListDescuentoResponse,
   status: 'idle',
   error: null,
@@ -50,6 +56,30 @@ export const getDiscountsByBranch = createAsyncThunk(
   async (id: string) => {
     try {
       const response = await getDiscountByBranchId(id);
+      return response.data;
+    } catch (error) {
+      return handleThunkError(error);
+    }
+  }
+);
+
+export const createSale = createAsyncThunk(
+  'sales/createSale',
+  async (sale: ISale, { rejectWithValue }) => {
+    try {
+      const response = await postSale(sale);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleThunkError(error));
+    }
+  }
+);
+
+export const getSalesByBranch = createAsyncThunk(
+  'sales/getSalesByBranchId',
+  async (id: string) => {
+    try {
+      const response = await getSaleByBranchId(id);
       return response.data;
     } catch (error) {
       return handleThunkError(error);
@@ -91,6 +121,14 @@ const salesSlice = createSlice({
       .addCase(getDiscountsByBranch.fulfilled, (state, { payload }) => {
         state.status = 'succeeded';
         state.branchDiscounts = payload;
+      })
+      .addCase(createSale.fulfilled, (state, { payload }) => {
+        state.status = 'succeeded';
+        state.sales = [...state.sales, payload];
+      })
+      .addCase(getSalesByBranch.fulfilled, (state, { payload }) => {
+        state.status = 'succeeded';
+        state.branchSales = payload;
       });
   },
 });

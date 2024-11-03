@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import {
   Check,
   ChevronsUpDown,
+  CirclePlus,
   ShoppingBag,
   ShoppingCart,
   Truck,
@@ -41,6 +42,8 @@ import {
 } from '@/shared/helpers/salesHelper';
 import { toast, Toaster } from 'sonner';
 import { IProductSale, ISale } from '@/interfaces/salesInterfaces';
+import { createSale } from '@/app/slices/salesSlice';
+import { store } from '@/app/store';
 
 export interface ISaleProps {
   userId: string;
@@ -179,6 +182,7 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
   }, [productSale]);
 
   const handleProccessSale = () => {
+    setProcesingSale(true);
     const newSale: ISale = {
       userId: userId,
       sucursalId: selectedProduct?.sucursalId ?? '',
@@ -188,21 +192,25 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
       discount: saleSummary.totalDiscount,
     };
 
-    setProcesingSale(true);
-    const examplePromiseSale = new Promise((resolve) => {
-      setTimeout(() => {
+    const request = store
+      .dispatch(createSale(newSale))
+      .unwrap()
+      .catch(() => {
         setProcesingSale(false);
-        resolve('Venta procesada exitosamente');
-      }, 2500);
-    });
+        return Promise.reject();
+      })
+      .then(() => {
+        setTimeout(() => {
+          setProductSale([]);
+          setProcesingSale(false);
+        }, 1000);
+      });
 
-    toast.promise(examplePromiseSale, {
+    toast.promise(request, {
       loading: 'Procesando...',
       success: 'Venta procesada exitosamente',
       error: 'Error al procesar la venta',
     });
-
-    console.log(newSale, 'newSale');
   };
 
   return (
@@ -227,7 +235,7 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
           </Label>
         </div>
         <div className="flex gap-4 mb-4">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col w-full gap-1">
             <Label className="text-xs">Producto</Label>
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
@@ -236,7 +244,7 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
                   variant="outline"
                   role="combobox"
                   aria-expanded={open}
-                  className="w-[250px] justify-between"
+                  className="justify-between w-full"
                 >
                   {selectedProduct
                     ? products.find(
@@ -246,7 +254,7 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
                   <ChevronsUpDown className="w-4 h-4 ml-2 opacity-50 shrink-0" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[250px] p-0">
+              <PopoverContent className="p-0">
                 <Command>
                   <CommandInput placeholder="Buscar producto" />
                   <CommandList className="product__list">
@@ -282,7 +290,7 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
               </PopoverContent>
             </Popover>
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 w-[20%]">
             <Label className="text-xs">Cantidad</Label>
             <Input
               type="number"
@@ -297,11 +305,11 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
               }
               min={0}
               max={selectedProduct?.stock ?? 0}
-              className="w-[6rem]"
+              className="w-full"
             />
           </div>
           {supplierMode && (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 w-[20%]">
               <Label className="text-xs">Precio</Label>
               <Input
                 type="number"
@@ -315,37 +323,42 @@ export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
                   )
                 }
                 min={0}
-                className="w-[6rem]"
+                className="w-full"
               />
             </div>
           )}
-          <div className="flex flex-col justify-end gap-1">
+          <div className="flex flex-col justify-end gap-1 w-[10%]">
             <Button
-              className="w-[7rem]"
+              className="w-full text-xs"
               disabled={
                 !selectedProduct || quantity <= 0 || price <= 0 || procesingSale
               }
               onClick={handleAddProductSale}
             >
-              Agregar
+              <CirclePlus />
             </Button>
           </div>
         </div>
-        <ProductSale
-          procesingSale={procesingSale}
-          products={productSale}
-          handleRemoveProductSale={handleRemoveProductSale}
-        />
+        <div className="product__sale__list">
+          <ProductSale
+            procesingSale={procesingSale}
+            products={productSale}
+            handleRemoveProductSale={handleRemoveProductSale}
+          />
+        </div>
       </CardContent>
-      <CardFooter className="flex items-center justify-between">
-        <p>Subtotal: ${saleSummary.subTotal.toFixed(2)}</p>
-        <p className="text-green-600">
+      <CardFooter className="flex items-center justify-between py-0 px-[1.5rem]">
+        <span>Subtotal: ${saleSummary.subTotal.toFixed(2)}</span>
+        <span className="text-green-600">
           Descuento: ${saleSummary.totalDiscount.toFixed(2)}
-        </p>
-        <p className="font-bold">Total: ${saleSummary.total.toFixed(2)}</p>
+        </span>
+        <span className="font-bold">
+          Total: ${saleSummary.total.toFixed(2)}
+        </span>
         <Button
           disabled={productSale.length === 0 || procesingSale}
           onClick={handleProccessSale}
+          className="h-[2rem]"
         >
           Procesar
           <ShoppingCart />
