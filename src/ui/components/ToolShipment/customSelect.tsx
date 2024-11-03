@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAppSelector } from '@/app/hooks';
-import { Branch } from '@/app/slices/branchSlice';
 import {
   Select,
   SelectContent,
@@ -8,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Branch } from '@/interfaces/branchInterfaces';
 
 export interface ICustomSelect {
   sourceBranchId: string;

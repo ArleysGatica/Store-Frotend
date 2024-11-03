@@ -15,16 +15,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Pencil, PlusCircle, Trash } from 'lucide-react';
-import { IBranch, ITablaBranch } from '@/interfaces/branchInterfaces';
+import { PlusCircle } from 'lucide-react';
+import {
+  Branch,
+  IProductoGroups,
+  ITablaBranch,
+} from '@/interfaces/branchInterfaces';
 import ProductForm from './ProductForm';
-import { IProductoGroups } from '@/api/services/groups';
 import { IRoles } from '@/app/slices/login';
-import { getFormatedDate } from '@/shared/helpers/transferHelper';
-import { InventarioSucursal, InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
+import {
+  InventarioSucursal,
+  InventarioSucursalWithPopulated,
+} from '@/interfaces/transferInterfaces';
 import { store } from '@/app/store';
-import { createProduct, updateProduct } from '@/app/slices/productsSlice';
-import { inventoryUpdateProduct } from '@/api/services/products';
+import { updateProduct } from '@/app/slices/productsSlice';
 
 interface ProductsTableProps {
   products: InventarioSucursalWithPopulated[];
@@ -39,7 +43,7 @@ interface ProductsTableProps {
         _id: string;
         username: string;
         role: IRoles;
-        sucursalId?: IBranch;
+        sucursalId?: Branch;
       }
     | undefined;
 }
@@ -51,9 +55,8 @@ const ProductsTable = ({
   groups,
   userRoles,
 }: ProductsTableProps) => {
-  const [editingProduct, setEditingProduct] = useState<InventarioSucursal | null>(
-    null
-  );
+  const [editingProduct, setEditingProduct] =
+    useState<InventarioSucursal | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
   const data = {
@@ -62,6 +65,7 @@ const ProductsTable = ({
       descripcion: product.productoId.descripcion,
       precio: product?.precio?.$numberDecimal ?? 0,
       stock: product.stock,
+      puntoReCompra: product.puntoReCompra,
     })),
     sucursalId: userRoles?.sucursalId?._id ?? '',
   };
@@ -79,11 +83,6 @@ const ProductsTable = ({
     setEditingProduct(product);
     setIsEditing(true);
   };
-
-  console.log(
-    products.map((product) => product.productoId._id),
-    'product'
-  );
 
   return (
     <>
@@ -117,7 +116,9 @@ const ProductsTable = ({
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    handleAddToBranchOnly(product as unknown as InventarioSucursal)
+                    handleAddToBranchOnly(
+                      product as unknown as InventarioSucursal
+                    )
                   }
                 >
                   <PlusCircle className="h-3.5 w-3.5" />

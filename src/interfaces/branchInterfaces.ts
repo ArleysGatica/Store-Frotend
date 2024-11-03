@@ -23,6 +23,7 @@ export interface BranchState {
   selectedBranch: IBranchWithProducts | null;
   status: IStatus;
   error: string | null;
+  loading: boolean;
 }
 
 export interface ICategoriesProps {
@@ -71,5 +72,5 @@ export interface ITablaBranch {
 
 export interface IProductosGrupos {
   productoId: string;
-  grupoId: IProductoGroups;
+  groupId: IProductoGroups;
 }

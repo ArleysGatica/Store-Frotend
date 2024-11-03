@@ -125,6 +125,7 @@ const initialState: BranchState = {
   selectedBranch: null,
   status: 'idle',
   error: null,
+  loading: false,
 };
 
 const branchesSlice = createSlice({

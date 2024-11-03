@@ -8,9 +8,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import ProductForm from './ProductForm';
-import { ITablaBranch } from '@/interfaces/branchInterfaces';
-import { IProductoGroups } from '@/api/services/groups';
-import { SearchComponent } from '@/shared/components/ui/Search';
+import { IProductoGroups, ITablaBranch } from '@/interfaces/branchInterfaces';
 
 interface SearchAndFilterProps {
   searchTerm: string;

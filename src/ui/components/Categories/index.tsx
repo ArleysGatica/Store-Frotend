@@ -16,7 +16,6 @@ import { store } from '@/app/store';
 import { useAppSelector } from '@/app/hooks';
 import { Label } from '@radix-ui/react-label';
 import { Link } from 'react-router-dom';
-import { IProductoGroups } from '@/api/services/groups';
 import {
   AddingGroups,
   createGroupSlice,
@@ -25,6 +24,7 @@ import {
 } from '@/app/slices/groups';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { toast } from 'sonner';
+import { IProductoGroups } from '@/interfaces/branchInterfaces';
 
 export default function Categories() {
   const categories = useAppSelector((state) => state.categories.groups);
