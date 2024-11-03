@@ -3,7 +3,7 @@ import { Products } from '../../../../ui/components/Table/products';
 import { useAppSelector } from '@/app/hooks';
 import { Allproducts } from '@/ui/components/products/AllProducts';
 import { ProductsTransit } from '@/ui/components/products/TransitProduct';
-import { ProductFormExist } from '@/ui/components/products/existingProduct/Table/Table';
+import { ProductFormExist } from '@/ui/components/products/ExistingProduct';
 
 export const ViewProucts = () => {
   const user = useAppSelector((state) => state.auth.signIn.user);
