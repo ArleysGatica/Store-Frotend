@@ -32,18 +32,18 @@ export default function Dashboard() {
   const COLORS = ['#8b5cf6', '#3b82f6', '#f59e0b'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8">Dashboard</h1>
+    <div className="min-h-screen ">
+      <div className="mx-auto space-y-8 px-[7rem]">
+        <h1 className="mb-8 text-4xl font-bold text-gray-800">Dashboard</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Ventas"
             value="$4,000,000.00"
             subValue="450"
             subLabel="Volumen"
             change={20.0}
-            icon={<CreditCardIcon className="h-6 w-6 text-blue-500" />}
+            icon={<CreditCardIcon className="w-6 h-6 text-blue-500" />}
           />
           <StatCard
             title="Clientes"
@@ -51,7 +51,7 @@ export default function Dashboard() {
             subValue="1,180"
             subLabel="Activos"
             change={15.8}
-            icon={<UsersIcon className="h-6 w-6 text-green-500" />}
+            icon={<UsersIcon className="w-6 h-6 text-green-500" />}
           />
           <StatCard
             title="Pedidos"
@@ -59,7 +59,7 @@ export default function Dashboard() {
             subValue="5"
             subLabel="Pendientes"
             change={-4.9}
-            icon={<ShoppingBagIcon className="h-6 w-6 text-purple-500" />}
+            icon={<ShoppingBagIcon className="w-6 h-6 text-purple-500" />}
           />
           <StatCard
             title="Productos"
@@ -67,11 +67,11 @@ export default function Dashboard() {
             subValue="32"
             subLabel="Activos"
             change={24}
-            icon={<PackageIcon className="h-6 w-6 text-yellow-500" />}
+            icon={<PackageIcon className="w-6 h-6 text-yellow-500" />}
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <Card className="col-span-2">
             <CardHeader>
               <CardTitle className="text-xl font-semibold">
@@ -104,7 +104,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="text-xl font-semibold">Marketing</CardTitle>
             </CardHeader>
-            <CardContent className="h-80 flex items-center justify-center">
+            <CardContent className="flex items-center justify-center h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -142,11 +142,11 @@ export default function Dashboard() {
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+                  className="flex items-center justify-between p-4 transition-shadow duration-200 bg-white rounded-lg shadow-sm hover:shadow-md"
                 >
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center">
-                      <PackageIcon className="h-8 w-8 text-gray-500" />
+                    <div className="flex items-center justify-center w-16 h-16 bg-gray-200 rounded-md">
+                      <PackageIcon className="w-8 h-8 text-gray-500" />
                     </div>
                     <div>
                       <p className="font-semibold text-gray-800">iPhone 13</p>
@@ -191,13 +191,13 @@ function StatCard({
 }: StatCardProps) {
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         {icon}
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        <div className="flex items-center text-xs text-muted-foreground mt-2">
+        <div className="flex items-center mt-2 text-xs text-muted-foreground">
           <span>
             {subValue} {subLabel}
           </span>
@@ -205,9 +205,9 @@ function StatCard({
             className={`ml-2 flex items-center ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}
           >
             {change >= 0 ? (
-              <ArrowUpIcon className="h-4 w-4 mr-1" />
+              <ArrowUpIcon className="w-4 h-4 mr-1" />
             ) : (
-              <ArrowDownIcon className="h-4 w-4 mr-1" />
+              <ArrowDownIcon className="w-4 h-4 mr-1" />
             )}
             {Math.abs(change)}%
           </span>

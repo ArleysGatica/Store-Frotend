@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import './styles.scss';
 import { PanelRightOpen } from 'lucide-react';
 
 interface SidebarProps {
-  links: { name: string; path: string; icon?: string }[];
+  links: { name: string; path: string; icon?: React.ReactNode }[];
   className?: string;
 }
 
@@ -36,8 +36,8 @@ export const Sidebar = ({ links, className }: SidebarProps) => {
             className="flex items-center gap-2 text-lg font-medium text-black"
             to={link.path}
           >
-            <li className="flex items-center w-full h-10 gap-2 p-2 transition-colors duration-200 border-b rounded-sm border-border hover:bg-gray-200">
-              {link.icon && <span className="text-xl">{link.icon}</span>}
+            <li className="flex items-center w-full h-10 gap-2 p-2 transition-colors duration-200 border-b rounded-sm border-border hover:bg-gray-200 hover:text-blue-500">
+              {link.icon && link.icon}
               {link.name}
             </li>
           </Link>
@@ -46,14 +46,14 @@ export const Sidebar = ({ links, className }: SidebarProps) => {
       {isCollapsed && (
         <ul className="flex flex-col gap-2 p-2">
           {links.map((link) => (
-            <li
-              key={link.name}
-              className="flex items-center justify-center w-10 h-10"
-            >
-              <Link to={link.path} className="size-5">
+            <Link to={link.path} className="size-10">
+              <li
+                key={link.name}
+                className="flex items-center justify-center w-10 h-10 text-black hover:text-blue-500"
+              >
                 {link.icon}
-              </Link>
-            </li>
+              </li>
+            </Link>
           ))}
         </ul>
       )}
