@@ -7,7 +7,6 @@ import {
   CardDescription,
   CardContent,
 } from '@/components/ui/card';
-import { toast } from '@/components/hooks/use-toast';
 import { IProductoGroups, ITablaBranch } from '@/interfaces/branchInterfaces';
 import { store } from '@/app/store';
 import SearchAndFilter from './sear';
@@ -18,6 +17,7 @@ import { useAppSelector } from '@/app/hooks';
 import { getAllGroupsSlice } from '@/app/slices/groups';
 import { createProduct } from '@/app/slices/branchSlice';
 import { Boxes } from 'lucide-react';
+import { toast, Toaster } from 'sonner';
 
 export function Products() {
   const user = useAppSelector((state) => state.auth.signIn.user);
@@ -57,16 +57,17 @@ export function Products() {
   );
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
-  const handleAddProduct = (newProduct: ITablaBranch) => {
-    const product: ITablaBranch = {
-      ...newProduct,
-    };
-    store.dispatch(createProduct(product));
-    setProducts((prevProducts) => [...prevProducts, product]);
-    toast({
-      title: 'Product added',
-      description: `${product.nombre} has been added to the product list.`,
-    });
+  const handleAddProduct = async (newProduct: ITablaBranch) => {
+    try {
+      const product: ITablaBranch = {
+        ...newProduct,
+      };
+      await store.dispatch(createProduct(product)).unwrap();
+      setProducts((prevProducts) => [...prevProducts, product]);
+      toast.success(`Producto ${product.nombre} creado exitosamente`);
+    } catch (error) {
+      toast.error('Error al crear producto:' + error);
+    }
   };
 
   const GroupsAll = useAppSelector((state) => state.categories.groups);
@@ -104,53 +105,56 @@ export function Products() {
   }, [selectedGroup]);
 
   return (
-    <div className="flex flex-col w-full bg-muted/40">
-      <main className="flex-1 p-4 md:p-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <Boxes size={20} />
+    <>
+      <Toaster richColors position="bottom-right" />
+      <div className="flex flex-col w-full">
+        <main className="flex-1 p-4 md:p-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Boxes size={20} />
 
-              <CardTitle>Products</CardTitle>
-            </div>
+                <CardTitle>Products</CardTitle>
+              </div>
 
-            <CardDescription>Gestione sus productos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SearchAndFilter
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              filterStatus={filterStatus}
-              setFilterStatus={setFilterStatus}
-              onAddProduct={handleAddProduct}
-              sucursalId={user?.sucursalId?._id}
-              handleSelectChange={handleSelectChange}
-              selectedGroup={selectedGroup}
-              groups={GroupsAll}
-            />
-            {filteredProducts.length === 0 ? (
-              <span className="flex justify-center w-full text-sm text-center text-muted-foreground">
-                No hay productos en esta sucursal
-              </span>
-            ) : (
-              <ProductsTable
-                products={currentItems}
+              <CardDescription>Gestione sus productos</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SearchAndFilter
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                filterStatus={filterStatus}
+                setFilterStatus={setFilterStatus}
+                onAddProduct={handleAddProduct}
+                sucursalId={user?.sucursalId?._id}
+                handleSelectChange={handleSelectChange}
                 selectedGroup={selectedGroup}
                 groups={GroupsAll}
-                userRoles={userRoles}
-                handleSelectChange={handleSelectChange}
               />
-            )}
-          </CardContent>
-          <CardFooter className="flex items-center justify-between">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </CardFooter>
-        </Card>
-      </main>
-    </div>
+              {filteredProducts.length === 0 ? (
+                <span className="flex justify-center w-full text-sm text-center text-muted-foreground">
+                  No hay productos en esta sucursal
+                </span>
+              ) : (
+                <ProductsTable
+                  products={currentItems}
+                  selectedGroup={selectedGroup}
+                  groups={GroupsAll}
+                  userRoles={userRoles}
+                  handleSelectChange={handleSelectChange}
+                />
+              )}
+            </CardContent>
+            <CardFooter className="flex items-center justify-between">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </CardFooter>
+          </Card>
+        </main>
+      </div>
+    </>
   );
 }

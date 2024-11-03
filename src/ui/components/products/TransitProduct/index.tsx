@@ -90,7 +90,7 @@ export const ProductsTransit = () => {
   const totalPages = Math.ceil(filteredProducts?.length / itemsPerPage);
 
   return (
-    <div className="flex flex-col w-full bg-muted/40">
+    <div className="flex flex-col w-full">
       <main className="flex-1 p-4 md:p-6">
         <Card>
           <CardHeader>

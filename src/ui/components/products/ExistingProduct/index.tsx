@@ -21,6 +21,7 @@ import {
 } from '@/app/slices/branchSlice';
 import { InventarioSucursalWithPopulated } from '@/interfaces/transferInterfaces';
 import { Boxes } from 'lucide-react';
+import Pagination from '@/shared/components/ui/Pagination/Pagination';
 
 export function ProductFormExist() {
   const user = useAppSelector((state) => state.auth.signIn.user);
@@ -31,7 +32,7 @@ export function ProductFormExist() {
     'active',
     'draft',
   ]);
-  console.log(products, 'products');
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
   const userRoles = useAppSelector((state) => state.auth.signIn.user);
@@ -112,20 +113,8 @@ export function ProductFormExist() {
   );
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
-  const handleAddProduct = (newProduct: ITablaBranch) => {
-    const product: ITablaBranch = {
-      ...newProduct,
-    };
-    store.dispatch(createProduct(product));
-    setProducts((prevProducts) => [...prevProducts, product]);
-    toast({
-      title: 'Product added',
-      description: `${product.nombre} has been added to the product list.`,
-    });
-  };
-
   return (
-    <div className="flex flex-col w-full  bg-muted/40">
+    <div className="flex flex-col w-full">
       <main className="flex-1 p-4 md:p-6">
         <Card>
           <CardHeader>
@@ -136,18 +125,7 @@ export function ProductFormExist() {
             <CardDescription>Gestione sus productos</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* <SearchAndFilter
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              filterStatus={filterStatus}
-              setFilterStatus={setFilterStatus}
-              onAddProduct={handleAddProduct}
-              sucursalId={user?.sucursalId?._id}
-              handleSelectChange={handleSelectChange}
-              selectedGroup={selectedGroup}
-              groups={GroupsAll}
-            /> */}
-            {filteredProducts.length === 0 ? (
+            {currentItems.length === 0 ? (
               <span className="flex justify-center w-full text-sm text-center text-muted-foreground">
                 No hay productos en esta sucursal
               </span>
@@ -162,11 +140,11 @@ export function ProductFormExist() {
             )}
           </CardContent>
           <CardFooter className="flex items-center justify-between">
-            {/* <Pagination
+            <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
-            /> */}
+            />
           </CardFooter>
         </Card>
       </main>
