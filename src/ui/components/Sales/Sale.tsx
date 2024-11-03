@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { ProductSale } from './ProductSale';
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Popover,
   PopoverContent,
@@ -40,28 +40,15 @@ import {
   handleProductSaleAlerts,
 } from '@/shared/helpers/salesHelper';
 import { toast, Toaster } from 'sonner';
-
-export interface IProductSale {
-  productId: string;
-  groupId: string;
-  sucursalId: string;
-  productName: string;
-  quantity: number;
-  price: number;
-  discount: null | {
-    id: string;
-    name: string;
-    amount: number;
-    percentage: number;
-  };
-}
+import { IProductSale, ISale } from '@/interfaces/salesInterfaces';
 
 export interface ISaleProps {
+  userId: string;
   products: ITablaBranch[];
   setProducts: React.Dispatch<React.SetStateAction<ITablaBranch[]>>;
 }
 
-export const Sale = ({ products, setProducts }: ISaleProps) => {
+export const Sale = ({ products, setProducts, userId }: ISaleProps) => {
   const discounts = useAppSelector((state) => state.sales.branchDiscounts);
   const [procesingSale, setProcesingSale] = useState(false);
 
@@ -103,7 +90,7 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
       price: price,
       discount: null,
       groupId: selectedProduct?.grupoId ?? '',
-      sucursalId: selectedProduct?.sucursalId ?? '',
+      clientType: supplierMode ? 'Proveedor' : 'Regular',
     };
 
     const isExistentProduct = productSale.find(
@@ -117,7 +104,11 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
         newProductSale.quantity + isExistentProduct.quantity;
     }
 
-    const productWithDiscount = applyDiscounts(newProductSale, discounts);
+    const productWithDiscount = applyDiscounts(
+      selectedProduct?.sucursalId ?? '',
+      newProductSale,
+      discounts
+    );
 
     if (isExistentProduct) {
       const updatedProductSale = productSale.map((item) =>
@@ -166,17 +157,37 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
     setProducts(updatedProducts);
   };
 
-  const subTotal = productSale.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const totalDiscount = productSale.reduce(
-    (sum, item) => sum + (item.discount?.amount || 0),
-    0
-  );
-  const total = subTotal - totalDiscount;
+  const saleSummary = useMemo(() => {
+    if (productSale.length === 0)
+      return { subTotal: 0, totalDiscount: 0, total: 0 };
+
+    const subTotal = productSale.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    const totalDiscount = productSale.reduce(
+      (sum, item) => sum + (item.discount?.amount || 0),
+      0
+    );
+    const total = subTotal - totalDiscount;
+
+    return {
+      subTotal,
+      totalDiscount,
+      total,
+    };
+  }, [productSale]);
 
   const handleProccessSale = () => {
+    const newSale: ISale = {
+      userId: userId,
+      sucursalId: selectedProduct?.sucursalId ?? '',
+      products: productSale,
+      subtotal: saleSummary.subTotal,
+      total: saleSummary.total,
+      discount: saleSummary.totalDiscount,
+    };
+
     setProcesingSale(true);
     const examplePromiseSale = new Promise((resolve) => {
       setTimeout(() => {
@@ -190,6 +201,8 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
       success: 'Venta procesada exitosamente',
       error: 'Error al procesar la venta',
     });
+
+    console.log(newSale, 'newSale');
   };
 
   return (
@@ -325,9 +338,11 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
         />
       </CardContent>
       <CardFooter className="flex items-center justify-between">
-        <p>Subtotal: ${subTotal.toFixed(2)}</p>
-        <p className="text-green-600">Descuento: ${totalDiscount.toFixed(2)}</p>
-        <p className="font-bold">Total: ${total.toFixed(2)}</p>
+        <p>Subtotal: ${saleSummary.subTotal.toFixed(2)}</p>
+        <p className="text-green-600">
+          Descuento: ${saleSummary.totalDiscount.toFixed(2)}
+        </p>
+        <p className="font-bold">Total: ${saleSummary.total.toFixed(2)}</p>
         <Button
           disabled={productSale.length === 0 || procesingSale}
           onClick={handleProccessSale}

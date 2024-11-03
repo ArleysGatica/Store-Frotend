@@ -35,3 +35,28 @@ export interface IDescuento {
 }
 
 export type IDisccountType = 'porcentaje' | 'valor';
+
+export interface IProductSale {
+  productId: string;
+  groupId: string;
+  clientType: 'Regular' | 'Proveedor';
+  productName: string;
+  quantity: number;
+  price: number;
+  discount: null | {
+    id: string;
+    name: string;
+    type: 'producto' | 'grupo';
+    amount: number;
+    percentage: number;
+  };
+}
+
+export interface ISale {
+  userId: string;
+  sucursalId: string;
+  products: IProductSale[];
+  subtotal: number;
+  total: number;
+  discount: number;
+}
