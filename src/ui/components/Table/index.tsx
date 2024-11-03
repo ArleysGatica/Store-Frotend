@@ -18,6 +18,7 @@ import { useAppSelector } from '@/app/hooks';
 import { getAllGroupsSlice } from '@/app/slices/groups';
 import { GetBranches } from '@/shared/helpers/Branchs';
 import { createProduct } from '@/app/slices/branchSlice';
+import { Boxes } from 'lucide-react';
 
 export function DataTableDemo() {
   const { Id } = useParams<{ Id: string }>();
@@ -88,10 +89,11 @@ export function DataTableDemo() {
         <main className="flex-1 p-4 md:p-6">
           <Card>
             <CardHeader>
-              <CardTitle>Products</CardTitle>
-              <CardDescription>
-                Manage your products and view their sales performance.
-              </CardDescription>
+              <div className="flex items-center gap-3">
+                <Boxes size={20} />
+                <CardTitle>Products</CardTitle>
+              </div>
+              <CardDescription>Gestione sus productos</CardDescription>
             </CardHeader>
             <CardContent>
               <SearchAndFilter

@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/table';
 import { MapIndex } from './table';
 import { Loader } from '@/shared/components/ui/Loader';
+import { ListOrdered } from 'lucide-react';
 
 const orderStatusOptions = [
   { value: 'Todos', label: 'Ver Todos' },
@@ -105,14 +106,17 @@ export const BranchReceived = () => {
     <div className="container p-4 mx-auto space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Orders</CardTitle>
+          <div className="flex items-center gap-3">
+            <ListOrdered size={20} />
+            <CardTitle>Products</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between mb-4">
             <div className="flex space-x-2">
               <Select onValueChange={handleStatusChange}>
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Selecciona un estado" />
+                  <SelectValue placeholder="Estado" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>

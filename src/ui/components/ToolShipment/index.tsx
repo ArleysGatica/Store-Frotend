@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Boxes, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -11,7 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { TabsContent } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAppSelector } from '@/app/hooks';
 import { ConsolidatedShipment } from './consolidatedShipment';
 import { SummaryTools } from './summaryTools';
@@ -144,7 +144,12 @@ export default function ToolShipment() {
       <TabsContent value="send">
         <div className="branch__grid">
           <Card className="product__list">
-            <br />
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Boxes size={20} />
+                <CardTitle>Products</CardTitle>
+              </div>
+            </CardHeader>
             <CardContent>
               <div className="relative mb-4">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />

@@ -22,6 +22,7 @@ import {
 import { ITablaBranch } from '@/interfaces/branchInterfaces';
 import { GetBranches } from '@/shared/helpers/Branchs';
 import { fetchBranches } from '@/app/slices/branchSlice';
+import { Boxes } from 'lucide-react';
 
 export const ProductsTransit = () => {
   const dataAllProducts = useAppSelector(
@@ -93,7 +94,10 @@ export const ProductsTransit = () => {
       <main className="flex-1 p-4 md:p-6">
         <Card>
           <CardHeader>
-            <CardTitle>Products</CardTitle>
+            <div className="flex items-center gap-3">
+              <Boxes size={20} />
+              <CardTitle>Products</CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="flex justify-between mb-4">
