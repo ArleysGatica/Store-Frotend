@@ -129,17 +129,17 @@ export const Sale = ({ products, setProducts }: ISaleProps) => {
     }
 
     const updatedProducts = products.map((item) => {
-      const newStock = item.stock - productWithDiscount.quantity;
+      if (item.id === productWithDiscount.productId) {
+        const newStock = item.stock + quantity;
+        handleProductSaleAlerts(
+          item.nombre,
+          newStock,
+          selectedProduct?.puntoReCompra ?? 0
+        );
+        return { ...item, stock: newStock };
+      }
 
-      handleProductSaleAlerts(
-        item.nombre,
-        newStock,
-        selectedProduct?.puntoReCompra ?? 0
-      );
-
-      return item.id === productWithDiscount.productId
-        ? { ...item, stock: newStock }
-        : item;
+      return item;
     });
 
     setProducts(updatedProducts);
